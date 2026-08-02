@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "appTitle": "Dawaai",
+  "home": "Home",
+  "services": "Services",
+  "account": "Account",
+  "notifications": "Notifications",
+  "signOut": "Sign out"
+}

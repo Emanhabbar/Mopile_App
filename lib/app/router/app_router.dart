@@ -1,0 +1,422 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/constants/app_roles.dart';
+import '../../features/account/presentation/pages/account_profile_page.dart';
+import '../../features/account/presentation/pages/change_password_page.dart';
+import '../../features/admin/presentation/pages/admin_workspace_page.dart';
+import '../../features/auth/presentation/controllers/auth_controller.dart';
+import '../../features/auth/presentation/controllers/splash_controller.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/registration_success_page.dart';
+import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/auth/presentation/pages/splash_page.dart';
+import '../../features/chat/presentation/pages/chat_page.dart';
+import '../../features/chat/presentation/pages/chat_sessions_page.dart';
+import '../../features/dashboard/presentation/pages/home_shell.dart';
+import '../../features/donations/presentation/pages/donation_form_page.dart';
+import '../../features/donations/presentation/pages/donations_page.dart';
+import '../../features/donations/presentation/pages/pharmacy_donations_page.dart';
+import '../../features/medicines/presentation/pages/create_medicine_page.dart';
+import '../../features/medicines/presentation/pages/medicine_details_page.dart';
+import '../../features/medicines/presentation/pages/medicines_page.dart';
+import '../../features/intelligence/presentation/pages/intelligence_page.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/organization/presentation/pages/organization_workspace_page.dart';
+import '../../features/organization/presentation/pages/public_organization_details_page.dart';
+import '../../features/organization/presentation/pages/public_organizations_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_inventory_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_profile_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_request_details_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_requests_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_working_hours_page.dart';
+import '../../features/pharmacy_discovery/presentation/pages/external_pharmacy_details_page.dart';
+import '../../features/prescriptions/presentation/pages/pharmacy_prescription_orders_page.dart';
+import '../../features/prescriptions/presentation/pages/prescription_details_page.dart';
+import '../../features/prescriptions/presentation/pages/prescriptions_page.dart';
+import '../../features/supply_chain/presentation/pages/supply_chain_workspace_page.dart';
+import '../../features/settings/presentation/pages/settings_details_pages.dart';
+import '../../features/user/presentation/pages/health_profile_page.dart';
+import '../../features/user/presentation/pages/medicine_request_details_page.dart';
+import '../../features/user/presentation/pages/medicine_requests_page.dart';
+import '../../features/user/presentation/pages/medicine_search_page.dart';
+import '../../features/user/presentation/pages/nearby_pharmacies_page.dart';
+import '../../features/user/presentation/pages/pharmacy_details_page.dart';
+import '../../features/user/presentation/pages/search_history_page.dart';
+
+final _routerRefreshProvider = Provider<_RouterRefreshNotifier>((ref) {
+  final notifier = _RouterRefreshNotifier();
+  ref.listen(authControllerProvider, (_, _) => notifier.refresh());
+  ref.listen(splashCompletedProvider, (_, _) => notifier.refresh());
+  ref.onDispose(notifier.dispose);
+  return notifier;
+});
+
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final refreshNotifier = ref.watch(_routerRefreshProvider);
+  final router = GoRouter(
+    initialLocation: '/splash',
+    refreshListenable: refreshNotifier,
+    redirect: (context, state) {
+      final auth = ref.read(authControllerProvider);
+      final location = state.matchedLocation;
+      final splashCompleted = ref.read(splashCompletedProvider);
+
+      if (!splashCompleted || auth.isLoading) {
+        return location == '/splash' ? null : '/splash';
+      }
+
+      final isAuthenticated = auth.valueOrNull != null;
+      if (!isAuthenticated) {
+        final isPublicAuthPage =
+            location == '/login' ||
+            location == '/register' ||
+            location == '/forgot-password';
+        return isPublicAuthPage ? null : '/login';
+      }
+
+      final registrationCompleted = ref.read(registrationCompletedProvider);
+      if (location == '/register' && registrationCompleted) {
+        return '/registration-success';
+      }
+      if (location == '/registration-success') {
+        return registrationCompleted ? null : '/home';
+      }
+
+      if (location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password' ||
+          location == '/splash') {
+        return '/home';
+      }
+      if (location.startsWith('/user/') &&
+          auth.valueOrNull?.user.primaryRole != AppRole.user) {
+        return '/home';
+      }
+      if (location.startsWith('/pharmacy/') &&
+          auth.valueOrNull?.user.primaryRole != AppRole.pharmacy) {
+        return '/home';
+      }
+      if (location.startsWith('/organization/') &&
+          auth.valueOrNull?.user.primaryRole != AppRole.organization) {
+        return '/home';
+      }
+      if (location.startsWith('/admin/') &&
+          auth.valueOrNull?.user.primaryRole != AppRole.admin) {
+        return '/home';
+      }
+      if (location.startsWith('/supply-chain') &&
+          !{
+            AppRole.pharmacy,
+            AppRole.warehouse,
+            AppRole.representative,
+          }.contains(auth.valueOrNull?.user.primaryRole)) {
+        return '/home';
+      }
+      return null;
+    },
+    routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgot-password',
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: '/registration-success',
+        name: 'registration-success',
+        builder: (context, state) => const RegistrationSuccessPage(),
+      ),
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        builder: (context, state) => const HomeShell(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: '/intelligence',
+        name: 'intelligence',
+        builder: (context, state) => const IntelligencePage(),
+      ),
+      GoRoute(
+        path: '/account/profile',
+        name: 'account-profile',
+        builder: (context, state) => const AccountProfilePage(),
+      ),
+      GoRoute(
+        path: '/account/password',
+        name: 'account-password',
+        builder: (context, state) => const ChangePasswordPage(),
+      ),
+      GoRoute(
+        path: '/settings/appearance',
+        name: 'settings-appearance',
+        builder: (context, state) => const AppearanceSettingsPage(),
+      ),
+      GoRoute(
+        path: '/settings/notifications',
+        name: 'settings-notifications',
+        builder: (context, state) => const NotificationPreferencesPage(),
+      ),
+      GoRoute(
+        path: '/settings/permissions',
+        name: 'settings-permissions',
+        builder: (context, state) => const PermissionsSettingsPage(),
+      ),
+      GoRoute(
+        path: '/settings/privacy',
+        name: 'settings-privacy',
+        builder: (context, state) =>
+            const InformationPage(kind: InformationPageKind.privacy),
+      ),
+      GoRoute(
+        path: '/settings/terms',
+        name: 'settings-terms',
+        builder: (context, state) =>
+            const InformationPage(kind: InformationPageKind.terms),
+      ),
+      GoRoute(
+        path: '/settings/help',
+        name: 'settings-help',
+        builder: (context, state) =>
+            const InformationPage(kind: InformationPageKind.help),
+      ),
+      GoRoute(
+        path: '/settings/about',
+        name: 'settings-about',
+        builder: (context, state) =>
+            const InformationPage(kind: InformationPageKind.about),
+      ),
+      GoRoute(
+        path: '/medicines',
+        name: 'medicines',
+        builder: (context, state) => const MedicinesPage(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: 'medicine-create',
+            redirect: (context, state) =>
+                ref
+                        .read(authControllerProvider)
+                        .valueOrNull
+                        ?.user
+                        .primaryRole ==
+                    AppRole.admin
+                ? null
+                : '/medicines',
+            builder: (context, state) => const CreateMedicinePage(),
+          ),
+          GoRoute(
+            path: ':medicineId',
+            name: 'medicine-details',
+            builder: (context, state) => MedicineDetailsPage(
+              medicineId: state.pathParameters['medicineId']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/organizations',
+        name: 'public-organizations',
+        builder: (context, state) => const PublicOrganizationsPage(),
+        routes: [
+          GoRoute(
+            path: ':organizationId',
+            name: 'public-organization-details',
+            builder: (context, state) => PublicOrganizationDetailsPage(
+              organizationId: state.pathParameters['organizationId']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/pharmacies/external/:placeId',
+        name: 'external-pharmacy-details',
+        builder: (context, state) => ExternalPharmacyDetailsPage(
+          placeId: state.pathParameters['placeId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/user/health',
+        name: 'user-health',
+        builder: (context, state) => const HealthProfilePage(),
+      ),
+      GoRoute(
+        path: '/user/search',
+        name: 'user-medicine-search',
+        builder: (context, state) => MedicineSearchPage(
+          initialQuery: state.extra is String ? state.extra! as String : null,
+        ),
+      ),
+      GoRoute(
+        path: '/user/nearby-pharmacies',
+        name: 'user-nearby-pharmacies',
+        builder: (context, state) => const NearbyPharmaciesPage(),
+      ),
+      GoRoute(
+        path: '/user/pharmacies/:pharmacyId',
+        name: 'user-pharmacy-details',
+        builder: (context, state) => PharmacyDetailsPage(
+          pharmacyId: state.pathParameters['pharmacyId']!,
+          initialMedicineId: state.uri.queryParameters['medicine'],
+        ),
+      ),
+      GoRoute(
+        path: '/user/requests',
+        name: 'user-medicine-requests',
+        builder: (context, state) => const MedicineRequestsPage(),
+      ),
+      GoRoute(
+        path: '/user/requests/:requestId',
+        name: 'user-medicine-request-details',
+        builder: (context, state) => MedicineRequestDetailsPage(
+          requestId: state.pathParameters['requestId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/user/search-history',
+        name: 'user-search-history',
+        builder: (context, state) => const SearchHistoryPage(),
+      ),
+      GoRoute(
+        path: '/user/prescriptions',
+        name: 'user-prescriptions',
+        builder: (context, state) => const PrescriptionsPage(),
+        routes: [
+          GoRoute(
+            path: ':orderId',
+            name: 'user-prescription-details',
+            builder: (context, state) => PrescriptionDetailsPage(
+              orderId: state.pathParameters['orderId']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/user/donations',
+        name: 'user-donations',
+        builder: (context, state) => const DonationsPage(),
+        routes: [
+          GoRoute(
+            path: 'create-offer',
+            name: 'user-donation-offer-create',
+            builder: (context, state) =>
+                const DonationFormPage(mode: DonationFormMode.offer),
+          ),
+          GoRoute(
+            path: 'create-request',
+            name: 'user-assistance-request-create',
+            builder: (context, state) =>
+                const DonationFormPage(mode: DonationFormMode.assistance),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/user/chat',
+        name: 'user-chat-sessions',
+        builder: (context, state) => const ChatSessionsPage(),
+        routes: [
+          GoRoute(
+            path: ':sessionId',
+            name: 'user-chat',
+            builder: (context, state) =>
+                ChatPage(sessionId: state.pathParameters['sessionId']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/pharmacy/profile',
+        name: 'pharmacy-profile',
+        builder: (context, state) => const PharmacyProfilePage(),
+      ),
+      GoRoute(
+        path: '/pharmacy/working-hours',
+        name: 'pharmacy-working-hours',
+        builder: (context, state) => const PharmacyWorkingHoursPage(),
+      ),
+      GoRoute(
+        path: '/pharmacy/inventory',
+        name: 'pharmacy-inventory',
+        builder: (context, state) => const PharmacyInventoryPage(),
+      ),
+      GoRoute(
+        path: '/pharmacy/requests',
+        name: 'pharmacy-requests',
+        builder: (context, state) => const PharmacyRequestsPage(),
+      ),
+      GoRoute(
+        path: '/pharmacy/requests/:requestId',
+        name: 'pharmacy-request-details',
+        builder: (context, state) => PharmacyRequestDetailsPage(
+          requestId: state.pathParameters['requestId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/pharmacy/prescriptions',
+        name: 'pharmacy-prescriptions',
+        builder: (context, state) => const PharmacyPrescriptionOrdersPage(),
+      ),
+      GoRoute(
+        path: '/pharmacy/donations',
+        name: 'pharmacy-donations',
+        builder: (context, state) => const PharmacyDonationsPage(),
+      ),
+      GoRoute(
+        path: '/organization/workspace',
+        name: 'organization-workspace',
+        builder: (context, state) => OrganizationWorkspacePage(
+          initialSection: switch (state.uri.queryParameters['section']) {
+            'campaigns' => 1,
+            'donations' => 2,
+            'assistance' => 3,
+            'profile' => 4,
+            _ => 0,
+          },
+        ),
+      ),
+      GoRoute(
+        path: '/admin/workspace',
+        name: 'admin-workspace',
+        builder: (context, state) => AdminWorkspacePage(
+          initialSection: switch (state.uri.queryParameters['section']) {
+            'approvals' => 1,
+            'accounts' => 2,
+            'ticker' => 3,
+            _ => 0,
+          },
+        ),
+      ),
+      GoRoute(
+        path: '/supply-chain',
+        name: 'supply-chain',
+        builder: (context, state) => const SupplyChainWorkspacePage(),
+      ),
+    ],
+  );
+  ref.onDispose(router.dispose);
+  return router;
+});
+
+class _RouterRefreshNotifier extends ChangeNotifier {
+  void refresh() => notifyListeners();
+}

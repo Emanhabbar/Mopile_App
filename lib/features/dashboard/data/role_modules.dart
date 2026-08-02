@@ -1,0 +1,231 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/constants/app_roles.dart';
+import '../../../shared/models/feature_module.dart';
+
+List<FeatureModule> modulesForRole(AppRole role) {
+  return switch (role) {
+    AppRole.user => const [
+      FeatureModule(
+        title: 'البحث عن دواء',
+        description: 'ابحث في الصيدليات القريبة',
+        icon: Icons.medication_liquid_rounded,
+        color: Color(0xFF087F72),
+        routeName: 'medicine-search',
+      ),
+      FeatureModule(
+        title: 'الصيدليات القريبة',
+        description: 'اعرض الأقرب والمسار إليها',
+        icon: Icons.map_rounded,
+        color: Color(0xFF3977C4),
+        routeName: 'nearby-pharmacies',
+      ),
+      FeatureModule(
+        title: 'وصفاتي',
+        description: 'حلّل الوصفة وتابع الحجز',
+        icon: Icons.receipt_long_rounded,
+        color: Color(0xFF8A5AC2),
+        routeName: 'prescriptions',
+      ),
+      FeatureModule(
+        title: 'طلباتي',
+        description: 'تابع طلبات توفر الأدوية',
+        icon: Icons.inventory_2_rounded,
+        color: Color(0xFFE08A3E),
+        routeName: 'medicine-requests',
+      ),
+      FeatureModule(
+        title: 'ملفي الصحي',
+        description: 'بياناتك الصحية والبطاقة',
+        icon: Icons.health_and_safety_rounded,
+        color: Color(0xFFD14E62),
+        routeName: 'health-profile',
+      ),
+      FeatureModule(
+        title: 'التبرعات',
+        description: 'عروض الدواء وطلبات المساعدة',
+        icon: Icons.volunteer_activism_rounded,
+        color: Color(0xFFB77B21),
+        routeName: 'donations',
+      ),
+      FeatureModule(
+        title: 'المنظمات',
+        description: 'الحملات والمنظمات المعتمدة',
+        icon: Icons.apartment_rounded,
+        color: Color(0xFF4E6B8B),
+        routeName: 'organizations',
+      ),
+      FeatureModule(
+        title: 'المساعد الدوائي',
+        description: 'مساعدة سريعة ومعلومات موثوقة',
+        icon: Icons.chat_bubble_rounded,
+        color: Color(0xFF1A8E9B),
+        routeName: 'chat',
+      ),
+      FeatureModule(
+        title: 'البدائل الدوائية',
+        description: 'اعرض خيارات مشابهة ومعلومات المقارنة',
+        icon: Icons.compare_arrows_rounded,
+        color: Color(0xFF5C6BC0),
+        routeName: 'intelligence',
+      ),
+    ],
+    AppRole.pharmacy => const [
+      FeatureModule(
+        title: 'مخزون الأدوية',
+        description: 'الكميات والأسعار والتوفر',
+        icon: Icons.inventory_rounded,
+        color: Color(0xFF087F72),
+        routeName: 'pharmacy-inventory',
+      ),
+      FeatureModule(
+        title: 'طلبات المستخدمين',
+        description: 'راجع الطلبات وأرسل الرد',
+        icon: Icons.assignment_rounded,
+        color: Color(0xFF3977C4),
+        routeName: 'pharmacy-requests',
+      ),
+      FeatureModule(
+        title: 'طلبات الوصفات',
+        description: 'جهّز الحجوزات وتابع حالتها',
+        icon: Icons.receipt_long_rounded,
+        color: Color(0xFF8A5AC2),
+        routeName: 'pharmacy-prescriptions',
+      ),
+      FeatureModule(
+        title: 'موقع الصيدلية',
+        description: 'الموقع والبيانات العامة',
+        icon: Icons.location_on_rounded,
+        color: Color(0xFFE08A3E),
+        routeName: 'pharmacy-profile',
+      ),
+      FeatureModule(
+        title: 'ساعات العمل',
+        description: 'أوقات الدوام وحالة الفتح',
+        icon: Icons.schedule_rounded,
+        color: Color(0xFFD14E62),
+        routeName: 'working-hours',
+      ),
+      FeatureModule(
+        title: 'دليل الأدوية',
+        description: 'اختر الأدوية لإضافتها للمخزون',
+        icon: Icons.medication_rounded,
+        color: Color(0xFF4E6B8B),
+        routeName: 'medicine-catalog',
+      ),
+      FeatureModule(
+        title: 'التحقق من التبرعات',
+        description: 'فحص العبوات واعتماد استلامها',
+        icon: Icons.verified_outlined,
+        color: Color(0xFFB77B21),
+        routeName: 'pharmacy-donations',
+      ),
+      FeatureModule(
+        title: 'توريد الصيدلية',
+        description: 'المستودعات والطلبات واحتياج المخزون',
+        icon: Icons.local_shipping_outlined,
+        color: Color(0xFF1A8E9B),
+        routeName: 'supply-chain',
+      ),
+      FeatureModule(
+        title: 'تحليل المخزون',
+        description: 'بدائل الأدوية وتوقع الاحتياج القادم',
+        icon: Icons.auto_graph_rounded,
+        color: Color(0xFF5C6BC0),
+        routeName: 'intelligence',
+      ),
+    ],
+    AppRole.organization => const [
+      FeatureModule(
+        title: 'الحملات',
+        description: 'أنشئ الحملات وتابع حالتها',
+        icon: Icons.campaign_rounded,
+        color: Color(0xFF087F72),
+        routeName: 'campaigns',
+      ),
+      FeatureModule(
+        title: 'عروض التبرع',
+        description: 'راجع الأدوية المعروضة',
+        icon: Icons.volunteer_activism_rounded,
+        color: Color(0xFFE08A3E),
+        routeName: 'donation-offers',
+      ),
+      FeatureModule(
+        title: 'طلبات المساعدة',
+        description: 'تابع الطلبات وحدّث حالتها',
+        icon: Icons.support_agent_rounded,
+        color: Color(0xFF3977C4),
+        routeName: 'assistance-requests',
+      ),
+      FeatureModule(
+        title: 'ملف المنظمة',
+        description: 'البيانات ووثائق التحقق',
+        icon: Icons.verified_rounded,
+        color: Color(0xFF8A5AC2),
+        routeName: 'organization-profile',
+      ),
+    ],
+    AppRole.admin => const [
+      FeatureModule(
+        title: 'الموافقات',
+        description: 'الصيدليات والمنظمات المعلقة',
+        icon: Icons.fact_check_rounded,
+        color: Color(0xFF087F72),
+        routeName: 'approvals',
+      ),
+      FeatureModule(
+        title: 'الحسابات',
+        description: 'عرض الحسابات وإدارة حالتها',
+        icon: Icons.manage_accounts_rounded,
+        color: Color(0xFF3977C4),
+        routeName: 'accounts',
+      ),
+      FeatureModule(
+        title: 'شريط الإعلانات',
+        description: 'الإعلانات والصيدليات المناوبة',
+        icon: Icons.campaign_rounded,
+        color: Color(0xFFE08A3E),
+        routeName: 'home-ticker',
+      ),
+      FeatureModule(
+        title: 'دليل الأدوية',
+        description: 'إدارة بيانات الأدوية',
+        icon: Icons.medication_rounded,
+        color: Color(0xFF8A5AC2),
+        routeName: 'medicine-catalog',
+      ),
+      FeatureModule(
+        title: 'خدمات التحليل',
+        description: 'اختبار البدائل وتوقع نفاد المخزون',
+        icon: Icons.psychology_alt_outlined,
+        color: Color(0xFF5C6BC0),
+        routeName: 'intelligence',
+      ),
+    ],
+    AppRole.warehouse => const [
+      FeatureModule(
+        title: 'إدارة المستودع',
+        description: 'المخزون والطلبات والشحنات والفواتير',
+        icon: Icons.warehouse_rounded,
+        color: Color(0xFF087F72),
+        routeName: 'supply-chain',
+      ),
+      FeatureModule(
+        title: 'تحليل المخزون',
+        description: 'توقع النفاد وتخطيط إعادة الطلب',
+        icon: Icons.auto_graph_rounded,
+        color: Color(0xFF5C6BC0),
+        routeName: 'intelligence',
+      ),
+    ],
+    AppRole.representative => const [
+      FeatureModule(
+        title: 'مهام التوصيل',
+        description: 'تابع الشحنات المسندة وحدّث حالتها',
+        icon: Icons.delivery_dining_rounded,
+        color: Color(0xFF3977C4),
+        routeName: 'supply-chain',
+      ),
+    ],
+  };
+}
