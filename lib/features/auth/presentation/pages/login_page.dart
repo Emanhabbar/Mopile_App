@@ -37,8 +37,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
   static const Color _textPrimary = Color(0xFF153F45);
   static const Color _textSecondary = Color(0xFF7C9397);
 
-  static const String _fontFamily = 'IBM Plex Sans Arabic';
-
   static const String _logoPath =
       'assets/brand/dawaai-icon-foreground.png';
 
@@ -108,44 +106,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
             : 'تعذر تسجيل الدخول. تحقق من البيانات وحاول مجددًا.'
         : null;
 
-    final baseTheme = Theme.of(context);
-
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Theme(
-        data: baseTheme.copyWith(
-          textTheme: baseTheme.textTheme.apply(
-            fontFamily: _fontFamily,
-          ),
-          primaryTextTheme: baseTheme.primaryTextTheme.apply(
-            fontFamily: _fontFamily,
-          ),
-          inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
-            labelStyle: const TextStyle(
-              fontFamily: _fontFamily,
-            ),
-            hintStyle: const TextStyle(
-              fontFamily: _fontFamily,
-            ),
-            errorStyle: const TextStyle(
-              fontFamily: _fontFamily,
-            ),
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              textStyle: const TextStyle(
-                fontFamily: _fontFamily,
-              ),
-            ),
-          ),
-          filledButtonTheme: FilledButtonThemeData(
-            style: FilledButton.styleFrom(
-              textStyle: const TextStyle(
-                fontFamily: _fontFamily,
-              ),
-            ),
-          ),
-        ),
+        data: Theme.of(context),
         child: Scaffold(
         backgroundColor: _background,
         resizeToAvoidBottomInset: true,
