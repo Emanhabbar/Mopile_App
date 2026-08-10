@@ -18,7 +18,7 @@ abstract final class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
-      fontFamily: 'Tajawal',
+      fontFamily: 'IBM Plex Sans Arabic',
       fontFamilyFallback: const [
         'Noto Sans Arabic',
         'Segoe UI',
@@ -294,6 +294,13 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorSchemeSeed: AppColors.primary,
+      fontFamily: 'IBM Plex Sans Arabic',
+      fontFamilyFallback: const [
+        'Noto Sans Arabic',
+        'Segoe UI',
+        'Arial',
+        'sans-serif',
+      ],
     );
   }
 }

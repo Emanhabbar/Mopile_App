@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/localization/locale_controller.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
-import '../../../../core/widgets/app_reveal.dart';
-import '../../../../core/widgets/app_text_field.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -16,26 +13,86 @@ class LoginPage extends ConsumerStatefulWidget {
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+
   bool _obscurePassword = true;
+
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  static const Color _primary = Color(0xFF076A73);
+  static const Color _background = Color(0xFFF4F9F9);
+  static const Color _surface = Color(0xFFFFFFFF);
+  static const Color _fieldBackground = Color(0xFFFFFFFF);
+  static const Color _border = Color(0xFFD4E2E4);
+  static const Color _textPrimary = Color(0xFF153F45);
+  static const Color _textSecondary = Color(0xFF7C9397);
+
+  static const String _fontFamily = 'IBM Plex Sans Arabic';
+
+  static const String _logoPath =
+      'assets/brand/dawaai-icon-foreground.png';
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 550),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.025),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
+    _animationController.dispose();
+
     _emailController.dispose();
     _passwordController.dispose();
+
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+
     super.dispose();
   }
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    await ref
-        .read(authControllerProvider.notifier)
-        .login(
-          email: _emailController.text,
+
+    final isValid = _formKey.currentState?.validate() ?? false;
+
+    if (!isValid) {
+      return;
+    }
+
+    await ref.read(authControllerProvider.notifier).login(
+          email: _emailController.text.trim(),
           password: _passwordController.text,
         );
   }
@@ -43,389 +100,620 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
-    final locale = ref.watch(localeControllerProvider);
-    final isArabic = locale.languageCode == 'ar';
-    final error = authState.hasError
+    final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
+
+    final String? error = authState.hasError
         ? authState.error is ApiException
-              ? (authState.error! as ApiException).message
-              : isArabic
-              ? 'تعذر تسجيل الدخول. حاول مجددًا.'
-              : 'Unable to sign in. Please try again.'
+            ? (authState.error! as ApiException).message
+            : 'تعذر تسجيل الدخول. تحقق من البيانات وحاول مجددًا.'
         : null;
 
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Stack(
-              children: [
-                const Positioned.fill(child: _PageBackground()),
-                Column(
-                  children: [
-                    const SizedBox(height: 266),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 470),
-                          child: AppReveal(
-                            delay: const Duration(milliseconds: 90),
-                            child: _LoginCard(
-                              formKey: _formKey,
-                              emailController: _emailController,
-                              passwordController: _passwordController,
-                              obscurePassword: _obscurePassword,
-                              isArabic: isArabic,
-                              isLoading: authState.isLoading,
-                              error: error,
-                              onTogglePassword: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
+    final baseTheme = Theme.of(context);
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Theme(
+        data: baseTheme.copyWith(
+          textTheme: baseTheme.textTheme.apply(
+            fontFamily: _fontFamily,
+          ),
+          primaryTextTheme: baseTheme.primaryTextTheme.apply(
+            fontFamily: _fontFamily,
+          ),
+          inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
+            labelStyle: const TextStyle(
+              fontFamily: _fontFamily,
+            ),
+            hintStyle: const TextStyle(
+              fontFamily: _fontFamily,
+            ),
+            errorStyle: const TextStyle(
+              fontFamily: _fontFamily,
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              textStyle: const TextStyle(
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              textStyle: const TextStyle(
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+        ),
+        child: Scaffold(
+        backgroundColor: _background,
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _LoginHeader(
+                imagePath: _logoPath,
+                onBack: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/');
+                  }
+                },
+              ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        14,
+                        keyboardVisible ? 16 : 28,
+                        14,
+                        keyboardVisible ? 22 : 28,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight - 56,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 520),
+                            child: FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: SlideTransition(
+                                position: _slideAnimation,
+                                child: Form(
+                                  key: _formKey,
+                                  child: AutofillGroup(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        const SizedBox(height: 24),
+                                        _LoginFormCard(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        _FieldLabel(
+                                          text: 'البريد الإلكتروني',
+                                        ),
+                                        const SizedBox(height: 10),
+                                        _LoginTextField(
+                                          controller: _emailController,
+                                          focusNode: _emailFocusNode,
+                                          hintText: 'name@example.com',
+                                          leadingIcon:
+                                              Icons.mail_outline_rounded,
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                          textInputAction:
+                                              TextInputAction.next,
+                                          autofillHints: const [
+                                            AutofillHints.email,
+                                          ],
+                                          onSubmitted: (_) {
+                                            _passwordFocusNode.requestFocus();
+                                          },
+                                          validator: (value) {
+                                            final email =
+                                                value?.trim() ?? '';
+
+                                            final isValidEmail = RegExp(
+                                              r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                                            ).hasMatch(email);
+
+                                            if (!isValidEmail) {
+                                              return 'أدخل بريدًا إلكترونيًا صحيحًا.';
+                                            }
+
+                                            return null;
+                                          },
+                                        ),
+                                        const SizedBox(height: 16),
+                                        _FieldLabel(
+                                          text: 'كلمة المرور',
+                                        ),
+                                        const SizedBox(height: 10),
+                                        _LoginTextField(
+                                          controller: _passwordController,
+                                          focusNode: _passwordFocusNode,
+                                          hintText: '••••••••',
+                                          leadingIcon:
+                                              Icons.lock_outline_rounded,
+                                          obscureText: _obscurePassword,
+                                          textInputAction:
+                                              TextInputAction.done,
+                                          autofillHints: const [
+                                            AutofillHints.password,
+                                          ],
+                                          onSubmitted: (_) => _submit(),
+                                          trailing: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscurePassword =
+                                                    !_obscurePassword;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              _obscurePassword
+                                                  ? Icons.visibility_outlined
+                                                  : Icons
+                                                      .visibility_off_outlined,
+                                              color: _textSecondary,
+                                              size: 25,
+                                            ),
+                                            tooltip: _obscurePassword
+                                                ? 'إظهار كلمة المرور'
+                                                : 'إخفاء كلمة المرور',
+                                          ),
+                                          validator: (value) {
+                                            if ((value ?? '').isEmpty) {
+                                              return 'أدخل كلمة المرور.';
+                                            }
+
+                                            return null;
+                                          },
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: TextButton(
+                                            onPressed: authState.isLoading
+                                                ? null
+                                                : () {
+                                                    context.push(
+                                                      '/forgot-password',
+                                                    );
+                                                  },
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: _primary,
+                                              minimumSize: Size.zero,
+                                              tapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 2,
+                                                vertical: 13,
+                                              ),
+                                              textStyle: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'نسيت كلمة المرور؟',
+                                            ),
+                                          ),
+                                        ),
+                                        if (error != null) ...[
+                                          const SizedBox(height: 11),
+                                          _ErrorMessage(message: error),
+                                        ],
+                                        const SizedBox(height: 20),
+                                        _LoginButton(
+                                                                    isLoading: authState.isLoading,
+                                          onPressed: _submit,
+                                        ),
+
+                                        const SizedBox(height: 14),
+
+                                        Divider(
+                                          height: 1,
+                                          thickness: 0.8,
+                                          color: _border.withValues(alpha: 0.75),
+                                        ),
+
+                                        const SizedBox(height: 18),
+
+                                        _CreateAccountSection(
+                                                                    disabled: authState.isLoading,
+                                          onPressed: () {
+                                            ref
+                                                .read(
+                                                  authControllerProvider
+                                                      .notifier,
+                                                )
+                                                .clearError();
+
+                                            context.go('/register');
+                                          },
+                                        ),
+
+                                        const SizedBox(height: 14),
+
+                                        const _TermsText(),
+                                      ],
+                                    ),
+                                  ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                              onSubmit: _submit,
-                              onForgotPassword: () =>
-                                  context.push('/forgot-password'),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 17),
-                    _CreateAccountPrompt(
-                      isArabic: isArabic,
-                      disabled: authState.isLoading,
-                      onPressed: () {
-                        ref.read(authControllerProvider.notifier).clearError();
-                        context.go('/register');
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 26),
-                      child: Text(
-                        isArabic
-                            ? 'دواؤك واحتياجاتك الصحية في مكان واحد.'
-                            : 'Your medicine and health needs, all in one place.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-                  ],
-                ),
-                PositionedDirectional(
-                  top: 0,
-                  start: 0,
-                  end: 0,
-                  child: _LoginHero(
-                    isArabic: isArabic,
-                    onToggleLanguage: () =>
-                        ref.read(localeControllerProvider.notifier).toggle(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LoginHero extends StatelessWidget {
-  const _LoginHero({required this.isArabic, required this.onToggleLanguage});
-
-  final bool isArabic;
-  final VoidCallback onToggleLanguage;
-
-  @override
-  Widget build(BuildContext context) {
-    final topPadding = MediaQuery.paddingOf(context).top;
-    return SizedBox(
-      height: 326,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned.fill(
-            child: ClipPath(
-              clipper: const _OrganicHeaderClipper(),
-              child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [AppColors.primaryDeep, AppColors.primaryDark],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          PositionedDirectional(
-            top: -48,
-            end: -36,
-            child: _GlowCircle(
-              size: 190,
-              color: AppColors.primary.withValues(alpha: 0.5),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: 8,
-            start: -72,
-            child: _GlowCircle(
-              size: 168,
-              color: AppColors.primaryLight.withValues(alpha: 0.08),
-            ),
-          ),
-          PositionedDirectional(
-            top: topPadding + 10,
-            end: 18,
-            child: TextButton.icon(
-              onPressed: onToggleLanguage,
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 13,
-                  vertical: 9,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
-                ),
-              ),
-              icon: const Icon(Icons.language_rounded, size: 18),
-              label: Text(isArabic ? 'English' : 'العربية'),
-            ),
-          ),
-          PositionedDirectional(
-            top: topPadding + 62,
-            start: 24,
-            end: 24,
-            child: AppReveal(
-              child: Column(
-                children: [
-                  Container(
-                    width: 82,
-                    height: 82,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [AppColors.primary, AppColors.primaryDeep],
-                      ),
-                      borderRadius: BorderRadius.circular(27),
-                      border: Border.all(color: AppColors.secondary, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 24,
-                          offset: const Offset(0, 12),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.asset(
-                      'assets/brand/dawaai-icon-foreground.png',
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
-                      cacheWidth: 180,
-                    ),
-                  ),
-                  const SizedBox(height: 13),
-                  Text(
-                    'دوائي',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    isArabic
-                        ? 'رعاية دوائية أقرب إليك'
-                        : 'Medicine care, closer to you',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.72),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoginCard extends StatelessWidget {
-  const _LoginCard({
-    required this.formKey,
-    required this.emailController,
-    required this.passwordController,
-    required this.obscurePassword,
-    required this.isArabic,
-    required this.isLoading,
-    required this.onTogglePassword,
-    required this.onSubmit,
-    required this.onForgotPassword,
-    this.error,
-  });
-
-  final GlobalKey<FormState> formKey;
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final bool obscurePassword;
-  final bool isArabic;
-  final bool isLoading;
-  final String? error;
-  final VoidCallback onTogglePassword;
-  final VoidCallback onSubmit;
-  final VoidCallback onForgotPassword;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(22, 25, 22, 22),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.12),
-            blurRadius: 38,
-            offset: const Offset(0, 18),
-          ),
-        ],
-      ),
-      child: AutofillGroup(
-        child: Form(
-          key: formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                isArabic ? 'مرحبًا بعودتك' : 'Welcome back',
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineSmall?.copyWith(fontSize: 25),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                isArabic
-                    ? 'سجّل دخولك للوصول إلى خدماتك ومتابعة احتياجاتك.'
-                    : 'Sign in to access your services and keep track of your needs.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 24),
-              AppTextField(
-                label: isArabic ? 'البريد الإلكتروني' : 'Email address',
-                hint: 'name@example.com',
-                controller: emailController,
-                icon: Icons.mail_outline_rounded,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.email],
-                validator: (value) {
-                  final email = value?.trim() ?? '';
-                  if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
-                    return isArabic
-                        ? 'أدخل بريدًا إلكترونيًا صحيحًا.'
-                        : 'Enter a valid email address.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 17),
-              AppTextField(
-                label: isArabic ? 'كلمة المرور' : 'Password',
-                controller: passwordController,
-                icon: Icons.lock_outline_rounded,
-                obscureText: obscurePassword,
-                textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.password],
-                onSubmitted: (_) => onSubmit(),
-                suffixIcon: IconButton(
-                  onPressed: onTogglePassword,
-                  icon: Icon(
-                    obscurePassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                  ),
-                  tooltip: isArabic
-                      ? obscurePassword
-                            ? 'إظهار كلمة المرور'
-                            : 'إخفاء كلمة المرور'
-                      : obscurePassword
-                      ? 'Show password'
-                      : 'Hide password',
-                ),
-                validator: (value) {
-                  if ((value ?? '').isEmpty) {
-                    return isArabic
-                        ? 'أدخل كلمة المرور.'
-                        : 'Enter your password.';
-                  }
-                  return null;
-                },
-              ),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: TextButton(
-                  onPressed: isLoading ? null : onForgotPassword,
-                  child: Text(
-                    isArabic ? 'نسيت كلمة المرور؟' : 'Forgot password?',
-                  ),
-                ),
-              ),
-              if (error != null) ...[
-                const SizedBox(height: 15),
-                _LoginError(message: error!),
-              ],
-              const SizedBox(height: 23),
-              FilledButton.icon(
-                onPressed: isLoading ? null : onSubmit,
-                icon: isLoading
-                    ? const SizedBox.square(
-                        dimension: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.4,
-                        ),
-                      )
-                    : const Icon(Icons.login_rounded),
-                label: Text(
-                  isLoading
-                      ? isArabic
-                            ? 'جاري الدخول...'
-                            : 'Signing in...'
-                      : isArabic
-                      ? 'تسجيل الدخول'
-                      : 'Sign in',
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
       ),
+      ),
     );
   }
 }
 
-class _CreateAccountPrompt extends StatelessWidget {
-  const _CreateAccountPrompt({
-    required this.isArabic,
+class _LoginHeader extends StatelessWidget {
+  const _LoginHeader({
+    required this.imagePath,
+    required this.onBack,
+  });
+
+  final String imagePath;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(
+        minHeight: 95,
+      ),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
+      decoration: BoxDecoration(
+        color: _LoginPageState._surface,
+        border: Border(
+          bottom: BorderSide(
+            color: _LoginPageState._border.withValues(alpha: 0.75),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: _LoginPageState._primary.withValues(alpha: 0.035),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            right: 0,
+            child: Material(
+              color: _LoginPageState._background,
+              borderRadius: BorderRadius.circular(14),
+              child: InkWell(
+                onTap: onBack,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: _LoginPageState._border,
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: _LoginPageState._textPrimary,
+                    size: 25,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            child: SizedBox(
+              width: 60,
+              height: 48,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (_, __, ___) {
+                  return const Icon(
+                    Icons.local_pharmacy_rounded,
+                    color: _LoginPageState._primary,
+                    size: 42,
+                  );
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 64),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'تسجيل الدخول',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _LoginPageState._textPrimary,
+                    fontSize: 24,
+                    height: 1.2,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                const Text(
+                  'أدخل بيانات حسابك للوصول إلى خدماتك.',
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: _LoginPageState._textSecondary,
+                    fontSize: 12,
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoginFormCard extends StatelessWidget {
+  const _LoginFormCard({
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: child,
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel({
+    required this.text,
+  });
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: TextAlign.start,
+      style: const TextStyle(
+        color: _LoginPageState._textPrimary,
+        fontSize: 14,
+        height: 1.3,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+  }
+}
+
+class _LoginTextField extends StatelessWidget {
+  const _LoginTextField({
+    required this.controller,
+    required this.focusNode,
+    required this.hintText,
+    required this.leadingIcon,
+    this.keyboardType,
+    this.textInputAction,
+    this.autofillHints,
+    this.obscureText = false,
+    this.trailing,
+    this.validator,
+    this.onSubmitted,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final String hintText;
+  final IconData leadingIcon;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final Iterable<String>? autofillHints;
+  final bool obscureText;
+  final Widget? trailing;
+  final String? Function(String?)? validator;
+  final ValueChanged<String>? onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      autofillHints: autofillHints,
+      obscureText: obscureText,
+      validator: validator,
+      onFieldSubmitted: onSubmitted,
+      cursorColor: _LoginPageState._primary,
+      cursorWidth: 1.4,
+      style: const TextStyle(
+        color: _LoginPageState._textPrimary,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(
+          color: _LoginPageState._textSecondary,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+        prefixIcon: Icon(
+          leadingIcon,
+          color: _LoginPageState._primary.withValues(alpha: 0.82),
+          size: 25,
+        ),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 58,
+          minHeight: 62,
+        ),
+        suffixIcon: trailing,
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: 58,
+          minHeight: 62,
+        ),
+        filled: true,
+        fillColor: _LoginPageState._fieldBackground,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
+        errorStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: BorderSide(
+            color: _LoginPageState._border.withValues(alpha: 0.78),
+            width: 0.9,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: BorderSide(
+            color: _LoginPageState._primary.withValues(alpha: 0.34),
+            width: 1.05,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: BorderSide(
+            color: AppColors.danger.withValues(alpha: 0.55),
+            width: 0.95,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: BorderSide(
+            color: AppColors.danger.withValues(alpha: 0.68),
+            width: 1.1,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(17),
+          borderSide: BorderSide(
+            color: _LoginPageState._border.withValues(alpha: 0.45),
+            width: 0.8,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginButton extends StatelessWidget {
+  const _LoginButton({
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 60,
+      child: FilledButton(
+        onPressed: isLoading ? null : onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: _LoginPageState._primary,
+          disabledBackgroundColor:
+              _LoginPageState._primary.withValues(alpha: 0.55),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(17),
+          ),
+        ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          child: isLoading
+              ? const SizedBox.square(
+                  key: ValueKey('loading'),
+                  dimension: 23,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
+                )
+              : SizedBox(
+                  key: const ValueKey('content'),
+                  width: double.infinity,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text(
+                        'تسجيل الدخول',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CreateAccountSection extends StatelessWidget {
+  const _CreateAccountSection({
     required this.disabled,
     required this.onPressed,
   });
 
-  final bool isArabic;
   final bool disabled;
   final VoidCallback onPressed;
 
@@ -434,49 +722,120 @@ class _CreateAccountPrompt extends StatelessWidget {
     return Wrap(
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 2,
+      spacing: 4,
+      runSpacing: 4,
       children: [
         Text(
-          isArabic ? 'ليس لديك حساب؟' : 'New to Dawaai?',
-          style: Theme.of(context).textTheme.bodyMedium,
+          'ليس لديك حساب بعد؟',
+          style: const TextStyle(
+            color: _LoginPageState._textSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         TextButton(
           onPressed: disabled ? null : onPressed,
-          child: Text(isArabic ? 'إنشاء حساب جديد' : 'Create account'),
+          style: TextButton.styleFrom(
+            foregroundColor: _LoginPageState._primary,
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            overlayColor: _LoginPageState._primary.withOpacity(0.06),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 6,
+              vertical: 4,
+            ),
+          ),
+          child: Text(
+            'إنشاء حساب',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ),
       ],
     );
   }
 }
 
-class _LoginError extends StatelessWidget {
-  const _LoginError({required this.message});
+class _TermsText extends StatelessWidget {
+  const _TermsText();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: 'بالمتابعة، أنت توافق على ',
+          ),
+          TextSpan(
+            text: 'شروط الاستخدام',
+            style: TextStyle(
+              color: _LoginPageState._primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          TextSpan(text: ' و'),
+          TextSpan(
+            text: 'سياسة الخصوصية',
+            style: TextStyle(
+              color: _LoginPageState._primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          TextSpan(text: '.'),
+        ],
+      ),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: _LoginPageState._textSecondary,
+        fontSize: 11.5,
+        height: 1.65,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+}
+
+class _ErrorMessage extends StatelessWidget {
+  const _ErrorMessage({
+    required this.message,
+  });
 
   final String message;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(13),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.danger.withValues(alpha: 0.07),
+        color: AppColors.danger.withValues(alpha: 0.055),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: AppColors.danger.withValues(alpha: 0.14)),
+        border: Border.all(
+          color: AppColors.danger.withValues(alpha: 0.13),
+          width: 0.9,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline_rounded,
-            color: AppColors.danger,
-            size: 20,
+            color: AppColors.danger.withValues(alpha: 0.88),
+            size: 23,
           ),
-          const SizedBox(width: 9),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
-                color: AppColors.danger,
+              style: TextStyle(
+                color: AppColors.danger.withValues(alpha: 0.92),
+                fontSize: 13,
+                height: 1.45,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -485,80 +844,4 @@ class _LoginError extends StatelessWidget {
       ),
     );
   }
-}
-
-class _PageBackground extends StatelessWidget {
-  const _PageBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(color: AppColors.background),
-      child: Stack(
-        children: [
-          PositionedDirectional(
-            bottom: 55,
-            start: -75,
-            child: _GlowCircle(
-              size: 175,
-              color: AppColors.primaryLight.withValues(alpha: 0.1),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: -50,
-            end: -60,
-            child: _GlowCircle(
-              size: 155,
-              color: AppColors.secondary.withValues(alpha: 0.11),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GlowCircle extends StatelessWidget {
-  const _GlowCircle({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-  );
-}
-
-class _OrganicHeaderClipper extends CustomClipper<Path> {
-  const _OrganicHeaderClipper();
-
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..lineTo(0, size.height - 42)
-      ..cubicTo(
-        size.width * 0.18,
-        size.height - 6,
-        size.width * 0.34,
-        size.height - 76,
-        size.width * 0.56,
-        size.height - 48,
-      )
-      ..cubicTo(
-        size.width * 0.78,
-        size.height - 20,
-        size.width * 0.87,
-        size.height - 3,
-        size.width,
-        size.height - 34,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

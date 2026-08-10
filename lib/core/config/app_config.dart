@@ -3,7 +3,7 @@ abstract final class AppConfig {
 
   static const _configuredApiUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:5030/api/',
+    defaultValue: 'http://localhost:5030/api/',
   );
 
   static String get apiBaseUrl {
