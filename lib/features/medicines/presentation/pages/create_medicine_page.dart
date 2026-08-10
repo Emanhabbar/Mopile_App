@@ -265,7 +265,7 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
           content: Text(
             error is ApiException ? error.message : 'تعذر إضافة الدواء حاليًا.',
           ),
-          backgroundColor: AppColors.danger,
+          backgroundColor: context.appColors.danger,
         ),
       );
     } finally {
@@ -281,14 +281,14 @@ class _Intro extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
-      color: AppColors.primary.withValues(alpha: 0.07),
+      color: context.appColors.primary.withValues(alpha: 0.07),
       borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: AppColors.primary.withValues(alpha: 0.13)),
+      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.13)),
     ),
-    child: const Row(
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.library_add_rounded, color: AppColors.primary),
+        Icon(Icons.library_add_rounded, color: context.appColors.primary),
         SizedBox(width: 11),
         Expanded(
           child: Text(
@@ -309,7 +309,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, color: AppColors.primary, size: 21),
+      Icon(icon, color: context.appColors.primary, size: 21),
       const SizedBox(width: 8),
       Text(title, style: Theme.of(context).textTheme.titleLarge),
     ],
@@ -327,9 +327,9 @@ class _PrescriptionSwitch extends StatelessWidget {
     child: SwitchListTile(
       value: value,
       onChanged: onChanged,
-      secondary: const Icon(
+      secondary: Icon(
         Icons.receipt_long_outlined,
-        color: AppColors.primary,
+        color: context.appColors.primary,
       ),
       title: const Text('يتطلب وصفة طبية'),
       subtitle: const Text('فعّل الخيار إذا كان صرف الدواء يحتاج وصفة'),

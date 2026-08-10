@@ -407,12 +407,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               ],
             ),
           ),
-          bottom: const PreferredSize(
+          bottom: PreferredSize(
             preferredSize: Size.fromHeight(1),
             child: Divider(
               height: 1,
               thickness: 1,
-              color: AppColors.border,
+              color: context.appColors.border,
             ),
           ),
         ),
@@ -924,17 +924,17 @@ class _BusinessStep extends StatelessWidget {
 
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceSoft,
+                      color: context.appColors.surfaceSoft,
                       borderRadius:
                           BorderRadius.circular(16),
                       border: Border.all(
-                        color: AppColors.border,
+                        color: context.appColors.border,
                       ),
                     ),
                     child: SwitchListTile(
                       value: hasDeliveryService,
                       onChanged: onDeliveryChanged,
-                      activeColor: AppColors.primary,
+                      activeColor: context.appColors.primary,
                       secondary: const Icon(
                         Icons.delivery_dining_rounded,
                         color: Color(0xFF076A73),
@@ -1035,8 +1035,8 @@ class _BusinessStep extends StatelessWidget {
                           AlignmentDirectional.centerStart,
                       child: Text(
                         coordinateError!,
-                        style: const TextStyle(
-                          color: AppColors.danger,
+                        style: TextStyle(
+                          color: context.appColors.danger,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1523,14 +1523,14 @@ class AppTextField extends StatelessWidget {
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(17),
               borderSide: BorderSide(
-                color: AppColors.danger.withValues(alpha: 0.55),
+                color: context.appColors.danger.withValues(alpha: 0.55),
                 width: 0.95,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(17),
               borderSide: BorderSide(
-                color: AppColors.danger.withValues(alpha: 0.68),
+                color: context.appColors.danger.withValues(alpha: 0.68),
                 width: 1.05,
               ),
             ),
@@ -1557,16 +1557,16 @@ class _InlineError extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.danger.withValues(
+        color: context.appColors.danger.withValues(
           alpha: 0.08,
         ),
         borderRadius: BorderRadius.circular(13),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline_rounded,
-            color: AppColors.danger,
+            color: context.appColors.danger,
             size: 20,
           ),
 
@@ -1575,8 +1575,8 @@ class _InlineError extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
-                color: AppColors.danger,
+              style: TextStyle(
+                color: context.appColors.danger,
                 fontWeight: FontWeight.w600,
               ),
             ),

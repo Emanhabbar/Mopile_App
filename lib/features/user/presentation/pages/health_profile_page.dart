@@ -194,9 +194,9 @@ class _SectionSwitcher extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
@@ -241,7 +241,7 @@ class _SwitcherItem extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? AppColors.primary : Colors.transparent,
+            color: selected ? context.appColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(13),
           ),
           child: Row(
@@ -250,13 +250,13 @@ class _SwitcherItem extends StatelessWidget {
               Icon(
                 icon,
                 size: 19,
-                color: selected ? Colors.white : AppColors.textMuted,
+                color: selected ? Colors.white : context.appColors.textMuted,
               ),
               const SizedBox(width: 7),
               Text(
                 label,
                 style: TextStyle(
-                  color: selected ? Colors.white : AppColors.text,
+                  color: selected ? Colors.white : context.appColors.text,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -460,7 +460,7 @@ class _HealthCardView extends StatelessWidget {
             borderRadius: BorderRadius.circular(27),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.2),
+                color: context.appColors.primary.withValues(alpha: 0.2),
                 blurRadius: 28,
                 offset: const Offset(0, 13),
               ),
@@ -530,7 +530,7 @@ class _HealthCardView extends StatelessWidget {
         _InfoCollection(
           title: 'الأدوية الحالية',
           icon: Icons.medication_rounded,
-          color: AppColors.primary,
+          color: context.appColors.primary,
           values: card.currentMedications,
           emptyText: 'لا توجد أدوية حالية مسجلة',
         ),
@@ -597,7 +597,7 @@ class _TagEditorState extends State<_TagEditor> {
       children: [
         Row(
           children: [
-            Icon(widget.icon, size: 18, color: AppColors.primary),
+            Icon(widget.icon, size: 18, color: context.appColors.primary),
             const SizedBox(width: 7),
             Text(
               widget.label,
@@ -670,9 +670,9 @@ class _PageIntro extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.07),
+        color: context.appColors.primary.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.13)),
+        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.13)),
       ),
       child: Row(
         children: [
@@ -680,7 +680,7 @@ class _PageIntro extends StatelessWidget {
             width: 49,
             height: 49,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: context.appColors.primary,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(icon, color: Colors.white),
@@ -717,7 +717,7 @@ class _FormTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.primary, size: 21),
+        Icon(icon, color: context.appColors.primary, size: 21),
         const SizedBox(width: 8),
         Text(title, style: Theme.of(context).textTheme.titleLarge),
       ],
@@ -957,7 +957,7 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.textMuted, size: 18),
+          Icon(icon, color: context.appColors.textMuted, size: 18),
           const SizedBox(width: 9),
           Expanded(child: Text(value)),
         ],

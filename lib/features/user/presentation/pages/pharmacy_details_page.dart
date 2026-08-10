@@ -185,9 +185,9 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          icon: const Icon(
+          icon: Icon(
             Icons.check_circle_rounded,
-            color: AppColors.success,
+            color: context.appColors.success,
             size: 42,
           ),
           title: const Text('تم إرسال الطلب'),
@@ -251,7 +251,7 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
       ..showSnackBar(
         SnackBar(
           content: Text(message),
-          backgroundColor: error ? AppColors.danger : null,
+          backgroundColor: error ? context.appColors.danger : null,
         ),
       );
   }
@@ -410,7 +410,7 @@ class _MedicineChoice extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(19),
         side: BorderSide(
-          color: selected ? AppColors.primary : AppColors.border,
+          color: selected ? context.appColors.primary : context.appColors.border,
           width: selected ? 1.5 : 1,
         ),
       ),
@@ -424,12 +424,12 @@ class _MedicineChoice extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.09),
+                  color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.medication_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
               ),
               const SizedBox(width: 11),
@@ -460,8 +460,8 @@ class _MedicineChoice extends StatelessWidget {
                 children: [
                   Text(
                     _price(medicine.sellingPrice),
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: context.appColors.primary,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -475,11 +475,11 @@ class _MedicineChoice extends StatelessWidget {
                       ),
                     ),
                   if (selected)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: 4),
                       child: Icon(
                         Icons.check_circle_rounded,
-                        color: AppColors.primary,
+                        color: context.appColors.primary,
                         size: 18,
                       ),
                     ),
@@ -649,7 +649,7 @@ class _RatingForm extends StatelessWidget {
                     Icons.star_rounded,
                     color: index < rating
                         ? const Color(0xFFE4A84B)
-                        : AppColors.border,
+                        : context.appColors.border,
                   ),
                 ),
               ),
@@ -716,8 +716,8 @@ class _WorkingHours extends StatelessWidget {
                         : '${_time(hour.openTime)} - ${_time(hour.closeTime)}',
                     style: TextStyle(
                       color: hour.isClosed
-                          ? AppColors.textMuted
-                          : AppColors.primary,
+                          ? context.appColors.textMuted
+                          : context.appColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -749,10 +749,10 @@ class _FormHeading extends StatelessWidget {
           width: 43,
           height: 43,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.09),
+            color: context.appColors.primary.withValues(alpha: 0.09),
             borderRadius: BorderRadius.circular(13),
           ),
-          child: Icon(icon, color: AppColors.primary),
+          child: Icon(icon, color: context.appColors.primary),
         ),
         const SizedBox(width: 11),
         Expanded(
@@ -824,12 +824,12 @@ class _EmptyMedicines extends StatelessWidget {
   const _EmptyMedicines();
 
   @override
-  Widget build(BuildContext context) => const Card(
+  Widget build(BuildContext context) => Card(
     child: Padding(
       padding: EdgeInsets.all(28),
       child: Column(
         children: [
-          Icon(Icons.medication_outlined, color: AppColors.textMuted, size: 34),
+          Icon(Icons.medication_outlined, color: context.appColors.textMuted, size: 34),
           SizedBox(height: 10),
           Text('لا توجد أدوية متاحة حاليًا'),
         ],

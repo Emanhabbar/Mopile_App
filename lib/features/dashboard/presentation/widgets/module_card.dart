@@ -35,14 +35,14 @@ class ModuleCard extends StatelessWidget {
                   Container(
                     width: 28,
                     height: 28,
-                    decoration: const BoxDecoration(
-                      color: AppColors.surfaceSoft,
+                    decoration: BoxDecoration(
+                      color: context.appColors.surfaceSoft,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_rounded,
                       size: 16,
-                      color: AppColors.primary,
+                      color: context.appColors.primary,
                     ),
                   ),
                 ],
@@ -60,7 +60,7 @@ class ModuleCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
+                  color: context.appColors.textMuted,
                   fontSize: 12,
                 ),
               ),

@@ -276,7 +276,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
             child: const Text('حذف'),
           ),
         ],
@@ -306,7 +306,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? AppColors.danger : null,
+        backgroundColor: error ? context.appColors.danger : null,
       ),
     );
   }
@@ -333,10 +333,10 @@ class _InventoryOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [AppColors.primaryDeep, Color(0xFF185866)],
+          colors: [context.appColors.primaryDeep, Color(0xFF185866)],
         ),
         borderRadius: BorderRadius.circular(24),
       ),
@@ -351,9 +351,9 @@ class _InventoryOverview extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.inventory_2_rounded,
-                  color: AppColors.secondary,
+                  color: context.appColors.secondary,
                 ),
               ),
               const SizedBox(width: 11),
@@ -381,8 +381,8 @@ class _InventoryOverview extends StatelessWidget {
                 onPressed: onAdd,
                 tooltip: 'إضافة دواء',
                 style: IconButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
-                  foregroundColor: AppColors.primaryDeep,
+                  backgroundColor: context.appColors.secondary,
+                  foregroundColor: context.appColors.primaryDeep,
                 ),
                 icon: const Icon(Icons.add_rounded),
               ),
@@ -394,13 +394,13 @@ class _InventoryOverview extends StatelessWidget {
               _OverviewFact(
                 label: 'متوفر',
                 value: available,
-                color: AppColors.primaryLight,
+                color: context.appColors.primaryLight,
               ),
               const SizedBox(width: 8),
               _OverviewFact(
                 label: 'منخفض',
                 value: low,
-                color: AppColors.secondary,
+                color: context.appColors.secondary,
               ),
               const SizedBox(width: 8),
               _OverviewFact(
@@ -467,7 +467,7 @@ class _InventoryCard extends StatelessWidget {
   final VoidCallback onDelete;
   @override
   Widget build(BuildContext context) {
-    final statusColor = _stockColor(item.stockStatus);
+    final statusColor = _stockColor(context.appColors, item.stockStatus);
     final details = [
       item.scientificName,
       item.dosageForm,
@@ -536,7 +536,7 @@ class _InventoryCard extends StatelessWidget {
                             tooltip: 'خيارات الصنف',
                             onSelected: (value) =>
                                 value == 'edit' ? onEdit() : onDelete(),
-                            itemBuilder: (_) => const [
+                            itemBuilder: (_) => [
                               PopupMenuItem(
                                 value: 'edit',
                                 child: ListTile(
@@ -550,7 +550,7 @@ class _InventoryCard extends StatelessWidget {
                                 child: ListTile(
                                   leading: Icon(
                                     Icons.delete_outline_rounded,
-                                    color: AppColors.danger,
+                                    color: context.appColors.danger,
                                   ),
                                   title: Text('حذف'),
                                   contentPadding: EdgeInsets.zero,
@@ -564,7 +564,7 @@ class _InventoryCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.background,
+                          color: context.appColors.background,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
@@ -594,8 +594,8 @@ class _InventoryCard extends StatelessWidget {
                           _Chip(
                             text: item.isAvailable ? 'متاح للطلب' : 'غير متاح',
                             color: item.isAvailable
-                                ? AppColors.success
-                                : AppColors.textMuted,
+                                ? context.appColors.success
+                                : context.appColors.textMuted,
                           ),
                           if (item.requiresPrescription)
                             const _Chip(
@@ -608,8 +608,8 @@ class _InventoryCard extends StatelessWidget {
                               color:
                                   item.daysUntilExpiry != null &&
                                       item.daysUntilExpiry! <= 30
-                                  ? AppColors.danger
-                                  : AppColors.textMuted,
+                                  ? context.appColors.danger
+                                  : context.appColors.textMuted,
                             ),
                         ],
                       ),
@@ -643,8 +643,8 @@ class _InventoryFact extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppColors.text,
+            style: TextStyle(
+              color: context.appColors.text,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
             ),
@@ -673,7 +673,7 @@ class _AddMedicineOptions extends StatelessWidget {
               width: 44,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.appColors.border,
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -722,7 +722,7 @@ class _AddOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: AppColors.surfaceSoft,
+    color: context.appColors.surfaceSoft,
     borderRadius: BorderRadius.circular(18),
     child: InkWell(
       onTap: onTap,
@@ -734,11 +734,11 @@ class _AddOptionTile extends StatelessWidget {
             Container(
               width: 46,
               height: 46,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: context.appColors.surface,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppColors.primary),
+              child: Icon(icon, color: context.appColors.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -754,7 +754,7 @@ class _AddOptionTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_left_rounded, color: AppColors.primary),
+            Icon(Icons.chevron_left_rounded, color: context.appColors.primary),
           ],
         ),
       ),
@@ -811,7 +811,7 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
               width: 44,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.appColors.border,
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -879,16 +879,16 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           Container(
             margin: const EdgeInsets.only(bottom: 13),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSoft,
+              color: context.appColors.surfaceSoft,
               borderRadius: BorderRadius.circular(15),
             ),
             child: SwitchListTile(
               value: _requiresPrescription,
               onChanged: (value) =>
                   setState(() => _requiresPrescription = value),
-              secondary: const Icon(
+              secondary: Icon(
                 Icons.description_outlined,
-                color: AppColors.primary,
+                color: context.appColors.primary,
               ),
               title: const Text('يتطلب وصفة طبية'),
             ),
@@ -896,8 +896,8 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           if (_error != null) ...[
             Text(
               _error!,
-              style: const TextStyle(
-                color: AppColors.danger,
+              style: TextStyle(
+                color: context.appColors.danger,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1027,7 +1027,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                     width: 44,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColors.border,
+                      color: context.appColors.border,
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
@@ -1051,13 +1051,13 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                       vertical: 9,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceWarm,
+                      color: context.appColors.surfaceWarm,
                       borderRadius: BorderRadius.circular(13),
                     ),
                     child: Text(
                       'تم اختيار ${_selected.length} دواء',
-                      style: const TextStyle(
-                        color: AppColors.warning,
+                      style: TextStyle(
+                        color: context.appColors.warning,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -1099,7 +1099,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                     margin: EdgeInsets.zero,
                     clipBehavior: Clip.antiAlias,
                     color: selected
-                        ? AppColors.primary.withValues(alpha: .06)
+                        ? context.appColors.primary.withValues(alpha: .06)
                         : null,
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
@@ -1110,12 +1110,12 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceSoft,
+                          color: context.appColors.surfaceSoft,
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.medication_rounded,
-                          color: AppColors.primary,
+                          color: context.appColors.primary,
                         ),
                       ),
                       title: Text(medicine.name),
@@ -1136,8 +1136,8 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                               : Icons.add_circle_outline_rounded,
                           key: ValueKey(selected),
                           color: selected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
+                              ? context.appColors.primary
+                              : context.appColors.textMuted,
                         ),
                       ),
                       onTap: () => setState(() {
@@ -1274,13 +1274,13 @@ class _InventoryEditorState extends State<_InventoryEditor> {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.danger.withValues(alpha: .07),
+                color: context.appColors.danger.withValues(alpha: .07),
                 borderRadius: BorderRadius.circular(13),
               ),
               child: Text(
                 _validationError!,
-                style: const TextStyle(
-                  color: AppColors.danger,
+                style: TextStyle(
+                  color: context.appColors.danger,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1396,10 +1396,10 @@ class _InventoryEmpty extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 28),
     children: [
       const SizedBox(height: 80),
-      const Icon(
+      Icon(
         Icons.inventory_2_outlined,
         size: 48,
-        color: AppColors.textMuted,
+        color: context.appColors.textMuted,
       ),
       const SizedBox(height: 12),
       Text(
@@ -1429,8 +1429,9 @@ String _stock(String value) => switch (value.toLowerCase()) {
   'outofstock' => 'نافد',
   _ => value,
 };
-Color _stockColor(String value) => switch (value.toLowerCase()) {
-  'instock' => AppColors.success,
+Color _stockColor(AppColors colors, String value) => switch (value
+    .toLowerCase()) {
+  'instock' => colors.success,
   'lowstock' => const Color(0xFFB47618),
-  _ => AppColors.danger,
+  _ => colors.danger,
 };

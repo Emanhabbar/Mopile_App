@@ -41,12 +41,12 @@ class RegistrationSuccessPage extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: context.appColors.surface,
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(color: Colors.white),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.shadow.withValues(alpha: 0.12),
+                                color: context.appColors.shadow.withValues(alpha: 0.12),
                                 blurRadius: 38,
                                 offset: const Offset(0, 17),
                               ),
@@ -89,13 +89,13 @@ class RegistrationSuccessPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
                     child: Text(
                       'أهلًا بك في دوائي',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: context.appColors.textMuted,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -125,12 +125,12 @@ class _SuccessHero extends StatelessWidget {
           Positioned.fill(
             child: ClipPath(
               clipper: const _SuccessClipper(),
-              child: const DecoratedBox(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
-                    colors: [AppColors.primaryDeep, AppColors.primaryDark],
+                    colors: [context.appColors.primaryDeep, context.appColors.primaryDark],
                   ),
                 ),
               ),
@@ -144,7 +144,7 @@ class _SuccessHero extends StatelessWidget {
               height: 190,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.48),
+                color: context.appColors.primary.withValues(alpha: 0.48),
               ),
             ),
           ),
@@ -156,7 +156,7 @@ class _SuccessHero extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryLight.withValues(alpha: 0.08),
+                color: context.appColors.primaryLight.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -178,19 +178,19 @@ class _SuccessHero extends StatelessWidget {
                       height: 116,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.secondary.withValues(alpha: 0.2),
+                        color: context.appColors.secondary.withValues(alpha: 0.2),
                       ),
                     ),
                     Container(
                       width: 82,
                       height: 82,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.secondary,
+                        color: context.appColors.secondary,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.check_rounded,
-                        color: AppColors.primaryDeep,
+                        color: context.appColors.primaryDeep,
                         size: 46,
                       ),
                     ),

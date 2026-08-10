@@ -94,8 +94,8 @@ class _MedicineRequestDetailsPageState
                       : const Icon(Icons.close_rounded),
                   label: Text(_cancelling ? 'جاري الإلغاء...' : 'إلغاء الطلب'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.danger,
-                    side: const BorderSide(color: AppColors.danger),
+                    foregroundColor: context.appColors.danger,
+                    side: BorderSide(color: context.appColors.danger),
                   ),
                 ),
               ],
@@ -127,7 +127,7 @@ class _MedicineRequestDetailsPageState
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
             child: const Text('تأكيد الإلغاء'),
           ),
         ],
@@ -157,7 +157,7 @@ class _MedicineRequestDetailsPageState
                   ? error.message
                   : 'تعذر إلغاء الطلب حاليًا.',
             ),
-            backgroundColor: AppColors.danger,
+            backgroundColor: context.appColors.danger,
           ),
         );
       }
@@ -205,9 +205,9 @@ class _RequestProgress extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 15),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: steps
@@ -216,10 +216,10 @@ class _RequestProgress extends StatelessWidget {
             .expand((entry) {
               final step = entry.value;
               final color = step.danger
-                  ? AppColors.danger
+                  ? context.appColors.danger
                   : step.active
-                  ? AppColors.primary
-                  : AppColors.textMuted;
+                  ? context.appColors.primary
+                  : context.appColors.textMuted;
               final widgets = <Widget>[
                 Expanded(
                   child: Column(
@@ -253,8 +253,8 @@ class _RequestProgress extends StatelessWidget {
                     width: 18,
                     height: 2,
                     color: steps[entry.key + 1].active
-                        ? AppColors.primary.withValues(alpha: 0.35)
-                        : AppColors.border,
+                        ? context.appColors.primary.withValues(alpha: 0.35)
+                        : context.appColors.border,
                   ),
                 );
               }
@@ -274,7 +274,7 @@ class _RequestHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = details.request;
-    final style = _statusStyle(request.status);
+    final style = _statusStyle(context.appColors, request.status);
     return Container(
       padding: const EdgeInsets.all(21),
       decoration: BoxDecoration(
@@ -376,14 +376,14 @@ class _PharmacyResponse extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(Icons.mark_chat_read_outlined, color: Color(0xFFB47618)),
               SizedBox(width: 8),
               Text(
                 'رد الصيدلية',
                 style: TextStyle(
-                  color: AppColors.text,
+                  color: context.appColors.text,
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
                 ),
@@ -432,9 +432,9 @@ class _PharmacyCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.local_pharmacy_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -519,15 +519,15 @@ class _Row extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 11),
     child: Row(
       children: [
-        Icon(icon, color: AppColors.textMuted, size: 19),
+        Icon(icon, color: context.appColors.textMuted, size: 19),
         const SizedBox(width: 9),
         Expanded(
           child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
         ),
         Text(
           value,
-          style: const TextStyle(
-            color: AppColors.text,
+          style: TextStyle(
+            color: context.appColors.text,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -536,11 +536,11 @@ class _Row extends StatelessWidget {
   );
 }
 
-({Color color, IconData icon}) _statusStyle(String status) => switch (status
-    .toLowerCase()) {
-  'available' => (color: AppColors.success, icon: Icons.check_circle_rounded),
-  'unavailable' => (color: AppColors.danger, icon: Icons.cancel_rounded),
-  'cancelled' => (color: AppColors.textMuted, icon: Icons.block_rounded),
+({Color color, IconData icon}) _statusStyle(AppColors colors, String status) =>
+    switch (status.toLowerCase()) {
+  'available' => (color: colors.success, icon: Icons.check_circle_rounded),
+  'unavailable' => (color: colors.danger, icon: Icons.cancel_rounded),
+  'cancelled' => (color: colors.textMuted, icon: Icons.block_rounded),
   _ => (color: const Color(0xFFB47618), icon: Icons.schedule_rounded),
 };
 

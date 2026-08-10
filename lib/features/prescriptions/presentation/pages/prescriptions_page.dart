@@ -102,7 +102,7 @@ class _PrescriptionsPageState extends ConsumerState<PrescriptionsPage> {
       ..showSnackBar(
         SnackBar(
           content: Text(text),
-          backgroundColor: error ? AppColors.danger : null,
+          backgroundColor: error ? context.appColors.danger : null,
         ),
       );
   }
@@ -121,9 +121,9 @@ class _UploadCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         child: Column(
           children: [
-            const Icon(
+            Icon(
               Icons.document_scanner_outlined,
-              color: AppColors.primary,
+              color: context.appColors.primary,
               size: 38,
             ),
             const SizedBox(height: 10),
@@ -169,7 +169,7 @@ class _PrescriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = prescriptionStatusInfo(order.status);
+    final status = prescriptionStatusInfo(context.appColors, order.status);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: ListTile(
@@ -208,14 +208,14 @@ class _EmptyPrescriptions extends StatelessWidget {
   const _EmptyPrescriptions();
 
   @override
-  Widget build(BuildContext context) => const Card(
+  Widget build(BuildContext context) => Card(
     child: Padding(
       padding: EdgeInsets.all(28),
       child: Column(
         children: [
           Icon(
             Icons.receipt_long_outlined,
-            color: AppColors.textMuted,
+            color: context.appColors.textMuted,
             size: 36,
           ),
           SizedBox(height: 10),
@@ -227,6 +227,7 @@ class _EmptyPrescriptions extends StatelessWidget {
 }
 
 ({String label, Color color, IconData icon}) prescriptionStatusInfo(
+  AppColors colors,
   String status,
 ) => switch (status.toLowerCase()) {
   'reserved' => (
@@ -236,27 +237,27 @@ class _EmptyPrescriptions extends StatelessWidget {
   ),
   'readyforpickup' => (
     label: 'جاهزة للاستلام',
-    color: AppColors.success,
+    color: colors.success,
     icon: Icons.inventory_2_rounded,
   ),
   'collected' => (
     label: 'تم الاستلام',
-    color: AppColors.success,
+    color: colors.success,
     icon: Icons.task_alt_rounded,
   ),
   'expired' => (
     label: 'منتهية',
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     icon: Icons.timer_off_rounded,
   ),
   'cancelled' => (
     label: 'ملغاة',
-    color: AppColors.danger,
+    color: colors.danger,
     icon: Icons.block_rounded,
   ),
   _ => (
     label: 'تم التحليل',
-    color: AppColors.primary,
+    color: colors.primary,
     icon: Icons.document_scanner_rounded,
   ),
 };

@@ -25,14 +25,14 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
     final sessions = ref.watch(chatSessionsProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('المساعد الدوائي'),
             Text(
               'إرشاد سريع للوصول إلى خدمات دوائي',
               style: TextStyle(
-                color: AppColors.textMuted,
+                color: context.appColors.textMuted,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
@@ -56,7 +56,7 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
               const SizedBox(height: 22),
               Row(
                 children: [
-                  const Icon(Icons.history_rounded, color: AppColors.primary),
+                  Icon(Icons.history_rounded, color: context.appColors.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -70,13 +70,13 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceSoft,
+                      color: context.appColors.surfaceSoft,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '${items.length}',
-                      style: const TextStyle(
-                        color: AppColors.primary,
+                      style: TextStyle(
+                        color: context.appColors.primary,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -164,7 +164,7 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
                   ? error.message
                   : 'تعذر بدء المحادثة حاليًا.',
             ),
-            backgroundColor: AppColors.danger,
+            backgroundColor: context.appColors.danger,
           ),
         );
       }
@@ -182,13 +182,13 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [AppColors.primaryDeep, AppColors.primary],
+      gradient: LinearGradient(
+        colors: [context.appColors.primaryDeep, context.appColors.primary],
       ),
       borderRadius: BorderRadius.circular(28),
       boxShadow: [
         BoxShadow(
-          color: AppColors.primaryDeep.withValues(alpha: .15),
+          color: context.appColors.primaryDeep.withValues(alpha: .15),
           blurRadius: 22,
           offset: const Offset(0, 10),
         ),
@@ -206,9 +206,9 @@ class _InfoCard extends StatelessWidget {
                 color: Colors.white.withValues(alpha: .12),
                 borderRadius: BorderRadius.circular(17),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.auto_awesome_rounded,
-                color: AppColors.secondary,
+                color: context.appColors.secondary,
               ),
             ),
             const SizedBox(width: 12),
@@ -269,7 +269,7 @@ class _HeroHint extends StatelessWidget {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: AppColors.secondary, size: 15),
+        Icon(icon, color: context.appColors.secondary, size: 15),
         const SizedBox(width: 5),
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
       ],
@@ -296,15 +296,15 @@ class _SessionCard extends StatelessWidget {
               height: 46,
               decoration: BoxDecoration(
                 color: session.isEnded
-                    ? AppColors.surfaceSoft
-                    : AppColors.primary.withValues(alpha: .09),
+                    ? context.appColors.surfaceSoft
+                    : context.appColors.primary.withValues(alpha: .09),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
                 session.isEnded ? Icons.forum_outlined : Icons.chat_rounded,
                 color: session.isEnded
-                    ? AppColors.textMuted
-                    : AppColors.primary,
+                    ? context.appColors.textMuted
+                    : context.appColors.primary,
               ),
             ),
             const SizedBox(width: 11),
@@ -322,8 +322,8 @@ class _SessionCard extends StatelessWidget {
                         '${session.messagesCount} رسائل',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: context.appColors.textMuted,
                       fontSize: 11,
                     ),
                   ),
@@ -335,8 +335,8 @@ class _SessionCard extends StatelessWidget {
               children: [
                 Text(
                   _chatDate(session.lastActivityAtUtc),
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  style: TextStyle(
+                    color: context.appColors.textMuted,
                     fontSize: 9,
                   ),
                 ),
@@ -344,8 +344,8 @@ class _SessionCard extends StatelessWidget {
                 Icon(
                   Icons.chevron_left_rounded,
                   color: session.isEnded
-                      ? AppColors.textMuted
-                      : AppColors.primary,
+                      ? context.appColors.textMuted
+                      : context.appColors.primary,
                 ),
               ],
             ),
@@ -364,12 +364,12 @@ String _chatDate(DateTime value) =>
 class _EmptySessions extends StatelessWidget {
   const _EmptySessions();
   @override
-  Widget build(BuildContext context) => const Card(
+  Widget build(BuildContext context) => Card(
     child: Padding(
       padding: EdgeInsets.all(28),
       child: Column(
         children: [
-          Icon(Icons.forum_outlined, color: AppColors.textMuted, size: 38),
+          Icon(Icons.forum_outlined, color: context.appColors.textMuted, size: 38),
           SizedBox(height: 10),
           Text('لا توجد محادثات سابقة'),
         ],

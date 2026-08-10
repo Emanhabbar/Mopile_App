@@ -590,14 +590,14 @@ class _LoginTextField extends StatelessWidget {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
           borderSide: BorderSide(
-            color: AppColors.danger.withValues(alpha: 0.55),
+            color: context.appColors.danger.withValues(alpha: 0.55),
             width: 0.95,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
           borderSide: BorderSide(
-            color: AppColors.danger.withValues(alpha: 0.68),
+            color: context.appColors.danger.withValues(alpha: 0.68),
             width: 1.1,
           ),
         ),
@@ -777,10 +777,10 @@ class _ErrorMessage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.danger.withValues(alpha: 0.055),
+        color: context.appColors.danger.withValues(alpha: 0.055),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: AppColors.danger.withValues(alpha: 0.13),
+          color: context.appColors.danger.withValues(alpha: 0.13),
           width: 0.9,
         ),
       ),
@@ -789,7 +789,7 @@ class _ErrorMessage extends StatelessWidget {
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: AppColors.danger.withValues(alpha: 0.88),
+            color: context.appColors.danger.withValues(alpha: 0.88),
             size: 23,
           ),
           const SizedBox(width: 10),
@@ -797,7 +797,7 @@ class _ErrorMessage extends StatelessWidget {
             child: Text(
               message,
               style: TextStyle(
-                color: AppColors.danger.withValues(alpha: 0.92),
+                color: context.appColors.danger.withValues(alpha: 0.92),
                 fontSize: 13,
                 height: 1.45,
                 fontWeight: FontWeight.w600,

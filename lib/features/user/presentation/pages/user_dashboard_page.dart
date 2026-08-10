@@ -435,7 +435,7 @@ class _QuickActions extends StatelessWidget {
         'وصفاتي',
         'إدارة الوصفات والطلبات',
         Icons.receipt_long_rounded,
-        AppColors.primary,
+        context.appColors.primary,
         onPrescriptions,
       ),
       (
@@ -606,12 +606,12 @@ class _LocationSummary extends StatelessWidget {
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
             color: hasLocation
-                ? AppColors.primary.withValues(alpha: 0.07)
+                ? context.appColors.primary.withValues(alpha: 0.07)
                 : const Color(0xFFFFF9EC),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: hasLocation
-                  ? AppColors.primary.withValues(alpha: 0.15)
+                  ? context.appColors.primary.withValues(alpha: 0.15)
                   : const Color(0xFFF1DDAF),
             ),
           ),
@@ -622,7 +622,7 @@ class _LocationSummary extends StatelessWidget {
                     ? Icons.my_location_rounded
                     : Icons.add_location_alt,
                 color: hasLocation
-                    ? AppColors.primary
+                    ? context.appColors.primary
                     : const Color(0xFFB57920),
               ),
               const SizedBox(width: 12),
@@ -680,12 +680,12 @@ class _NearbyPharmacyCard extends StatelessWidget {
                       width: 41,
                       height: 41,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: context.appColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(13),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.local_pharmacy_rounded,
-                        color: AppColors.primary,
+                        color: context.appColors.primary,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -722,8 +722,8 @@ class _NearbyPharmacyCard extends StatelessWidget {
                                 : 'مغلقة'
                           : pharmacy.statusText,
                       color: pharmacy.isOpenNow
-                          ? AppColors.success
-                          : AppColors.textMuted,
+                          ? context.appColors.success
+                          : context.appColors.textMuted,
                     ),
                   ],
                 ),
@@ -756,12 +756,12 @@ class _RequestCard extends StatelessWidget {
                 width: 45,
                 height: 45,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.09),
+                  color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.medication_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
               ),
               const SizedBox(width: 12),
@@ -829,12 +829,12 @@ class _SearchActivity extends StatelessWidget {
               width: 39,
               height: 39,
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: context.appColors.background,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.search_rounded,
-                color: AppColors.primary,
+                color: context.appColors.primary,
                 size: 21,
               ),
             ),
@@ -863,7 +863,7 @@ class _SearchActivity extends StatelessWidget {
             Text(
               '${item.resultCount} نتيجة',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.primary,
+                color: context.appColors.primary,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
               ),
@@ -905,13 +905,13 @@ class _EmptyActivity extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.textMuted, size: 30),
+          Icon(icon, color: context.appColors.textMuted, size: 30),
           const SizedBox(height: 10),
           Text(
             text,
@@ -928,26 +928,27 @@ class _SmallPill extends StatelessWidget {
   const _SmallPill({
     required this.icon,
     required this.text,
-    this.color = AppColors.primary,
+    this.color,
   });
 
   final IconData icon;
   final String text;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final pillColor = color ?? context.appColors.primary;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
+          color: pillColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 11),
+            Icon(icon, color: pillColor, size: 11),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
@@ -955,7 +956,7 @@ class _SmallPill extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: color,
+                  color: pillColor,
                   fontWeight: FontWeight.w700,
                   fontSize: 10.5,
                 ),

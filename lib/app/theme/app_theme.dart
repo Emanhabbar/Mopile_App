@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
@@ -14,51 +13,30 @@ abstract final class AppTheme {
 
   static ThemeData get light => _buildTheme(
     brightness: Brightness.light,
-    primary: AppColors.primary,
-    primaryDark: AppColors.primaryDark,
-    primaryDeep: AppColors.primaryDeep,
-    secondary: AppColors.secondary,
-    background: AppColors.background,
-    surface: AppColors.surface,
-    surfaceSoft: AppColors.surfaceSoft,
-    text: AppColors.text,
-    textMuted: AppColors.textMuted,
-    border: AppColors.border,
-    danger: AppColors.danger,
-    shadow: AppColors.shadow,
+    colors: AppColors.light,
   );
 
   static ThemeData get dark => _buildTheme(
     brightness: Brightness.dark,
-    primary: DarkColors.primary,
-    primaryDark: DarkColors.primaryDark,
-    primaryDeep: DarkColors.primaryDeep,
-    secondary: DarkColors.secondary,
-    background: DarkColors.background,
-    surface: DarkColors.surface,
-    surfaceSoft: DarkColors.surfaceSoft,
-    text: DarkColors.text,
-    textMuted: DarkColors.textMuted,
-    border: DarkColors.border,
-    danger: DarkColors.danger,
-    shadow: DarkColors.shadow,
+    colors: AppColors.dark,
   );
 
   static ThemeData _buildTheme({
     required Brightness brightness,
-    required Color primary,
-    required Color primaryDark,
-    required Color primaryDeep,
-    required Color secondary,
-    required Color background,
-    required Color surface,
-    required Color surfaceSoft,
-    required Color text,
-    required Color textMuted,
-    required Color border,
-    required Color danger,
-    required Color shadow,
+    required AppColors colors,
   }) {
+    final primary = colors.primary;
+    final primaryDark = colors.primaryDark;
+    final primaryDeep = colors.primaryDeep;
+    final secondary = colors.secondary;
+    final background = colors.background;
+    final surface = colors.surface;
+    final surfaceSoft = colors.surfaceSoft;
+    final text = colors.text;
+    final textMuted = colors.textMuted;
+    final border = colors.border;
+    final danger = colors.danger;
+    final shadow = colors.shadow;
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primary,
       brightness: brightness,
@@ -72,6 +50,7 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
+      extensions: [colors],
       scaffoldBackgroundColor: background,
       fontFamily: _fontFamily,
       fontFamilyFallback: _fontFallback,

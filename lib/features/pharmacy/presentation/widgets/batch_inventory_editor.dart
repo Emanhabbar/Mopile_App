@@ -155,7 +155,7 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
           width: 44,
           height: 4,
           decoration: BoxDecoration(
-            color: AppColors.border,
+            color: context.appColors.border,
             borderRadius: BorderRadius.circular(20),
           ),
         ),
@@ -166,12 +166,12 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: AppColors.surfaceSoft,
+                color: context.appColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.playlist_add_check_circle_outlined,
-                color: AppColors.primary,
+                color: context.appColors.primary,
               ),
             ),
             const SizedBox(width: 12),
@@ -209,8 +209,8 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
             const SizedBox(width: 10),
             Text(
               '$_completedPrices/${_entries.length} أسعار',
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: context.appColors.primary,
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),
@@ -234,7 +234,7 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
     padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      border: const Border(top: BorderSide(color: AppColors.border)),
+      border: Border(top: BorderSide(color: context.appColors.border)),
     ),
     child: SizedBox(
       width: double.infinity,
@@ -287,13 +287,13 @@ class _BatchMedicineCard extends StatelessWidget {
                   height: 42,
                   decoration: BoxDecoration(
                     color: hasPrice
-                        ? AppColors.success.withValues(alpha: .1)
-                        : AppColors.surfaceSoft,
+                        ? context.appColors.success.withValues(alpha: .1)
+                        : context.appColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: Icon(
                     hasPrice ? Icons.check_rounded : Icons.medication_outlined,
-                    color: hasPrice ? AppColors.success : AppColors.primary,
+                    color: hasPrice ? context.appColors.success : context.appColors.primary,
                   ),
                 ),
                 const SizedBox(width: 11),

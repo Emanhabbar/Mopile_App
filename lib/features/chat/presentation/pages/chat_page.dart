@@ -51,8 +51,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               session?.isEnded == true ? 'محادثة منتهية' : 'جاهز لمساعدتك',
               style: TextStyle(
                 color: session?.isEnded == true
-                    ? AppColors.textMuted
-                    : AppColors.success,
+                    ? context.appColors.textMuted
+                    : context.appColors.success,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
@@ -195,7 +195,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         content: Text(
           error is ApiException ? error.message : 'تعذر إرسال الرسالة.',
         ),
-        backgroundColor: AppColors.danger,
+        backgroundColor: context.appColors.danger,
       ),
     );
   }
@@ -207,21 +207,21 @@ class _ConversationNotice extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
     decoration: BoxDecoration(
-      color: AppColors.surfaceWarm,
+      color: context.appColors.surfaceWarm,
       borderRadius: BorderRadius.circular(15),
     ),
-    child: const Row(
+    child: Row(
       children: [
         Icon(
           Icons.lightbulb_outline_rounded,
-          color: AppColors.warning,
+          color: context.appColors.warning,
           size: 19,
         ),
         SizedBox(width: 8),
         Expanded(
           child: Text(
             'اكتب سؤالك بوضوح لتحصل على نتيجة أدق، ولا تعتمد على المحادثة في الحالات الطارئة.',
-            style: TextStyle(fontSize: 10, color: AppColors.textMuted),
+            style: TextStyle(fontSize: 10, color: context.appColors.textMuted),
           ),
         ),
       ],
@@ -243,12 +243,12 @@ class _MessageBubble extends StatelessWidget {
           : MainAxisAlignment.end,
       children: [
         if (!message.isUser) ...[
-          const CircleAvatar(
+          CircleAvatar(
             radius: 15,
-            backgroundColor: AppColors.primaryDeep,
+            backgroundColor: context.appColors.primaryDeep,
             child: Icon(
               Icons.auto_awesome_rounded,
-              color: AppColors.secondary,
+              color: context.appColors.secondary,
               size: 15,
             ),
           ),
@@ -260,14 +260,14 @@ class _MessageBubble extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
-            color: message.isUser ? AppColors.primary : AppColors.surface,
+            color: message.isUser ? context.appColors.primary : context.appColors.surface,
             borderRadius: BorderRadiusDirectional.only(
               topStart: const Radius.circular(18),
               topEnd: const Radius.circular(18),
               bottomStart: Radius.circular(message.isUser ? 5 : 18),
               bottomEnd: Radius.circular(message.isUser ? 18 : 5),
             ),
-            border: message.isUser ? null : Border.all(color: AppColors.border),
+            border: message.isUser ? null : Border.all(color: context.appColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +275,7 @@ class _MessageBubble extends StatelessWidget {
               Text(
                 message.content,
                 style: TextStyle(
-                  color: message.isUser ? Colors.white : AppColors.text,
+                  color: message.isUser ? Colors.white : context.appColors.text,
                   height: 1.5,
                 ),
               ),
@@ -284,7 +284,7 @@ class _MessageBubble extends StatelessWidget {
                 '${message.sentAtUtc.hour.toString().padLeft(2, '0')}:'
                 '${message.sentAtUtc.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
-                  color: message.isUser ? Colors.white60 : AppColors.textMuted,
+                  color: message.isUser ? Colors.white60 : context.appColors.textMuted,
                   fontSize: 8,
                 ),
               ),
@@ -293,12 +293,12 @@ class _MessageBubble extends StatelessWidget {
         ),
         if (message.isUser) ...[
           const SizedBox(width: 7),
-          const CircleAvatar(
+          CircleAvatar(
             radius: 15,
-            backgroundColor: AppColors.surfaceSoft,
+            backgroundColor: context.appColors.surfaceSoft,
             child: Icon(
               Icons.person_outline,
-              color: AppColors.primary,
+              color: context.appColors.primary,
               size: 16,
             ),
           ),
@@ -326,9 +326,9 @@ class _Composer extends StatelessWidget {
     top: false,
     child: Container(
       padding: const EdgeInsets.fromLTRB(12, 9, 12, 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        border: Border(top: BorderSide(color: context.appColors.border)),
       ),
       child: Row(
         children: [
@@ -344,7 +344,7 @@ class _Composer extends StatelessWidget {
                 hintText: disabled ? 'تم إنهاء هذه المحادثة' : 'اكتب رسالتك...',
                 counterText: '',
                 filled: true,
-                fillColor: AppColors.surfaceSoft,
+                fillColor: context.appColors.surfaceSoft,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,

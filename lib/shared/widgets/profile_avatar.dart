@@ -29,11 +29,11 @@ class ProfileAvatar extends StatelessWidget {
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.border),
+        color: context.appColors.surface,
+        border: Border.all(color: context.appColors.border),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.08),
+            color: context.appColors.shadow.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -41,8 +41,8 @@ class ProfileAvatar extends StatelessWidget {
       ),
       child: CircleAvatar(
         radius: radius,
-        backgroundColor: AppColors.surfaceSoft,
-        foregroundColor: AppColors.primary,
+        backgroundColor: context.appColors.surfaceSoft,
+        foregroundColor: context.appColors.primary,
         backgroundImage: user.hasProfileImage
             ? NetworkImage('$imageUri')
             : null,

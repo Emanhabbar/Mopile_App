@@ -28,10 +28,10 @@ class SettingsPage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: AppColors.surfaceSoft,
+                color: context.appColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(Icons.tune_rounded, color: AppColors.primary),
+              child: Icon(Icons.tune_rounded, color: context.appColors.primary),
             ),
             const SizedBox(width: 10),
             Text('حسابي', style: Theme.of(context).textTheme.headlineSmall),
@@ -46,15 +46,15 @@ class SettingsPage extends ConsumerWidget {
         AppReveal(
           child: Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [AppColors.primary, AppColors.primaryDark],
+                colors: [context.appColors.primary, context.appColors.primaryDark],
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadow.withValues(alpha: 0.15),
+                  color: context.appColors.shadow.withValues(alpha: 0.15),
                   blurRadius: 22,
                   offset: const Offset(0, 9),
                 ),
@@ -93,8 +93,8 @@ class SettingsPage extends ConsumerWidget {
                           ),
                           child: Text(
                             _roleLabel(user.primaryRole),
-                            style: const TextStyle(
-                              color: AppColors.secondary,
+                            style: TextStyle(
+                              color: context.appColors.secondary,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -233,7 +233,7 @@ class SettingsPage extends ConsumerWidget {
           label: const Text('تسجيل الخروج'),
           style: OutlinedButton.styleFrom(
             minimumSize: const Size.fromHeight(54),
-            foregroundColor: AppColors.danger,
+            foregroundColor: context.appColors.danger,
             side: const BorderSide(color: Color(0xFFE8CACA)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -288,7 +288,7 @@ class _SettingsSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, color: AppColors.primary, size: 21),
+      Icon(icon, color: context.appColors.primary, size: 21),
       const SizedBox(width: 8),
       Expanded(
         child: Column(
@@ -297,7 +297,7 @@ class _SettingsSectionTitle extends StatelessWidget {
             Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
             Text(
               subtitle,
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+              style: TextStyle(color: context.appColors.textMuted, fontSize: 10),
             ),
           ],
         ),
@@ -316,9 +316,9 @@ class _SettingsIcon extends StatelessWidget {
     width: 40,
     height: 40,
     decoration: BoxDecoration(
-      color: AppColors.surfaceSoft,
+      color: context.appColors.surfaceSoft,
       borderRadius: BorderRadius.circular(13),
     ),
-    child: Icon(icon, color: AppColors.primary, size: 21),
+    child: Icon(icon, color: context.appColors.primary, size: 21),
   );
 }

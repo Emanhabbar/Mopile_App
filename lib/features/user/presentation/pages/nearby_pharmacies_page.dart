@@ -225,7 +225,7 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
       ..showSnackBar(
         SnackBar(
           content: Text(message),
-          backgroundColor: error ? AppColors.danger : null,
+          backgroundColor: error ? context.appColors.danger : null,
         ),
       );
   }
@@ -294,7 +294,7 @@ class _LocationHeader extends StatelessWidget {
                       : const Icon(Icons.my_location_rounded),
                   label: Text(isUpdating ? 'جاري التحديد...' : 'موقعي الحالي'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: context.appColors.primary,
                   ),
                 ),
               ),
@@ -438,7 +438,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.16),
+            color: context.appColors.shadow.withValues(alpha: 0.16),
             blurRadius: 34,
             offset: const Offset(0, 16),
           ),
@@ -484,10 +484,10 @@ class _MapCardState extends ConsumerState<_MapCard> {
                           strokeWidth: 6,
                           borderStrokeWidth: 5,
                           borderColor: Colors.white.withValues(alpha: 0.92),
-                          gradientColors: const [
-                            AppColors.primary,
+                          gradientColors: [
+                            context.appColors.primary,
                             Color(0xFF0E7482),
-                            AppColors.secondary,
+                            context.appColors.secondary,
                           ],
                         ),
                       ],
@@ -717,12 +717,12 @@ class _RouteOverview extends StatelessWidget {
     final routeReady = route?.routeAvailable == true && route!.path.length > 1;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.primaryDeep.withValues(alpha: 0.93),
+        color: context.appColors.primaryDeep.withValues(alpha: 0.93),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.2),
+            color: context.appColors.shadow.withValues(alpha: 0.2),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -737,12 +737,12 @@ class _RouteOverview extends StatelessWidget {
               width: 31,
               height: 31,
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.15),
+                color: context.appColors.secondary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 routeReady ? Icons.route_rounded : Icons.map_outlined,
-                color: AppColors.secondary,
+                color: context.appColors.secondary,
                 size: 18,
               ),
             ),
@@ -787,14 +787,14 @@ class _MapControl extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(15),
         elevation: 3,
-        shadowColor: AppColors.shadow.withValues(alpha: 0.25),
+        shadowColor: context.appColors.shadow.withValues(alpha: 0.25),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(15),
           child: SizedBox(
             width: 44,
             height: 44,
-            child: Icon(icon, color: AppColors.primaryDark, size: 21),
+            child: Icon(icon, color: context.appColors.primaryDark, size: 21),
           ),
         ),
       ),
@@ -829,7 +829,7 @@ class _MapPharmacyPreview extends StatelessWidget {
       color: Colors.white.withValues(alpha: 0.97),
       borderRadius: BorderRadius.circular(23),
       elevation: 8,
-      shadowColor: AppColors.shadow.withValues(alpha: 0.24),
+      shadowColor: context.appColors.shadow.withValues(alpha: 0.24),
       child: InkWell(
         onTap: onOpen,
         borderRadius: BorderRadius.circular(23),
@@ -842,11 +842,11 @@ class _MapPharmacyPreview extends StatelessWidget {
                 height: 47,
                 decoration: BoxDecoration(
                   gradient: number == 1
-                      ? const LinearGradient(
-                          colors: [AppColors.secondary, Color(0xFFE7AE45)],
+                      ? LinearGradient(
+                          colors: [context.appColors.secondary, Color(0xFFE7AE45)],
                         )
-                      : const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryDark],
+                      : LinearGradient(
+                          colors: [context.appColors.primary, context.appColors.primaryDark],
                         ),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -854,7 +854,7 @@ class _MapPharmacyPreview extends StatelessWidget {
                 child: Text(
                   '$number',
                   style: TextStyle(
-                    color: number == 1 ? AppColors.primaryDeep : Colors.white,
+                    color: number == 1 ? context.appColors.primaryDeep : Colors.white,
                     fontSize: 17,
                     fontWeight: FontWeight.w900,
                   ),
@@ -878,7 +878,7 @@ class _MapPharmacyPreview extends StatelessWidget {
                         Icon(
                           Icons.near_me_rounded,
                           size: 14,
-                          color: AppColors.primary.withValues(alpha: 0.8),
+                          color: context.appColors.primary.withValues(alpha: 0.8),
                         ),
                         const SizedBox(width: 4),
                         Flexible(
@@ -900,9 +900,9 @@ class _MapPharmacyPreview extends StatelessWidget {
                 onPressed: canNavigate ? onDirections : null,
                 tooltip: 'بدء الاتجاهات',
                 style: IconButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.appColors.primary,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.border,
+                  disabledBackgroundColor: context.appColors.border,
                 ),
                 icon: const Icon(Icons.navigation_rounded, size: 20),
               ),
@@ -929,19 +929,19 @@ class _UserMarker extends StatelessWidget {
             height: 50,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary.withValues(alpha: 0.14),
+              color: context.appColors.primary.withValues(alpha: 0.14),
             ),
           ),
           Container(
             width: 27,
             height: 27,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: context.appColors.primary,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 4),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadow.withValues(alpha: 0.3),
+                  color: context.appColors.shadow.withValues(alpha: 0.3),
                   blurRadius: 12,
                 ),
               ],
@@ -972,7 +972,7 @@ class _PharmacyMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = nearest ? const Color(0xFFE3A940) : AppColors.primaryDark;
+    final color = nearest ? const Color(0xFFE3A940) : context.appColors.primaryDark;
     return Semantics(
       button: true,
       selected: selected,
@@ -994,7 +994,7 @@ class _PharmacyMarker extends StatelessWidget {
                 border: Border.all(color: Colors.white, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.shadow.withValues(
+                    color: context.appColors.shadow.withValues(
                       alpha: selected ? 0.34 : 0.22,
                     ),
                     blurRadius: selected ? 17 : 10,
@@ -1007,7 +1007,7 @@ class _PharmacyMarker extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.local_pharmacy_rounded,
-                    color: nearest ? AppColors.primaryDeep : Colors.white,
+                    color: nearest ? context.appColors.primaryDeep : Colors.white,
                     size: selected ? 25 : 22,
                   ),
                   PositionedDirectional(
@@ -1023,8 +1023,8 @@ class _PharmacyMarker extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         '$number',
-                        style: const TextStyle(
-                          color: AppColors.primaryDeep,
+                        style: TextStyle(
+                          color: context.appColors.primaryDeep,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                         ),
@@ -1058,7 +1058,7 @@ class _PharmacyMarker extends StatelessWidget {
                   width: 9,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.shadow.withValues(alpha: 0.18),
+                    color: context.appColors.shadow.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
@@ -1094,7 +1094,7 @@ class _ResultsSummary extends StatelessWidget {
             ],
           ),
         ),
-        const Icon(Icons.route_rounded, color: AppColors.primary),
+        Icon(Icons.route_rounded, color: context.appColors.primary),
       ],
     );
   }
@@ -1124,8 +1124,8 @@ class _NearbyItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
           color: isNearest
-              ? AppColors.primary.withValues(alpha: 0.35)
-              : AppColors.border,
+              ? context.appColors.primary.withValues(alpha: 0.35)
+              : context.appColors.border,
         ),
       ),
       child: InkWell(
@@ -1144,14 +1144,14 @@ class _NearbyItem extends StatelessWidget {
                 width: 43,
                 height: 43,
                 decoration: BoxDecoration(
-                  color: isNearest ? AppColors.primary : AppColors.background,
+                  color: isNearest ? context.appColors.primary : context.appColors.background,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '$number',
                   style: TextStyle(
-                    color: isNearest ? Colors.white : AppColors.text,
+                    color: isNearest ? Colors.white : context.appColors.text,
                     fontWeight: FontWeight.w900,
                     fontSize: 17,
                   ),
@@ -1242,7 +1242,7 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = highlighted ? const Color(0xFFB47618) : AppColors.textMuted;
+    final color = highlighted ? const Color(0xFFB47618) : context.appColors.textMuted;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -1404,7 +1404,7 @@ class _CenteredMessage extends StatelessWidget {
         padding: const EdgeInsets.all(30),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.textMuted, size: 35),
+            Icon(icon, color: context.appColors.textMuted, size: 35),
             const SizedBox(height: 11),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 5),

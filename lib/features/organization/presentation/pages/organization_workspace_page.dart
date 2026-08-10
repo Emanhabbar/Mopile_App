@@ -50,14 +50,14 @@ class _OrganizationWorkspacePageState
     final verification = ref.watch(organizationVerificationProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('إدارة المنظمة'),
             Text(
               'المبادرات والتبرعات والمستفيدون',
               style: TextStyle(
-                color: AppColors.textMuted,
+                color: context.appColors.textMuted,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w500,
               ),
@@ -219,16 +219,16 @@ class _OrganizationWorkspacePageState
                       width: 47,
                       height: 47,
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceSoft,
+                        color: context.appColors.surfaceSoft,
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.campaign_outlined,
-                        color: AppColors.primary,
+                        color: context.appColors.primary,
                       ),
                     ),
                     const SizedBox(width: 11),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -242,7 +242,7 @@ class _OrganizationWorkspacePageState
                           Text(
                             'أضف معلومات واضحة تساعد المتبرعين.',
                             style: TextStyle(
-                              color: AppColors.textMuted,
+                              color: context.appColors.textMuted,
                               fontSize: 11.5,
                             ),
                           ),
@@ -272,7 +272,7 @@ class _OrganizationWorkspacePageState
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceSoft,
+                    color: context.appColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Column(
@@ -592,7 +592,7 @@ class _OrganizationWorkspacePageState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? AppColors.danger : null,
+        backgroundColor: error ? context.appColors.danger : null,
       ),
     );
   }
@@ -640,13 +640,13 @@ class _SectionNavigation extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsetsDirectional.only(end: 8),
                 child: Material(
-                  color: selected ? AppColors.primaryDeep : AppColors.surface,
+                  color: selected ? context.appColors.primaryDeep : context.appColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(17),
                     side: BorderSide(
                       color: selected
-                          ? AppColors.primaryDeep
-                          : AppColors.border,
+                          ? context.appColors.primaryDeep
+                          : context.appColors.border,
                     ),
                   ),
                   child: InkWell(
@@ -663,13 +663,13 @@ class _SectionNavigation extends StatelessWidget {
                           Icon(
                             item.icon,
                             size: 19,
-                            color: selected ? Colors.white : AppColors.primary,
+                            color: selected ? Colors.white : context.appColors.primary,
                           ),
                           const SizedBox(width: 7),
                           Text(
                             item.label,
                             style: TextStyle(
-                              color: selected ? Colors.white : AppColors.text,
+                              color: selected ? Colors.white : context.appColors.text,
                               fontWeight: FontWeight.w800,
                               fontSize: 12.5,
                             ),
@@ -684,15 +684,15 @@ class _SectionNavigation extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? AppColors.secondary
-                                    : AppColors.surfaceWarm,
+                                    ? context.appColors.secondary
+                                    : context.appColors.surfaceWarm,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 '${item.count}',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: AppColors.primaryDeep,
+                                style: TextStyle(
+                                  color: context.appColors.primaryDeep,
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -745,7 +745,7 @@ class _OverviewSection extends StatelessWidget {
             child: _QuickAction(
               icon: Icons.add_rounded,
               label: 'حملة جديدة',
-              color: AppColors.primary,
+              color: context.appColors.primary,
               onTap: onCreateCampaign,
             ),
           ),
@@ -802,19 +802,19 @@ class _OverviewSection extends StatelessWidget {
               label: 'جميع الحملات',
               value: data.totalCampaignsCount,
               icon: Icons.campaign_outlined,
-              color: AppColors.primary,
+              color: context.appColors.primary,
             ),
             _ImpactMetric(
               label: 'الحملات النشطة',
               value: data.activeCampaignsCount,
               icon: Icons.bolt_rounded,
-              color: AppColors.success,
+              color: context.appColors.success,
             ),
             _ImpactMetric(
               label: 'عروض تنتظر',
               value: data.pendingDonationOffersCount,
               icon: Icons.volunteer_activism_outlined,
-              color: AppColors.warning,
+              color: context.appColors.warning,
             ),
             _ImpactMetric(
               label: 'طلبات مفتوحة',
@@ -1089,15 +1089,15 @@ class _OrganizationHero extends StatelessWidget {
         data.verificationStatus.toLowerCase() == 'approved';
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primaryDeep, AppColors.primary],
+        gradient: LinearGradient(
+          colors: [context.appColors.primaryDeep, context.appColors.primary],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(27),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDeep.withValues(alpha: .14),
+            color: context.appColors.primaryDeep.withValues(alpha: .14),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -1126,7 +1126,7 @@ class _OrganizationHero extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.secondary.withValues(alpha: .075),
+                color: context.appColors.secondary.withValues(alpha: .075),
               ),
             ),
           ),
@@ -1144,9 +1144,9 @@ class _OrganizationHero extends StatelessWidget {
                         color: Colors.white.withValues(alpha: .12),
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.apartment_rounded,
-                        color: AppColors.secondary,
+                        color: context.appColors.secondary,
                         size: 29,
                       ),
                     ),
@@ -1191,7 +1191,7 @@ class _OrganizationHero extends StatelessWidget {
                                 ? Icons.verified_rounded
                                 : Icons.hourglass_top_rounded,
                             color: verified
-                                ? AppColors.secondary
+                                ? context.appColors.secondary
                                 : Colors.white70,
                             size: 16,
                           ),
@@ -1233,8 +1233,8 @@ class _OrganizationHero extends StatelessWidget {
                         onPressed: onCreateCampaign,
                         style: FilledButton.styleFrom(
                           minimumSize: const Size(0, 46),
-                          backgroundColor: AppColors.secondary,
-                          foregroundColor: AppColors.primaryDeep,
+                          backgroundColor: context.appColors.secondary,
+                          foregroundColor: context.appColors.primaryDeep,
                         ),
                         icon: const Icon(Icons.add_rounded, size: 19),
                         label: const Text('إنشاء حملة جديدة'),
@@ -1308,7 +1308,7 @@ class _HeroSkeleton extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     height: 258,
     decoration: BoxDecoration(
-      color: AppColors.surfaceSoft,
+      color: context.appColors.surfaceSoft,
       borderRadius: BorderRadius.circular(27),
     ),
     child: const Center(child: CircularProgressIndicator()),
@@ -1337,8 +1337,8 @@ class _SectionHeading extends StatelessWidget {
           children: [
             Text(
               eyebrow,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: context.appColors.primary,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: .3,
@@ -1427,9 +1427,9 @@ class _ImpactMetric extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: AppColors.surface,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(21),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: context.appColors.border),
     ),
     child: Row(
       children: [
@@ -1450,8 +1450,8 @@ class _ImpactMetric extends StatelessWidget {
             children: [
               Text(
                 '$value',
-                style: const TextStyle(
-                  color: AppColors.text,
+                style: TextStyle(
+                  color: context.appColors.text,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                 ),
@@ -1480,9 +1480,9 @@ class _CompactCampaignCard extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
@@ -1491,13 +1491,13 @@ class _CompactCampaignCard extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               color: item.isUrgent
-                  ? AppColors.danger.withValues(alpha: .08)
-                  : AppColors.surfaceSoft,
+                  ? context.appColors.danger.withValues(alpha: .08)
+                  : context.appColors.surfaceSoft,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
               item.isUrgent ? Icons.priority_high_rounded : Icons.campaign,
-              color: item.isUrgent ? AppColors.danger : AppColors.primary,
+              color: item.isUrgent ? context.appColors.danger : context.appColors.primary,
             ),
           ),
           const SizedBox(width: 11),
@@ -1522,7 +1522,7 @@ class _CompactCampaignCard extends StatelessWidget {
           ),
           _StatusPill(
             label: _campaignStatus(item.status),
-            color: _campaignColor(item.status),
+                color: _campaignColor(context.appColors, item.status),
           ),
         ],
       ),
@@ -1557,7 +1557,7 @@ class _CampaignCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: item.isUrgent
                         ? const [Color(0xFFE96A78), Color(0xFFC94256)]
-                        : const [AppColors.primary, AppColors.primaryDeep],
+                        : [context.appColors.primary, context.appColors.primaryDeep],
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -1607,14 +1607,14 @@ class _CampaignCard extends StatelessWidget {
             children: [
               _StatusPill(
                 label: _campaignStatus(item.status),
-                color: _campaignColor(item.status),
+            color: _campaignColor(context.appColors, item.status),
               ),
               if (item.isUrgent)
-                const _StatusPill(label: 'عاجلة', color: AppColors.danger),
+                _StatusPill(label: 'عاجلة', color: context.appColors.danger),
               if (item.acceptsPublicDonations)
-                const _StatusPill(
+                _StatusPill(
                   label: 'تستقبل التبرعات',
-                  color: AppColors.success,
+                  color: context.appColors.success,
                 ),
             ],
           ),
@@ -1622,10 +1622,10 @@ class _CampaignCard extends StatelessWidget {
             const Divider(height: 24),
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.event_outlined,
                   size: 18,
-                  color: AppColors.textMuted,
+                  color: context.appColors.textMuted,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -1653,7 +1653,7 @@ class _DonationOfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = donationStatus(offer.status);
+    final state = donationStatus(context.appColors, offer.status);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1666,12 +1666,12 @@ class _DonationOfferCard extends StatelessWidget {
                   width: 47,
                   height: 47,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceWarm,
+                    color: context.appColors.surfaceWarm,
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.medication_liquid_outlined,
-                    color: AppColors.warning,
+                    color: context.appColors.warning,
                   ),
                 ),
                 const SizedBox(width: 11),
@@ -1759,7 +1759,7 @@ class _AssistanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = donationStatus(request.status);
+    final state = donationStatus(context.appColors, request.status);
     final active = request.status == 'Open' || request.status == 'UnderReview';
     return Card(
       child: Padding(
@@ -1913,10 +1913,10 @@ class _InfoRow extends StatelessWidget {
               width: 39,
               height: 39,
               decoration: BoxDecoration(
-                color: AppColors.surfaceSoft,
+                color: context.appColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(13),
               ),
-              child: Icon(icon, size: 19, color: AppColors.primary),
+              child: Icon(icon, size: 19, color: context.appColors.primary),
             ),
             const SizedBox(width: 11),
             Expanded(
@@ -1950,9 +1950,9 @@ class _DocumentTile extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
@@ -1960,12 +1960,12 @@ class _DocumentTile extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.surfaceSoft,
+              color: context.appColors.surfaceSoft,
               borderRadius: BorderRadius.circular(13),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.description_outlined,
-              color: AppColors.primary,
+              color: context.appColors.primary,
             ),
           ),
           const SizedBox(width: 10),
@@ -1986,7 +1986,7 @@ class _DocumentTile extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.check_circle_rounded, color: AppColors.success),
+          Icon(Icons.check_circle_rounded, color: context.appColors.success),
         ],
       ),
     ),
@@ -2002,7 +2002,7 @@ class _InlineDetail extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 5),
     child: Row(
       children: [
-        Icon(icon, size: 17, color: AppColors.textMuted),
+        Icon(icon, size: 17, color: context.appColors.textMuted),
         const SizedBox(width: 7),
         Expanded(
           child: Text(text, style: Theme.of(context).textTheme.bodySmall),
@@ -2063,10 +2063,10 @@ class _DateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: AppColors.surface,
+    color: context.appColors.surface,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(17),
-      side: const BorderSide(color: AppColors.border),
+      side: BorderSide(color: context.appColors.border),
     ),
     child: InkWell(
       onTap: onTap,
@@ -2075,9 +2075,9 @@ class _DateSelector extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.event_outlined,
-              color: AppColors.primary,
+              color: context.appColors.primary,
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -2087,8 +2087,8 @@ class _DateSelector extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: context.appColors.textMuted,
                       fontSize: 9.5,
                     ),
                   ),
@@ -2127,10 +2127,10 @@ class _VerificationCard extends StatelessWidget {
         status.toLowerCase() == 'approved';
     final rejected = status.toLowerCase() == 'rejected';
     final color = verified
-        ? AppColors.success
+        ? context.appColors.success
         : rejected
-        ? AppColors.danger
-        : AppColors.warning;
+        ? context.appColors.danger
+        : context.appColors.warning;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -2192,9 +2192,9 @@ class _Empty extends StatelessWidget {
     width: double.infinity,
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
     decoration: BoxDecoration(
-      color: AppColors.surface,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: context.appColors.border),
     ),
     child: Column(
       children: [
@@ -2202,10 +2202,10 @@ class _Empty extends StatelessWidget {
           width: 52,
           height: 52,
           decoration: BoxDecoration(
-            color: AppColors.surfaceSoft,
+            color: context.appColors.surfaceSoft,
             borderRadius: BorderRadius.circular(17),
           ),
-          child: Icon(icon, color: AppColors.primary, size: 25),
+          child: Icon(icon, color: context.appColors.primary, size: 25),
         ),
         const SizedBox(height: 12),
         Text(text, textAlign: TextAlign.center),
@@ -2234,11 +2234,12 @@ String _campaignStatus(String status) => switch (status.toLowerCase()) {
   'cancelled' => 'ملغاة',
   _ => 'مسودة',
 };
-Color _campaignColor(String status) => switch (status.toLowerCase()) {
-  'active' => AppColors.success,
-  'closed' => AppColors.textMuted,
-  'cancelled' => AppColors.danger,
-  _ => AppColors.warning,
+Color _campaignColor(AppColors colors, String status) => switch (status
+    .toLowerCase()) {
+  'active' => colors.success,
+  'closed' => colors.textMuted,
+  'cancelled' => colors.danger,
+  _ => colors.warning,
 };
 String _shortDate(DateTime value) =>
     '${value.year}/${value.month.toString().padLeft(2, '0')}/${value.day.toString().padLeft(2, '0')}';

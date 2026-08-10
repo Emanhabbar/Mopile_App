@@ -179,15 +179,15 @@ class _PharmacyHero extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [AppColors.primaryDeep, Color(0xFF174F5B)],
+          colors: [context.appColors.primaryDeep, Color(0xFF174F5B)],
         ),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withValues(alpha: 0.22),
+            color: context.appColors.shadow.withValues(alpha: 0.22),
             blurRadius: 30,
             offset: const Offset(0, 14),
           ),
@@ -201,7 +201,7 @@ class _PharmacyHero extends StatelessWidget {
             end: -55,
             child: _Orb(
               size: 180,
-              color: AppColors.primary.withValues(alpha: 0.42),
+              color: context.appColors.primary.withValues(alpha: 0.42),
             ),
           ),
           PositionedDirectional(
@@ -209,7 +209,7 @@ class _PharmacyHero extends StatelessWidget {
             start: -50,
             child: _Orb(
               size: 150,
-              color: AppColors.primaryLight.withValues(alpha: 0.07),
+              color: context.appColors.primaryLight.withValues(alpha: 0.07),
             ),
           ),
           Padding(
@@ -229,9 +229,9 @@ class _PharmacyHero extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.12),
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.local_pharmacy_rounded,
-                        color: AppColors.secondary,
+                        color: context.appColors.secondary,
                         size: 28,
                       ),
                     ),
@@ -241,7 +241,7 @@ class _PharmacyHero extends StatelessWidget {
                       icon: isOpen
                           ? Icons.circle_rounded
                           : Icons.schedule_rounded,
-                      color: isOpen ? AppColors.primaryLight : Colors.white70,
+                      color: isOpen ? context.appColors.primaryLight : Colors.white70,
                     ),
                   ],
                 ),
@@ -262,7 +262,7 @@ class _PharmacyHero extends StatelessWidget {
                       data.isApproved
                           ? Icons.verified_rounded
                           : Icons.hourglass_top_rounded,
-                      color: AppColors.secondary,
+                      color: context.appColors.secondary,
                       size: 23,
                     ),
                   ],
@@ -346,7 +346,7 @@ class _OperationsGrid extends StatelessWidget {
         'المخزون',
         lowStock > 0 ? '$lowStock منخفض' : 'إدارة الأصناف',
         Icons.inventory_2_rounded,
-        AppColors.primary,
+        context.appColors.primary,
         onInventory,
       ),
       (
@@ -431,7 +431,7 @@ class _OperationCard extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.appColors.surface,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: color, size: 21),
@@ -482,13 +482,13 @@ class _MetricsGrid extends StatelessWidget {
         'أصناف المخزون',
         data.inventoryItemsCount,
         Icons.medication_rounded,
-        AppColors.primary,
+        context.appColors.primary,
       ),
       (
         'متوفر',
         data.inStockCount,
         Icons.check_circle_rounded,
-        AppColors.success,
+        context.appColors.success,
       ),
       (
         'مخزون منخفض',
@@ -500,7 +500,7 @@ class _MetricsGrid extends StatelessWidget {
         'نافد',
         data.outOfStockCount,
         Icons.remove_circle_outline_rounded,
-        AppColors.danger,
+        context.appColors.danger,
       ),
     ];
 
@@ -519,9 +519,9 @@ class _MetricsGrid extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: context.appColors.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             children: [
@@ -612,9 +612,9 @@ class _ReadinessCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -625,7 +625,7 @@ class _ReadinessCard extends StatelessWidget {
                 width: 43,
                 height: 43,
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceWarm,
+                  color: context.appColors.surfaceWarm,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
@@ -657,10 +657,10 @@ class _ReadinessCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: data.profileCompletionPercentage.clamp(0, 100) / 100,
               minHeight: 7,
-              backgroundColor: AppColors.surfaceSoft,
+              backgroundColor: context.appColors.surfaceSoft,
               color: data.profileCompletionPercentage >= 100
-                  ? AppColors.success
-                  : AppColors.secondary,
+                  ? context.appColors.success
+                  : context.appColors.secondary,
             ),
           ),
           const SizedBox(height: 14),
@@ -706,7 +706,7 @@ class _ReadinessStep extends StatelessWidget {
                 complete
                     ? Icons.check_circle_rounded
                     : Icons.radio_button_unchecked_rounded,
-                color: complete ? AppColors.success : AppColors.textMuted,
+                color: complete ? context.appColors.success : context.appColors.textMuted,
                 size: 22,
               ),
               const SizedBox(width: 10),
@@ -723,9 +723,9 @@ class _ReadinessStep extends StatelessWidget {
                 ),
               ),
               if (onTap != null)
-                const Icon(
+                Icon(
                   Icons.chevron_left_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
             ],
           ),
@@ -744,7 +744,7 @@ class _InventoryAlertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expiring = alert.alertType.toLowerCase().contains('expir');
-    final color = expiring ? AppColors.danger : const Color(0xFFB7791F);
+    final color = expiring ? context.appColors.danger : const Color(0xFFB7791F);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -795,9 +795,9 @@ class _InventoryAlertCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_left_rounded,
-                color: AppColors.textMuted,
+                color: context.appColors.textMuted,
               ),
             ],
           ),
@@ -815,19 +815,19 @@ class _HealthyInventoryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.065),
+        color: context.appColors.success.withValues(alpha: 0.065),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.14)),
+        border: Border.all(color: context.appColors.success.withValues(alpha: 0.14)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.task_alt_rounded, color: AppColors.success),
+          Icon(Icons.task_alt_rounded, color: context.appColors.success),
           SizedBox(width: 10),
           Expanded(
             child: Text(
               'المخزون مستقر ولا توجد تنبيهات عاجلة',
               style: TextStyle(
-                color: AppColors.success,
+                color: context.appColors.success,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -923,7 +923,7 @@ class _CompletionProgress extends StatelessWidget {
             child: LinearProgressIndicator(
               value: value.clamp(0, 100) / 100,
               minHeight: 6,
-              color: AppColors.secondary,
+              color: context.appColors.secondary,
               backgroundColor: Colors.white.withValues(alpha: 0.1),
             ),
           ),
@@ -965,7 +965,7 @@ class _HeroMetric extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.secondary, size: 18),
+            Icon(icon, color: context.appColors.secondary, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Column(

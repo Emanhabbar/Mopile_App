@@ -119,7 +119,7 @@ class _MedicineHero extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       boxShadow: [
         BoxShadow(
-          color: AppColors.primary.withValues(alpha: 0.18),
+          color: context.appColors.primary.withValues(alpha: 0.18),
           blurRadius: 27,
           offset: const Offset(0, 12),
         ),
@@ -247,7 +247,7 @@ class _Section extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: AppColors.primary),
+                Icon(icon, color: context.appColors.primary),
                 const SizedBox(width: 8),
                 Text(title, style: Theme.of(context).textTheme.titleMedium),
               ],
@@ -304,7 +304,7 @@ class _Description extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.notes_rounded, color: AppColors.primary),
+              Icon(Icons.notes_rounded, color: context.appColors.primary),
               const SizedBox(width: 8),
               Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
             ],

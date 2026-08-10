@@ -157,9 +157,9 @@ class _CatalogHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        border: Border(bottom: BorderSide(color: context.appColors.border)),
       ),
       child: TextField(
         controller: controller,
@@ -220,13 +220,13 @@ class _ResultSummary extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.08),
+            color: context.appColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
             '${page.pageNumber}/${page.totalPages}',
-            style: const TextStyle(
-              color: AppColors.primary,
+            style: TextStyle(
+              color: context.appColors.primary,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -256,12 +256,12 @@ class _MedicineCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.09),
+                  color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.medication_liquid_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
               ),
               const SizedBox(width: 13),
@@ -296,10 +296,10 @@ class _MedicineCard extends StatelessWidget {
                         if (medicine.dosageForm case final form?)
                           _Tag(icon: Icons.category_outlined, text: form),
                         if (medicine.requiresPrescription)
-                          const _Tag(
+                          _Tag(
                             icon: Icons.receipt_long_outlined,
                             text: 'بوصفة طبية',
-                            color: Color(0xFFB47618),
+                            color: const Color(0xFFB47618),
                           ),
                       ],
                     ),
@@ -320,36 +320,39 @@ class _Tag extends StatelessWidget {
   const _Tag({
     required this.icon,
     required this.text,
-    this.color = AppColors.primary,
+    this.color,
   });
 
   final IconData icon;
   final String text;
-  final Color color;
+  final Color? color;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 13, color: color),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: TextStyle(
-            color: color,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) {
+    final tagColor = color ?? context.appColors.primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: tagColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: tagColor),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              color: tagColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 class _Pagination extends StatelessWidget {
@@ -402,10 +405,10 @@ class _EmptyCatalog extends StatelessWidget {
     padding: const EdgeInsets.all(34),
     children: [
       const SizedBox(height: 90),
-      const Icon(
+      Icon(
         Icons.medication_outlined,
         size: 52,
-        color: AppColors.textMuted,
+        color: context.appColors.textMuted,
       ),
       const SizedBox(height: 14),
       Text(

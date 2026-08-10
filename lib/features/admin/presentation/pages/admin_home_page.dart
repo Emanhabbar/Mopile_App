@@ -55,7 +55,7 @@ class AdminHomePage extends ConsumerWidget {
                     value: '${data.totalUsers}',
                     caption: '${data.activeUsers} نشط',
                     icon: Icons.people_alt_rounded,
-                    color: AppColors.primary,
+                    color: context.appColors.primary,
                   ),
                   RoleMetricData(
                     label: 'الصيدليات',
@@ -93,7 +93,7 @@ class AdminHomePage extends ConsumerWidget {
                     subtitle: 'صيدليات ومنظمات ومستودعات',
                     badge: pendingApprovals > 0 ? '$pendingApprovals' : null,
                     icon: Icons.fact_check_rounded,
-                    color: AppColors.primary,
+                    color: context.appColors.primary,
                     onTap: () =>
                         context.push('/admin/workspace?section=approvals'),
                   ),
@@ -130,7 +130,7 @@ class AdminHomePage extends ConsumerWidget {
                 icon: Icons.monitor_heart_outlined,
                 color: pendingApprovals > 0
                     ? const Color(0xFFB7791F)
-                    : AppColors.success,
+                    : context.appColors.success,
                 onTap: () => context.push('/admin/workspace'),
               ),
               const SizedBox(height: 14),
