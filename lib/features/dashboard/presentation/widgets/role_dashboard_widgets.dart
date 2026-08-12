@@ -141,12 +141,13 @@ class RoleMetricsGrid extends StatelessWidget {
   Widget build(BuildContext context) => GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
+    padding: EdgeInsets.zero,
     itemCount: items.length,
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
-      childAspectRatio: 1.62,
+      childAspectRatio: 1.85,
     ),
     itemBuilder: (context, index) {
       final item = items[index];
@@ -155,20 +156,34 @@ class RoleMetricsGrid extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: context.appColors.surface,
-            borderRadius: BorderRadius.circular(21),
-            border: Border.all(color: context.appColors.border),
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+              colors: [
+                item.color.withValues(alpha: 0.06),
+                context.appColors.surface,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: item.color.withValues(alpha: 0.12)),
           ),
           child: Row(
             children: [
               Container(
-                width: 43,
-                height: 43,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: item.color.withValues(alpha: .1),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      item.color.withValues(alpha: 0.18),
+                      item.color.withValues(alpha: 0.08),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(item.icon, color: item.color, size: 21),
+                child: Icon(item.icon, color: item.color, size: 22),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -180,24 +195,35 @@ class RoleMetricsGrid extends StatelessWidget {
                       item.value,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge?.copyWith(fontSize: 20),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: item.color,
+                      ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       item.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(fontSize: 10.5),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     if (item.caption != null)
-                      Text(
-                        item.caption!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: item.color, fontSize: 9.5),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          item.caption!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: item.color,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -237,12 +263,13 @@ class RoleActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) => GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
+    padding: EdgeInsets.zero,
     itemCount: items.length,
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
-      childAspectRatio: 1.18,
+      childAspectRatio: 1.15,
     ),
     itemBuilder: (context, index) {
       final item = items[index];
@@ -250,20 +277,20 @@ class RoleActionsGrid extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: item.onTap,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(24),
           child: Ink(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: AlignmentDirectional.topStart,
                 end: AlignmentDirectional.bottomEnd,
                 colors: [
-                  item.color.withValues(alpha: .12),
-                  item.color.withValues(alpha: .045),
+                  item.color.withValues(alpha: .14),
+                  item.color.withValues(alpha: .04),
                 ],
               ),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: item.color.withValues(alpha: .14)),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: item.color.withValues(alpha: .12)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,13 +298,20 @@ class RoleActionsGrid extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 42,
-                      height: 42,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .88),
+                        color: Colors.white.withValues(alpha: .9),
                         borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: item.color.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: Icon(item.icon, color: item.color, size: 22),
+                      child: Icon(item.icon, color: item.color, size: 23),
                     ),
                     const Spacer(),
                     if (item.badge != null)
@@ -300,10 +334,18 @@ class RoleActionsGrid extends StatelessWidget {
                         ),
                       )
                     else
-                      Icon(
-                        Icons.arrow_back_rounded,
-                        color: item.color,
-                        size: 18,
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: item.color.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: item.color,
+                          size: 15,
+                        ),
                       ),
                   ],
                 ),
@@ -312,16 +354,19 @@ class RoleActionsGrid extends StatelessWidget {
                   item.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Text(
                   item.subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(fontSize: 10.5),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 10.5,
+                    height: 1.4,
+                  ),
                 ),
               ],
             ),
@@ -347,11 +392,25 @@ class RoleSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
+      Container(
+        width: 4,
+        height: 20,
+        decoration: BoxDecoration(
+          color: context.appColors.primary,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+      const SizedBox(width: 10),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: 2),
             Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
           ],

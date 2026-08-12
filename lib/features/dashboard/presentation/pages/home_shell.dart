@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,6 +108,7 @@ class HomeShellAppBar extends ConsumerWidget implements PreferredSizeWidget {
               unreadNotifications > 99 ? '99+' : '$unreadNotifications',
             ),
             backgroundColor: context.appColors.secondary,
+            offset: const Offset(-2, 2),
             child: const Icon(Icons.notifications_none_rounded, size: 22),
           ),
         ),
@@ -275,21 +278,28 @@ class _DawaaiBottomBar extends StatelessWidget {
   final void Function(int index) onTap;
 
   @override
-  Widget build(BuildContext context) => Container(
-    height: 74,
-    padding: const EdgeInsets.all(7),
-    decoration: BoxDecoration(
-      color: context.appColors.surface,
-      borderRadius: BorderRadius.circular(25),
-      border: Border.all(color: context.appColors.border),
-      boxShadow: [
-        BoxShadow(
-          color: context.appColors.shadow.withValues(alpha: 0.13),
-          blurRadius: 26,
-          offset: const Offset(0, 11),
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(26),
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+      child: Container(
+        height: 76,
+        padding: const EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          color: context.appColors.surface.withValues(alpha: 0.75),
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(
+            color: context.appColors.border.withValues(alpha: 0.4),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: context.appColors.shadow.withValues(alpha: 0.06),
+              blurRadius: 30,
+              spreadRadius: -6,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
-      ],
-    ),
     child: Row(
       children: List.generate(destinations.length, (index) {
         final destination = destinations[index];
@@ -306,22 +316,22 @@ class _DawaaiBottomBar extends StatelessWidget {
                   HapticFeedback.selectionClick();
                   onTap(index);
                 },
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(20),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 260),
+                  duration: const Duration(milliseconds: 280),
                   curve: Curves.easeOutCubic,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? context.appColors.surfaceSoft
+                        ? context.appColors.primary.withValues(alpha: 0.1)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       AnimatedScale(
-                        scale: isSelected ? 1.08 : 1,
-                        duration: const Duration(milliseconds: 260),
+                        scale: isSelected ? 1.1 : 1,
+                        duration: const Duration(milliseconds: 280),
                         curve: Curves.easeOutBack,
                         child: Icon(
                           isSelected
@@ -330,7 +340,7 @@ class _DawaaiBottomBar extends StatelessWidget {
                           color: isSelected
                               ? context.appColors.primary
                               : context.appColors.textMuted,
-                          size: 22,
+                          size: 23,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -340,9 +350,9 @@ class _DawaaiBottomBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: isSelected
-                              ? context.appColors.primaryDark
+                              ? context.appColors.primary
                               : context.appColors.textMuted,
-                          fontSize: destinations.length >= 5 ? 9.5 : 11,
+                          fontSize: destinations.length >= 5 ? 10 : 11,
                           fontWeight: isSelected
                               ? FontWeight.w800
                               : FontWeight.w600,
@@ -356,6 +366,8 @@ class _DawaaiBottomBar extends StatelessWidget {
           ),
         );
       }),
+    ),
+    ),
     ),
   );
 }

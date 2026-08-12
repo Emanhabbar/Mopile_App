@@ -50,21 +50,28 @@ class _TickerCard extends StatelessWidget {
         ? const Color(0xFF3977C4)
         : context.appColors.primary;
     return Material(
-      color: color.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(17),
+      color: color.withValues(alpha: 0.07),
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.13),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withValues(alpha: 0.2),
+                      color.withValues(alpha: 0.08),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(13),
                 ),
                 child: Icon(
@@ -72,9 +79,10 @@ class _TickerCard extends StatelessWidget {
                       ? Icons.local_pharmacy_outlined
                       : Icons.campaign_outlined,
                   color: color,
+                  size: 20,
                 ),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,10 +93,12 @@ class _TickerCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 4),
                     Text(
                       item.message,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        height: 1.4,
+                      ),
                     ),
                     if (item.pharmacyName != null) ...[
                       const SizedBox(height: 5),
@@ -97,13 +107,27 @@ class _TickerCard extends StatelessWidget {
                         style: TextStyle(
                           color: color,
                           fontWeight: FontWeight.w700,
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ],
                 ),
               ),
-              if (onTap != null) Icon(Icons.chevron_left_rounded, color: color),
+              if (onTap != null)
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.chevron_left_rounded,
+                    color: color,
+                    size: 18,
+                  ),
+                ),
             ],
           ),
         ),
