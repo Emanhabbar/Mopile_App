@@ -77,7 +77,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               label: Text(
                 unreadNotifications > 99 ? '99+' : '$unreadNotifications',
               ),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: context.appColors.secondary,
               child: const Icon(Icons.notifications_none_rounded, size: 22),
             ),
           ),
@@ -307,12 +307,12 @@ class _DawaaiBottomBar extends StatelessWidget {
     height: 74,
     padding: const EdgeInsets.all(7),
     decoration: BoxDecoration(
-      color: AppColors.surface,
+      color: context.appColors.surface,
       borderRadius: BorderRadius.circular(25),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: context.appColors.border),
       boxShadow: [
         BoxShadow(
-          color: AppColors.shadow.withValues(alpha: 0.13),
+          color: context.appColors.shadow.withValues(alpha: 0.13),
           blurRadius: 26,
           offset: const Offset(0, 11),
         ),
@@ -340,7 +340,7 @@ class _DawaaiBottomBar extends StatelessWidget {
                   curve: Curves.easeOutCubic,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.surfaceSoft
+                        ? context.appColors.surfaceSoft
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                   ),
@@ -356,8 +356,8 @@ class _DawaaiBottomBar extends StatelessWidget {
                               ? destination.selectedIcon
                               : destination.icon,
                           color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
+                              ? context.appColors.primary
+                              : context.appColors.textMuted,
                           size: 22,
                         ),
                       ),
@@ -368,8 +368,8 @@ class _DawaaiBottomBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: isSelected
-                              ? AppColors.primaryDark
-                              : AppColors.textMuted,
+                              ? context.appColors.primaryDark
+                              : context.appColors.textMuted,
                           fontSize: destinations.length >= 5 ? 9.5 : 11,
                           fontWeight: isSelected
                               ? FontWeight.w800
@@ -403,10 +403,10 @@ class _HeaderAction extends StatelessWidget {
   Widget build(BuildContext context) => Tooltip(
     message: tooltip,
     child: Material(
-      color: AppColors.surface,
+      color: context.appColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.appColors.border),
       ),
       child: InkWell(
         onTap: onPressed,

@@ -100,7 +100,7 @@ class _PrescriptionDetailsPageState
                   icon: const Icon(Icons.close_rounded),
                   label: const Text('إلغاء الوصفة'),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.danger,
+                    foregroundColor: context.appColors.danger,
                   ),
                 ),
               ],
@@ -141,7 +141,7 @@ class _PrescriptionDetailsPageState
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
             child: const Text('إلغاء الوصفة'),
           ),
         ],
@@ -199,7 +199,7 @@ class _PrescriptionDetailsPageState
       ..showSnackBar(
         SnackBar(
           content: Text(text),
-          backgroundColor: error ? AppColors.danger : null,
+          backgroundColor: error ? context.appColors.danger : null,
         ),
       );
   }
@@ -212,7 +212,7 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = prescriptionStatusInfo(order.status);
+    final info = prescriptionStatusInfo(context.appColors, order.status);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -294,7 +294,7 @@ class _MedicineItem extends StatelessWidget {
     child: ListTile(
       leading: Icon(
         item.isMatched ? Icons.medication_rounded : Icons.help_outline_rounded,
-        color: item.isMatched ? AppColors.primary : AppColors.textMuted,
+        color: item.isMatched ? context.appColors.primary : context.appColors.textMuted,
       ),
       title: Text(item.displayName),
       subtitle: Text(
@@ -332,9 +332,9 @@ class _PharmacyMatchCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.local_pharmacy_rounded,
-                color: AppColors.primary,
+                color: context.appColors.primary,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -345,8 +345,8 @@ class _PharmacyMatchCard extends StatelessWidget {
               ),
               Text(
                 '${match.matchPercentage.toStringAsFixed(0)}٪',
-                style: const TextStyle(
-                  color: AppColors.primary,
+                style: TextStyle(
+                  color: context.appColors.primary,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -392,7 +392,7 @@ class _PickupCodeCard extends StatelessWidget {
           SelectableText(
             code,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: AppColors.primary,
+              color: context.appColors.primary,
               letterSpacing: 3,
             ),
           ),

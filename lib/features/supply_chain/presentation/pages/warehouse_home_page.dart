@@ -47,7 +47,7 @@ class WarehouseHomePage extends ConsumerWidget {
                   label: 'تشغيلات نشطة',
                   value: '${data.activeBatches}',
                   icon: Icons.inventory_2_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
                 RoleMetricData(
                   label: 'مخزون منخفض',
@@ -93,7 +93,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       ? '${data.lowStockBatches}'
                       : null,
                   icon: Icons.inventory_rounded,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                   onTap: () => context.push('/supply-chain'),
                 ),
                 RoleActionData(
@@ -149,7 +149,7 @@ class WarehouseHomePage extends ConsumerWidget {
                             ? Icons.remove_circle_outline_rounded
                             : Icons.inventory_2_outlined,
                         color: batch.sellableQuantity <= 0
-                            ? AppColors.danger
+                            ? context.appColors.danger
                             : const Color(0xFFE08A3E),
                         onTap: () => context.push('/supply-chain'),
                       ),
@@ -173,7 +173,7 @@ class WarehouseHomePage extends ConsumerWidget {
                         message:
                             '${order.orderCode} · ${_orderStatus(order.status)} · ${_money(order.totalAmount)} ل.س',
                         icon: Icons.receipt_long_outlined,
-                        color: _orderColor(order.status),
+                        color: _orderColor(context.appColors, order.status),
                         onTap: () => context.push('/supply-chain'),
                       ),
                     ),
@@ -203,9 +203,9 @@ String _orderStatus(String status) => switch (status) {
   _ => status,
 };
 
-Color _orderColor(String status) => switch (status) {
-  'Delivered' => AppColors.success,
-  'Rejected' || 'Cancelled' => AppColors.danger,
+Color _orderColor(AppColors colors, String status) => switch (status) {
+  'Delivered' => colors.success,
+  'Rejected' || 'Cancelled' => colors.danger,
   'OutForDelivery' => const Color(0xFF3977C4),
-  _ => AppColors.primary,
+  _ => colors.primary,
 };

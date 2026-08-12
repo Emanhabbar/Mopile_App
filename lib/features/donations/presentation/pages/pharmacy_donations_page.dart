@@ -17,14 +17,14 @@ class PharmacyDonationsPage extends ConsumerWidget {
     final offers = ref.watch(pharmacyDonationOffersProvider(null));
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('التحقق من التبرعات'),
             Text(
               'سلامة الدواء قبل وصوله للمستفيد',
               style: TextStyle(
-                color: AppColors.textMuted,
+                color: context.appColors.textMuted,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
@@ -45,12 +45,12 @@ class PharmacyDonationsPage extends ConsumerWidget {
           child: items.isEmpty
               ? ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  children: const [
+                  children: [
                     SizedBox(height: 120),
                     Icon(
                       Icons.verified_outlined,
                       size: 54,
-                      color: AppColors.textMuted,
+                      color: context.appColors.textMuted,
                     ),
                     SizedBox(height: 12),
                     Text(
@@ -138,7 +138,7 @@ class PharmacyDonationsPage extends ConsumerWidget {
           content: Text(
             error is ApiException ? error.message : 'تعذر تحديث التبرع.',
           ),
-          backgroundColor: AppColors.danger,
+          backgroundColor: context.appColors.danger,
         ),
       );
     }
@@ -152,8 +152,8 @@ class _PharmacyDonationHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [AppColors.primaryDeep, AppColors.primary],
+      gradient: LinearGradient(
+        colors: [context.appColors.primaryDeep, context.appColors.primary],
       ),
       borderRadius: BorderRadius.circular(25),
     ),
@@ -166,9 +166,9 @@ class _PharmacyDonationHero extends StatelessWidget {
             color: Colors.white.withValues(alpha: .12),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.verified_outlined,
-            color: AppColors.secondary,
+            color: context.appColors.secondary,
           ),
         ),
         const SizedBox(width: 12),
@@ -194,13 +194,13 @@ class _PharmacyDonationHero extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
-            color: AppColors.secondary,
+            color: context.appColors.secondary,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Text(
             '$count',
-            style: const TextStyle(
-              color: AppColors.primaryDeep,
+            style: TextStyle(
+              color: context.appColors.primaryDeep,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -228,11 +228,11 @@ class _DonationReviewCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  backgroundColor: AppColors.surfaceSoft,
+                CircleAvatar(
+                  backgroundColor: context.appColors.surfaceSoft,
                   child: Icon(
                     Icons.volunteer_activism_outlined,
-                    color: AppColors.primary,
+                    color: context.appColors.primary,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -303,9 +303,9 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (status) {
-      'PharmacyApproved' || 'ReceivedByPharmacy' => AppColors.success,
-      'PharmacyRejected' => AppColors.danger,
-      _ => AppColors.warning,
+      'PharmacyApproved' || 'ReceivedByPharmacy' => context.appColors.success,
+      'PharmacyRejected' => context.appColors.danger,
+      _ => context.appColors.warning,
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),

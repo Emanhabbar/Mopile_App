@@ -16,11 +16,11 @@ class AppLoadingState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 34,
               height: 34,
               child: CircularProgressIndicator(
-                color: AppColors.primary,
+                color: context.appColors.primary,
                 strokeWidth: 3,
               ),
             ),
@@ -57,12 +57,12 @@ class AppErrorState extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppColors.danger.withValues(alpha: 0.08),
+                  color: context.appColors.danger.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(21),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.cloud_off_rounded,
-                  color: AppColors.danger,
+                  color: context.appColors.danger,
                   size: 30,
                 ),
               ),
