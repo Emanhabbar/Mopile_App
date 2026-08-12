@@ -158,8 +158,8 @@ class _CatalogHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
       decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+        color: Color(0xFFFFFFFF),
+        border: Border(bottom: BorderSide(color: Color(0xFFD9E4E5))),
       ),
       child: TextField(
         controller: controller,
@@ -220,13 +220,13 @@ class _ResultSummary extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.08),
+            color: context.appColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
             '${page.pageNumber}/${page.totalPages}',
             style: const TextStyle(
-              color: AppColors.primary,
+              color: Color(0xFF216474),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -256,12 +256,12 @@ class _MedicineCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.09),
+                  color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
                   Icons.medication_liquid_rounded,
-                  color: AppColors.primary,
+                  color: Color(0xFF216474),
                 ),
               ),
               const SizedBox(width: 13),
@@ -283,7 +283,7 @@ class _MedicineCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: AppColors.textMuted,
+                          color: Color(0xFF668087),
                           fontSize: 11,
                         ),
                       ),
@@ -335,7 +335,7 @@ class _Tag extends StatelessWidget {
   const _Tag({
     required this.icon,
     required this.text,
-    this.color = AppColors.primary,
+    this.color = const Color(0xFF216474),
   });
 
   final IconData icon;
@@ -420,7 +420,7 @@ class _EmptyCatalog extends StatelessWidget {
       const Icon(
         Icons.medication_outlined,
         size: 52,
-        color: AppColors.textMuted,
+        color: Color(0xFF668087),
       ),
       const SizedBox(height: 14),
       Text(

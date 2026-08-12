@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../../../../app/theme/app_colors.dart';
-
 class PharmacyBarcodeScannerPage extends StatefulWidget {
   const PharmacyBarcodeScannerPage({super.key});
 
@@ -67,7 +65,7 @@ class _PharmacyBarcodeScannerPageState
           controller: _controller,
           onDetect: _onDetect,
           placeholderBuilder: (_) => const Center(
-            child: CircularProgressIndicator(color: AppColors.secondary),
+            child: CircularProgressIndicator(color: Color(0xFFF5CB72)),
           ),
           errorBuilder: (_, _) => const ColoredBox(
             color: Color(0xFF061D23),
@@ -219,7 +217,7 @@ class _ScannerOverlayPainter extends CustomPainter {
     canvas.drawPath(path, Paint()..color = Colors.black.withValues(alpha: .48));
 
     final border = Paint()
-      ..color = AppColors.secondary
+      ..color = Color(0xFFF5CB72)
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
     canvas.drawRRect(
@@ -230,7 +228,7 @@ class _ScannerOverlayPainter extends CustomPainter {
       Offset(window.left + 20, window.center.dy),
       Offset(window.right - 20, window.center.dy),
       Paint()
-        ..color = AppColors.secondary.withValues(alpha: .75)
+        ..color = Color(0xFFF5CB72).withValues(alpha: .75)
         ..strokeWidth = 2,
     );
   }

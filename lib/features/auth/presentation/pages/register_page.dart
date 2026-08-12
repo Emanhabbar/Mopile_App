@@ -348,7 +348,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       _logoPath,
                       fit: BoxFit.contain,
                       filterQuality: FilterQuality.high,
-                      errorBuilder: (_, __, ___) {
+                      errorBuilder: (_, _, _) {
                         return const Icon(
                           Icons.local_pharmacy_rounded,
                           color: Color(0xFF076A73),
@@ -934,7 +934,7 @@ class _BusinessStep extends StatelessWidget {
                     child: SwitchListTile(
                       value: hasDeliveryService,
                       onChanged: onDeliveryChanged,
-                      activeColor: context.appColors.primary,
+                      activeThumbColor: context.appColors.primary,
                       secondary: const Icon(
                         Icons.delivery_dining_rounded,
                         color: Color(0xFF076A73),
@@ -1304,7 +1304,7 @@ class _TypeCard extends StatelessWidget {
                       ? const Icon(
                           Icons.check_rounded,
                           size: 17,
-                          color: const Color(0xFF153F45),
+                          color: Color(0xFF153F45),
                         )
                       : null,
                 ),

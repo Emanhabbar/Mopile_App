@@ -56,7 +56,7 @@ class AdminHomePage extends ConsumerWidget {
                     value: '${data.totalUsers}',
                     caption: '${data.activeUsers} نشط',
                     icon: Icons.people_alt_rounded,
-                    color: AppColors.primary,
+                    color: context.appColors.primary,
                   ),
                   RoleMetricData(
                     label: 'الصيدليات',
@@ -99,7 +99,7 @@ class AdminHomePage extends ConsumerWidget {
                     subtitle: 'صيدليات ومنظمات ومستودعات',
                     badge: pendingApprovals > 0 ? '$pendingApprovals' : null,
                     icon: Icons.fact_check_rounded,
-                    color: AppColors.primary,
+                    color: context.appColors.primary,
                     onTap: () =>
                         context.push('/admin/workspace?section=approvals'),
                   ),
@@ -136,7 +136,7 @@ class AdminHomePage extends ConsumerWidget {
                 icon: Icons.monitor_heart_outlined,
                 color: pendingApprovals > 0
                     ? const Color(0xFFB7791F)
-                    : AppColors.success,
+                    : context.appColors.success,
                 onTap: () => context.push('/admin/workspace'),
               ),
               const SizedBox(height: 14),
@@ -163,7 +163,7 @@ class _AiServicesCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.hub_rounded, color: AppColors.primary),
+              const Icon(Icons.hub_rounded, color: Color(0xFF216474)),
               const SizedBox(width: 9),
               Expanded(
                 child: Text(
@@ -183,7 +183,7 @@ class _AiServicesCard extends StatelessWidget {
             loading: () => const LinearProgressIndicator(minHeight: 3),
             error: (_, _) => const Text(
               'تعذر قراءة حالة الخدمات حالياً.',
-              style: TextStyle(color: AppColors.danger, fontSize: 12),
+              style: TextStyle(color: Color(0xFFB33A3A), fontSize: 12),
             ),
             data: (health) => Column(
               children: [
@@ -204,7 +204,7 @@ class _AiServicesCard extends StatelessWidget {
       children: [
         Icon(
           status.available ? Icons.check_circle_rounded : Icons.error_rounded,
-          color: status.available ? AppColors.success : AppColors.danger,
+          color: status.available ? Color(0xFF167D5A) : Color(0xFFB33A3A),
           size: 18,
         ),
         const SizedBox(width: 8),
@@ -212,7 +212,7 @@ class _AiServicesCard extends StatelessWidget {
         Text(
           status.available ? 'يعمل' : 'غير متاح',
           style: TextStyle(
-            color: status.available ? AppColors.success : AppColors.danger,
+            color: status.available ? Color(0xFF167D5A) : Color(0xFFB33A3A),
             fontSize: 11,
             fontWeight: FontWeight.w800,
           ),

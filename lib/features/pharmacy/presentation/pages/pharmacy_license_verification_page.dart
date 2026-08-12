@@ -112,7 +112,7 @@ class _PharmacyLicenseVerificationPageState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? AppColors.danger : AppColors.success,
+        backgroundColor: error ? context.appColors.danger : context.appColors.success,
       ),
     );
   }
@@ -131,7 +131,7 @@ class _Header extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [AppColors.primaryDeep, Color(0xFF174F5B)],
+          colors: [Color(0xFF102F37), Color(0xFF174F5B)],
         ),
         borderRadius: BorderRadius.circular(28),
       ),
@@ -144,7 +144,7 @@ class _Header extends StatelessWidget {
               color: Colors.white.withValues(alpha: .1),
               borderRadius: BorderRadius.circular(21),
             ),
-            child: Icon(presentation.$2, color: AppColors.secondary, size: 32),
+            child: Icon(presentation.$2, color: context.appColors.secondary, size: 32),
           ),
           const SizedBox(height: 13),
           Text(
@@ -190,7 +190,7 @@ class _Instructions extends StatelessWidget {
             Text(
               verification!.rejectionReason ?? verification!.failureReason!,
               style: const TextStyle(
-                color: AppColors.danger,
+                color: Color(0xFFB33A3A),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -211,7 +211,7 @@ class _Tip extends StatelessWidget {
       children: [
         const Icon(
           Icons.check_circle_rounded,
-          color: AppColors.success,
+          color: Color(0xFF167D5A),
           size: 18,
         ),
         const SizedBox(width: 8),
@@ -261,7 +261,7 @@ class _VerificationDetails extends StatelessWidget {
           width: 115,
           child: Text(
             label,
-            style: const TextStyle(color: AppColors.textMuted),
+            style: const TextStyle(color: Color(0xFF668087)),
           ),
         ),
         Expanded(

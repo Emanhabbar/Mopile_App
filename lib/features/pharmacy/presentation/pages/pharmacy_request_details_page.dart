@@ -114,12 +114,12 @@ class _PharmacyRequestDetailsPageState
                 width: 43,
                 height: 43,
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSoft,
+                  color: context.appColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
                   Icons.quickreply_outlined,
-                  color: AppColors.primary,
+                  color: Color(0xFF216474),
                 ),
               ),
               const SizedBox(width: 11),
@@ -147,7 +147,7 @@ class _PharmacyRequestDetailsPageState
                 child: _ResponseChoice(
                   icon: Icons.check_circle_outline_rounded,
                   label: 'متوفر',
-                  color: AppColors.success,
+                  color: context.appColors.success,
                   selected: _status == 'Available',
                   enabled: data.isRequestedMedicineCurrentlyAvailable,
                   onTap: () => setState(() => _status = 'Available'),
@@ -158,7 +158,7 @@ class _PharmacyRequestDetailsPageState
                 child: _ResponseChoice(
                   icon: Icons.cancel_outlined,
                   label: 'غير متوفر',
-                  color: AppColors.danger,
+                  color: context.appColors.danger,
                   selected: _status == 'Unavailable',
                   onTap: () => setState(() => _status = 'Unavailable'),
                 ),
@@ -266,7 +266,7 @@ class _PharmacyRequestDetailsPageState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? AppColors.danger : null,
+        backgroundColor: error ? context.appColors.danger : null,
       ),
     );
   }
@@ -278,10 +278,10 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = switch (data.request.status.toLowerCase()) {
-      'available' => AppColors.success,
-      'unavailable' => AppColors.danger,
-      'cancelled' => AppColors.textMuted,
-      _ => AppColors.secondary,
+      'available' => context.appColors.success,
+      'unavailable' => context.appColors.danger,
+      'cancelled' => context.appColors.textMuted,
+      _ => context.appColors.secondary,
     };
     final statusText = data.request.statusDisplayText.trim().isNotEmpty
         ? data.request.statusDisplayText
@@ -290,7 +290,7 @@ class _Hero extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDeep],
+          colors: [Color(0xFF216474), Color(0xFF102F37)],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
@@ -310,7 +310,7 @@ class _Hero extends StatelessWidget {
                 ),
                 child: const Icon(
                   Icons.medication_rounded,
-                  color: AppColors.secondary,
+                  color: Color(0xFFF5CB72),
                   size: 27,
                 ),
               ),
@@ -327,8 +327,8 @@ class _Hero extends StatelessWidget {
                 child: Text(
                   statusText,
                   style: TextStyle(
-                    color: statusColor == AppColors.secondary
-                        ? AppColors.secondary
+                    color: statusColor == context.appColors.secondary
+                        ? context.appColors.secondary
                         : Colors.white,
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
@@ -400,7 +400,7 @@ class _InfoCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.surfaceWarm,
+                color: context.appColors.surfaceWarm,
                 borderRadius: BorderRadius.circular(13),
               ),
               child: Text('ملاحظة المستخدم: ${data.request.note}'),
@@ -467,7 +467,7 @@ class _ResponseChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: selected ? color.withValues(alpha: .1) : AppColors.background,
+    color: selected ? color.withValues(alpha: .1) : context.appColors.background,
     borderRadius: BorderRadius.circular(15),
     child: InkWell(
       onTap: enabled ? onTap : null,
@@ -477,7 +477,7 @@ class _ResponseChoice extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(
           border: Border.all(
-            color: selected ? color : AppColors.border,
+            color: selected ? color : context.appColors.border,
             width: selected ? 1.5 : 1,
           ),
           borderRadius: BorderRadius.circular(15),
@@ -485,12 +485,12 @@ class _ResponseChoice extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: enabled ? color : AppColors.textMuted, size: 19),
+            Icon(icon, color: enabled ? color : context.appColors.textMuted, size: 19),
             const SizedBox(width: 7),
             Text(
               label,
               style: TextStyle(
-                color: enabled ? color : AppColors.textMuted,
+                color: enabled ? color : context.appColors.textMuted,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -513,10 +513,10 @@ class _SectionTitle extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: AppColors.surfaceSoft,
+          color: context.appColors.surfaceSoft,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: AppColors.primary, size: 21),
+        child: Icon(icon, color: context.appColors.primary, size: 21),
       ),
       const SizedBox(width: 10),
       Text(title, style: Theme.of(context).textTheme.titleMedium),
@@ -539,7 +539,7 @@ class _DetailsRow extends StatelessWidget {
           width: 90,
           child: Text(
             label,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+            style: const TextStyle(color: Color(0xFF668087), fontSize: 12),
           ),
         ),
         Expanded(
@@ -568,16 +568,16 @@ class _ContactRow extends StatelessWidget {
     margin: const EdgeInsets.only(bottom: 8),
     padding: const EdgeInsets.all(11),
     decoration: BoxDecoration(
-      color: AppColors.background,
+      color: context.appColors.background,
       borderRadius: BorderRadius.circular(13),
     ),
     child: Row(
       children: [
-        Icon(icon, color: AppColors.primary, size: 20),
+        Icon(icon, color: context.appColors.primary, size: 20),
         const SizedBox(width: 10),
         Text(
           '$label: ',
-          style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+          style: const TextStyle(color: Color(0xFF668087), fontSize: 12),
         ),
         Expanded(
           child: Text(
@@ -598,12 +598,12 @@ class _Processed extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: AppColors.success.withValues(alpha: .08),
+      color: context.appColors.success.withValues(alpha: .08),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
       children: [
-        const Icon(Icons.task_alt_rounded, color: AppColors.success, size: 36),
+        const Icon(Icons.task_alt_rounded, color: Color(0xFF167D5A), size: 36),
         const SizedBox(height: 9),
         const Text(
           'تمت معالجة هذا الطلب',

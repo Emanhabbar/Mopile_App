@@ -411,7 +411,7 @@ class _LoginHeader extends StatelessWidget {
                 imagePath,
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.high,
-                errorBuilder: (_, __, ___) {
+                errorBuilder: (_, _, _) {
                   return const Icon(
                     Icons.local_pharmacy_rounded,
                     color: _LoginPageState._primary,
@@ -704,7 +704,7 @@ class _CreateAccountSection extends StatelessWidget {
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             surfaceTintColor: Colors.transparent,
-            overlayColor: _LoginPageState._primary.withOpacity(0.06),
+            overlayColor: _LoginPageState._primary.withValues(alpha: 0.06),
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             padding: const EdgeInsets.symmetric(

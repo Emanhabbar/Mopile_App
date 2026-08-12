@@ -224,12 +224,12 @@ class _LocationRequiredState extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.09),
+                  color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(21),
                 ),
                 child: const Icon(
                   Icons.add_location_alt_rounded,
-                  color: AppColors.primary,
+                  color: Color(0xFF216474),
                   size: 31,
                 ),
               ),
@@ -277,7 +277,7 @@ class _SearchHero extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDark.withValues(alpha: 0.17),
+            color: context.appColors.primaryDark.withValues(alpha: 0.17),
             blurRadius: 26,
             offset: const Offset(0, 12),
           ),
@@ -361,7 +361,7 @@ class _SearchControls extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(23),
-        side: const BorderSide(color: AppColors.border),
+        side: const BorderSide(color: Color(0xFFD9E4E5)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -552,7 +552,7 @@ class _MedicineResultCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: context.appColors.background,
                 borderRadius: BorderRadius.circular(17),
               ),
               child: Row(
@@ -576,7 +576,7 @@ class _MedicineResultCard extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.local_pharmacy_rounded,
-                  color: AppColors.primary,
+                  color: Color(0xFF216474),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -604,8 +604,8 @@ class _MedicineResultCard extends StatelessWidget {
                       ? Icons.check_circle_rounded
                       : Icons.schedule_rounded,
                   color: result.pharmacy.isOpenNow
-                      ? AppColors.success
-                      : AppColors.textMuted,
+                      ? context.appColors.success
+                      : context.appColors.textMuted,
                 ),
               ],
             ),
@@ -647,7 +647,7 @@ class _Fact extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: AppColors.text,
+              color: Color(0xFF142E35),
               fontWeight: FontWeight.w800,
               fontSize: 12,
             ),
@@ -695,7 +695,7 @@ class _DiscoveryEmpty extends StatelessWidget {
         padding: const EdgeInsets.all(30),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.textMuted, size: 37),
+            Icon(icon, color: context.appColors.textMuted, size: 37),
             const SizedBox(height: 12),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 5),
