@@ -52,4 +52,19 @@ class MedicinesRemoteDataSource {
       throw ApiException.fromDio(error);
     }
   }
+
+  Future<Medicine> updateLocalization(
+    String id,
+    UpdateMedicineLocalization request,
+  ) async {
+    try {
+      final response = await _dio.put<Map<String, dynamic>>(
+        ApiEndpoints.medicineLocalization(id),
+        data: request.toJson(),
+      );
+      return Medicine.fromJson(response.data ?? const {});
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
 }

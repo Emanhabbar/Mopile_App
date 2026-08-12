@@ -97,16 +97,23 @@ class UserPharmacyMedicine {
     required this.medicineId,
     required this.medicineName,
     required this.requiresPrescription,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.scientificName,
+    this.arabicScientificName,
     this.manufacturer,
     this.dosageForm,
     this.capacity,
     this.sellingPrice,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String medicineId;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final String? scientificName;
+  final String? arabicScientificName;
   final String? manufacturer;
   final String? dosageForm;
   final String? capacity;
@@ -117,7 +124,10 @@ class UserPharmacyMedicine {
       UserPharmacyMedicine(
         medicineId: json['medicineId']?.toString() ?? '',
         medicineName: json['medicineName']?.toString() ?? '',
+        arabicMedicineName: _nullable(json['arabicMedicineName']),
+        medicineDisplayName: _nullable(json['medicineDisplayName']),
         scientificName: _nullable(json['scientificName']),
+        arabicScientificName: _nullable(json['arabicScientificName']),
         manufacturer: _nullable(json['manufacturer']),
         dosageForm: _nullable(json['dosageForm']),
         capacity: _nullable(json['capacity']),
@@ -170,16 +180,23 @@ class MedicineAlternative {
   const MedicineAlternative({
     required this.medicineId,
     required this.medicineName,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.scientificName,
+    this.arabicScientificName,
     this.composition,
     this.dosageForm,
     this.manufacturer,
     this.capacity,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String medicineId;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final String? scientificName;
+  final String? arabicScientificName;
   final String? composition;
   final String? dosageForm;
   final String? manufacturer;
@@ -189,7 +206,10 @@ class MedicineAlternative {
       MedicineAlternative(
         medicineId: json['medicineId']?.toString() ?? '',
         medicineName: json['medicineName']?.toString() ?? '',
+        arabicMedicineName: _nullable(json['arabicMedicineName']),
+        medicineDisplayName: _nullable(json['medicineDisplayName']),
         scientificName: _nullable(json['scientificName']),
+        arabicScientificName: _nullable(json['arabicScientificName']),
         composition: _nullable(json['composition']),
         dosageForm: _nullable(json['dosageForm']),
         manufacturer: _nullable(json['manufacturer']),
@@ -209,10 +229,13 @@ class UserMedicineRequestResult {
     required this.status,
     required this.statusDisplayText,
     required this.canCancel,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.note,
     this.suggestedAlternative,
     this.createdAtUtc,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String requestId;
   final String requestCode;
@@ -220,6 +243,8 @@ class UserMedicineRequestResult {
   final String medicineId;
   final String pharmacyName;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final int requestedQuantity;
   final String status;
   final String statusDisplayText;
@@ -236,6 +261,8 @@ class UserMedicineRequestResult {
         medicineId: json['medicineId']?.toString() ?? '',
         pharmacyName: json['pharmacyName']?.toString() ?? '',
         medicineName: json['medicineName']?.toString() ?? '',
+        arabicMedicineName: _nullable(json['arabicMedicineName']),
+        medicineDisplayName: _nullable(json['medicineDisplayName']),
         requestedQuantity: (json['requestedQuantity'] as num?)?.toInt() ?? 0,
         status: json['status']?.toString() ?? '',
         statusDisplayText: json['statusDisplayText']?.toString() ?? '',
@@ -265,6 +292,8 @@ class UserMedicineRequest {
     required this.createdAtUtc,
     required this.pharmacyIsOpenNow,
     required this.pharmacyStatusText,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.note,
     this.pharmacyResponseNote,
     this.suggestedAlternative,
@@ -272,7 +301,8 @@ class UserMedicineRequest {
     this.respondedAtUtc,
     this.cancelledAtUtc,
     this.pharmacyPhoneNumber,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String requestId;
   final String requestCode;
@@ -280,6 +310,8 @@ class UserMedicineRequest {
   final String medicineId;
   final String pharmacyName;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final int requestedQuantity;
   final String status;
   final String statusDisplayText;
@@ -305,6 +337,8 @@ class UserMedicineRequest {
         medicineId: json['medicineId']?.toString() ?? '',
         pharmacyName: json['pharmacyName']?.toString() ?? '',
         medicineName: json['medicineName']?.toString() ?? '',
+        arabicMedicineName: _nullable(json['arabicMedicineName']),
+        medicineDisplayName: _nullable(json['medicineDisplayName']),
         requestedQuantity: (json['requestedQuantity'] as num?)?.toInt() ?? 0,
         status: json['status']?.toString() ?? '',
         statusDisplayText: json['statusDisplayText']?.toString() ?? '',

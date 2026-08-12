@@ -190,20 +190,29 @@ class PharmacyInventoryItem {
     required this.lowStockThreshold,
     required this.stockStatus,
     required this.requiresPrescription,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.scientificName,
+    this.arabicScientificName,
     this.manufacturer,
     this.dosageForm,
+    this.packageSize,
     this.capacity,
     this.expiryDateUtc,
     this.daysUntilExpiry,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String inventoryItemId;
   final String medicineId;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final String? scientificName;
+  final String? arabicScientificName;
   final String? manufacturer;
   final String? dosageForm;
+  final String? packageSize;
   final String? capacity;
   final double sellingPrice;
   final bool isPriceVisibleToUsers;
@@ -220,9 +229,13 @@ class PharmacyInventoryItem {
         inventoryItemId: _text(json['inventoryItemId']),
         medicineId: _text(json['medicineId']),
         medicineName: _text(json['medicineName']),
+        arabicMedicineName: _nullable(json['arabicMedicineName']),
+        medicineDisplayName: _nullable(json['medicineDisplayName']),
         scientificName: _nullable(json['scientificName']),
+        arabicScientificName: _nullable(json['arabicScientificName']),
         manufacturer: _nullable(json['manufacturer']),
         dosageForm: _nullable(json['dosageForm']),
+        packageSize: _nullable(json['packageSize']),
         capacity: _nullable(json['capacity']),
         sellingPrice: _double(json['sellingPrice']) ?? 0,
         isPriceVisibleToUsers: _bool(json['isPriceVisibleToUsers']),
@@ -273,16 +286,26 @@ class PharmacyCatalogMedicine {
     required this.id,
     required this.name,
     required this.requiresPrescription,
+    this.barcode,
+    this.arabicName,
+    String? displayName,
     this.scientificName,
+    this.arabicScientificName,
     this.manufacturer,
     this.dosageForm,
+    this.packageSize,
     this.capacity,
-  });
+  }) : displayName = displayName ?? arabicName ?? name;
   final String id;
   final String name;
+  final String? barcode;
+  final String? arabicName;
+  final String displayName;
   final String? scientificName;
+  final String? arabicScientificName;
   final String? manufacturer;
   final String? dosageForm;
+  final String? packageSize;
   final String? capacity;
   final bool requiresPrescription;
 
@@ -290,12 +313,44 @@ class PharmacyCatalogMedicine {
       PharmacyCatalogMedicine(
         id: _text(json['id']),
         name: _text(json['name']),
+        barcode: _nullable(json['barcode']),
+        arabicName: _nullable(json['arabicName']),
+        displayName: _nullable(json['displayName']),
         scientificName: _nullable(json['scientificName']),
+        arabicScientificName: _nullable(json['arabicScientificName']),
         manufacturer: _nullable(json['manufacturer']),
         dosageForm: _nullable(json['dosageForm']),
+        packageSize: _nullable(json['packageSize']),
         capacity: _nullable(json['capacity']),
         requiresPrescription: _bool(json['requiresPrescription']),
       );
+}
+
+class PharmacyCatalogPage {
+  const PharmacyCatalogPage({
+    required this.items,
+    required this.pageNumber,
+    required this.pageSize,
+    required this.totalCount,
+    required this.totalPages,
+  });
+
+  factory PharmacyCatalogPage.fromJson(Map<String, dynamic> json) =>
+      PharmacyCatalogPage(
+        items: _list(json['items'], PharmacyCatalogMedicine.fromJson),
+        pageNumber: _int(json['pageNumber']),
+        pageSize: _int(json['pageSize']),
+        totalCount: _int(json['totalCount']),
+        totalPages: _int(json['totalPages']),
+      );
+
+  final List<PharmacyCatalogMedicine> items;
+  final int pageNumber;
+  final int pageSize;
+  final int totalCount;
+  final int totalPages;
+
+  bool get hasNextPage => pageNumber < totalPages;
 }
 
 class PharmacyInventoryBatchItemInput {
@@ -383,17 +438,22 @@ class PharmacyRequest {
     required this.canRespond,
     required this.hasPharmacyResponse,
     required this.isFinalStatus,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.userPhoneNumber,
     this.note,
     this.pharmacyResponseNote,
     this.suggestedAlternative,
     this.createdAtUtc,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String requestId;
   final String requestCode;
   final String medicineId;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final String userFullName;
   final String? userPhoneNumber;
   final int requestedQuantity;
@@ -413,6 +473,8 @@ class PharmacyRequest {
         requestCode: _text(json['requestCode']),
         medicineId: _text(json['medicineId']),
         medicineName: _text(json['medicineName']),
+        arabicMedicineName: _nullable(json['arabicMedicineName']),
+        medicineDisplayName: _nullable(json['medicineDisplayName']),
         userFullName: _text(json['userFullName']),
         userPhoneNumber: _nullable(json['userPhoneNumber']),
         requestedQuantity: _int(json['requestedQuantity']),
@@ -440,6 +502,7 @@ class PharmacyRequestDetails {
     required this.isRequestedMedicineCurrentlyAvailable,
     required this.alternativeCandidates,
     this.requestedMedicineScientificName,
+    this.requestedMedicineArabicScientificName,
     this.requestedMedicineComposition,
     this.requestedMedicineDosageForm,
     this.requestedMedicineCapacity,
@@ -448,6 +511,7 @@ class PharmacyRequestDetails {
   final String pharmacyName;
   final String userEmail;
   final String? requestedMedicineScientificName;
+  final String? requestedMedicineArabicScientificName;
   final String? requestedMedicineComposition;
   final String? requestedMedicineDosageForm;
   final String? requestedMedicineCapacity;
@@ -461,6 +525,9 @@ class PharmacyRequestDetails {
         userEmail: _text(json['userEmail']),
         requestedMedicineScientificName: _nullable(
           json['requestedMedicineScientificName'],
+        ),
+        requestedMedicineArabicScientificName: _nullable(
+          json['requestedMedicineArabicScientificName'],
         ),
         requestedMedicineComposition: _nullable(
           json['requestedMedicineComposition'],
@@ -477,6 +544,103 @@ class PharmacyRequestDetails {
           PharmacyCatalogMedicine.fromJson,
         ),
       );
+}
+
+class PharmacyLicenseVerification {
+  const PharmacyLicenseVerification({
+    required this.verificationId,
+    required this.pharmacyId,
+    required this.status,
+    required this.registeredName,
+    required this.originalFileName,
+    required this.contentType,
+    required this.fileSizeBytes,
+    required this.attemptCount,
+    required this.submittedAtUtc,
+    this.isReadable,
+    this.extractedName,
+    this.parentName,
+    this.birthPlace,
+    this.birthYear,
+    this.registryNumber,
+    this.registryDate,
+    this.decreeNumber,
+    this.decreeDate,
+    this.documentSerialNumber,
+    this.ocrConfidence,
+    this.matchScore,
+    this.matchThreshold,
+    this.isNameMatch,
+    this.rejectionReason,
+    this.failureReason,
+    this.manualReviewNote,
+    this.manuallyReviewedAtUtc,
+    this.processedAtUtc,
+  });
+
+  factory PharmacyLicenseVerification.fromJson(Map<String, dynamic> json) =>
+      PharmacyLicenseVerification(
+        verificationId: _text(json['verificationId']),
+        pharmacyId: _text(json['pharmacyId']),
+        status: _text(json['status']),
+        registeredName: _text(json['registeredName']),
+        originalFileName: _text(json['originalFileName']),
+        contentType: _text(json['contentType']),
+        fileSizeBytes: _int(json['fileSizeBytes']),
+        isReadable: json['isReadable'] as bool?,
+        extractedName: _nullable(json['extractedName']),
+        parentName: _nullable(json['parentName']),
+        birthPlace: _nullable(json['birthPlace']),
+        birthYear: _nullable(json['birthYear']),
+        registryNumber: _nullable(json['registryNumber']),
+        registryDate: _nullable(json['registryDate']),
+        decreeNumber: _nullable(json['decreeNumber']),
+        decreeDate: _nullable(json['decreeDate']),
+        documentSerialNumber: _nullable(json['documentSerialNumber']),
+        ocrConfidence: _double(json['ocrConfidence']),
+        matchScore: _double(json['matchScore']),
+        matchThreshold: _double(json['matchThreshold']),
+        isNameMatch: json['isNameMatch'] as bool?,
+        rejectionReason: _nullable(json['rejectionReason']),
+        failureReason: _nullable(json['failureReason']),
+        manualReviewNote: _nullable(json['manualReviewNote']),
+        manuallyReviewedAtUtc: _date(json['manuallyReviewedAtUtc']),
+        attemptCount: _int(json['attemptCount']),
+        submittedAtUtc: _date(json['submittedAtUtc']) ?? DateTime.now(),
+        processedAtUtc: _date(json['processedAtUtc']),
+      );
+
+  final String verificationId;
+  final String pharmacyId;
+  final String status;
+  final String registeredName;
+  final String originalFileName;
+  final String contentType;
+  final int fileSizeBytes;
+  final bool? isReadable;
+  final String? extractedName;
+  final String? parentName;
+  final String? birthPlace;
+  final String? birthYear;
+  final String? registryNumber;
+  final String? registryDate;
+  final String? decreeNumber;
+  final String? decreeDate;
+  final String? documentSerialNumber;
+  final double? ocrConfidence;
+  final double? matchScore;
+  final double? matchThreshold;
+  final bool? isNameMatch;
+  final String? rejectionReason;
+  final String? failureReason;
+  final String? manualReviewNote;
+  final DateTime? manuallyReviewedAtUtc;
+  final int attemptCount;
+  final DateTime submittedAtUtc;
+  final DateTime? processedAtUtc;
+
+  bool get isPending =>
+      status.toLowerCase() == 'pending' || status.toLowerCase() == 'processing';
 }
 
 Map<String, dynamic> _map(Object? value) =>

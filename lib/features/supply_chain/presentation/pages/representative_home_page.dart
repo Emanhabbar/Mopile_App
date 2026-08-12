@@ -62,7 +62,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                     label: 'إجمالي المهام',
                     value: '${deliveries.length}',
                     icon: Icons.route_rounded,
-                    color: context.appColors.primary,
+                    color: AppColors.primary,
                   ),
                   RoleMetricData(
                     label: 'مهام نشطة',
@@ -74,14 +74,14 @@ class RepresentativeHomePage extends ConsumerWidget {
                     label: 'تم تسليمها',
                     value: '$completed',
                     icon: Icons.task_alt_rounded,
-                    color: context.appColors.success,
+                    color: AppColors.success,
                   ),
                   RoleMetricData(
                     label: 'متعثرة',
                     value:
                         '${deliveries.where((x) => {'Failed', 'Returned'}.contains(x.shipment!.status)).length}',
                     icon: Icons.report_problem_outlined,
-                    color: context.appColors.danger,
+                    color: AppColors.danger,
                   ),
                 ],
               ),
@@ -93,7 +93,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                     subtitle: 'العناوين وتحديث حالة الشحنة',
                     badge: active.isNotEmpty ? '${active.length}' : null,
                     icon: Icons.delivery_dining_rounded,
-                    color: context.appColors.primary,
+                    color: AppColors.primary,
                     onTap: () => context.push('/supply-chain'),
                   ),
                   RoleActionData(
@@ -125,7 +125,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                   message:
                       'عند إسناد شحنة ستصلك عبر الإشعارات وتظهر في هذه الصفحة.',
                   icon: Icons.check_circle_outline_rounded,
-                  color: context.appColors.success,
+                  color: AppColors.success,
                   onTap: () => context.push('/notifications'),
                 )
               else
@@ -162,7 +162,7 @@ class _DeliverySummaryCard extends StatelessWidget {
       message:
           '${shipment.shipmentCode} · ${order.pharmacyArea}، ${order.pharmacyCity} · ${_shipmentStatus(shipment.status)}',
       icon: _shipmentIcon(shipment.status),
-      color: _shipmentColor(context.appColors, shipment.status),
+      color: _shipmentColor(shipment.status),
       onTap: onTap,
     );
   }
@@ -191,9 +191,9 @@ IconData _shipmentIcon(String status) => switch (status) {
   _ => Icons.local_shipping_outlined,
 };
 
-Color _shipmentColor(AppColors colors, String status) => switch (status) {
-  'Delivered' => colors.success,
-  'Failed' || 'Returned' => colors.danger,
+Color _shipmentColor(String status) => switch (status) {
+  'Delivered' => AppColors.success,
+  'Failed' || 'Returned' => AppColors.danger,
   'OutForDelivery' || 'Arrived' => const Color(0xFF3977C4),
-  _ => colors.primary,
+  _ => AppColors.primary,
 };

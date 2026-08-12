@@ -33,14 +33,14 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: Column(
+      title: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('تغيير كلمة المرور'),
           Text(
             'حافظ على أمان حسابك',
             style: TextStyle(
-              color: context.appColors.textMuted,
+              color: AppColors.textMuted,
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -58,9 +58,9 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
           child: Container(
             padding: const EdgeInsets.all(17),
             decoration: BoxDecoration(
-              color: context.appColors.surface,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(23),
-              border: Border.all(color: context.appColors.border),
+              border: Border.all(color: AppColors.border),
             ),
             child: Column(
               children: [
@@ -170,7 +170,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                 ? error.message
                 : 'تعذر تغيير كلمة المرور حاليًا.',
           ),
-          backgroundColor: context.appColors.danger,
+          backgroundColor: AppColors.danger,
         ),
       );
     } finally {
@@ -185,8 +185,8 @@ class _PasswordHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
       ),
       borderRadius: BorderRadius.circular(26),
     ),
@@ -232,9 +232,9 @@ class _PasswordHeroIcon extends StatelessWidget {
       color: Colors.white.withValues(alpha: .12),
       borderRadius: BorderRadius.circular(17),
     ),
-    child: Icon(
+    child: const Icon(
       Icons.lock_reset_rounded,
-      color: context.appColors.secondary,
+      color: AppColors.secondary,
       size: 27,
     ),
   );

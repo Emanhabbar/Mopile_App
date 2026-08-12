@@ -84,9 +84,9 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
               ..._alternatives!.alternatives.map(
                 (item) => Card(
                   child: ListTile(
-                    leading: Icon(
+                    leading: const Icon(
                       Icons.medication_liquid_outlined,
-                      color: context.appColors.primary,
+                      color: AppColors.primary,
                     ),
                     title: Text(item.medicineName),
                     subtitle: Text(
@@ -98,8 +98,8 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
                     ),
                     trailing: Text(
                       '${(item.matchScore * 100).clamp(0, 100).round()}%',
-                      style: TextStyle(
-                        color: context.appColors.primary,
+                      style: const TextStyle(
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -188,7 +188,7 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(text),
-          backgroundColor: error ? context.appColors.danger : null,
+          backgroundColor: error ? AppColors.danger : null,
         ),
       );
 }
@@ -199,12 +199,12 @@ class _IntroCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      color: context.appColors.surfaceSoft,
+      color: AppColors.surfaceSoft,
       borderRadius: BorderRadius.circular(22),
     ),
-    child: Row(
+    child: const Row(
       children: [
-        Icon(Icons.psychology_alt_outlined, color: context.appColors.primary),
+        Icon(Icons.psychology_alt_outlined, color: AppColors.primary),
         SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -238,7 +238,7 @@ class _PredictionCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Icon(Icons.insights_rounded, color: context.appColors.warning),
+          const Icon(Icons.insights_rounded, color: AppColors.warning),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

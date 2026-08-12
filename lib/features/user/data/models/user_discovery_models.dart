@@ -88,16 +88,23 @@ class NearbyMedicineResult {
     required this.availabilityStatus,
     required this.rankingScore,
     required this.pharmacy,
+    this.arabicMedicineName,
+    String? medicineDisplayName,
     this.scientificName,
+    this.arabicScientificName,
     this.manufacturer,
     this.dosageForm,
     this.capacity,
     this.sellingPrice,
-  });
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String medicineId;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final String? scientificName;
+  final String? arabicScientificName;
   final String? manufacturer;
   final String? dosageForm;
   final String? capacity;
@@ -113,7 +120,10 @@ class NearbyMedicineResult {
     return NearbyMedicineResult(
       medicineId: json['medicineId']?.toString() ?? '',
       medicineName: json['medicineName']?.toString() ?? '',
+      arabicMedicineName: _nullable(json['arabicMedicineName']),
+      medicineDisplayName: _nullable(json['medicineDisplayName']),
       scientificName: _nullable(json['scientificName']),
+      arabicScientificName: _nullable(json['arabicScientificName']),
       manufacturer: _nullable(json['manufacturer']),
       dosageForm: _nullable(json['dosageForm']),
       capacity: _nullable(json['capacity']),

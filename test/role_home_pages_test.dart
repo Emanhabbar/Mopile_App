@@ -35,6 +35,24 @@ void main() {
               openAssistanceRequests: 1,
             ),
           ),
+          adminAiServicesHealthProvider.overrideWith(
+            (ref) async => const AdminAiServicesHealth(
+              licenseVerification: AdminAiServiceStatus(
+                available: true,
+                status: 'ok',
+              ),
+              drugSearch: AdminAiServiceStatus(
+                available: true,
+                status: 'ok',
+                itemsLoaded: 11075,
+              ),
+              smartPharmacyBot: AdminAiServiceStatus(
+                available: true,
+                status: 'ok',
+                itemsLoaded: 16315,
+              ),
+            ),
+          ),
         ],
         child: const MaterialApp(home: Scaffold(body: AdminHomePage())),
       ),

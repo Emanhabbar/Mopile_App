@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pharmacy_app/features/pharmacy/data/data_sources/pharmacy_remote_data_source.dart';
 import 'package:pharmacy_app/features/pharmacy/data/models/pharmacy_models.dart';
+import 'package:pharmacy_app/features/pharmacy/data/repositories/pharmacy_repository.dart';
 
 void main() {
   test('catalog search unwraps the paged backend response', () async {
@@ -27,11 +28,12 @@ void main() {
         'totalPages': 1,
       });
 
-    final medicines = await PharmacyRemoteDataSource(dio).searchCatalog('');
+    final page = await PharmacyRemoteDataSource(dio).searchCatalog('');
 
-    expect(medicines, hasLength(1));
-    expect(medicines.single.id, 'medicine-1');
-    expect(medicines.single.name, 'Panadol');
+    expect(page.items, hasLength(1));
+    expect(page.items.single.id, 'medicine-1');
+    expect(page.items.single.name, 'Panadol');
+    expect(page.hasNextPage, isFalse);
   });
 
   test(
@@ -79,6 +81,33 @@ void main() {
       expect(items[1]['isPriceVisibleToUsers'], isFalse);
     },
   );
+
+  test('catalog repository caches identical pages', () async {
+    final adapter = _JsonAdapter({
+      'items': [
+        {
+          'id': 'medicine-1',
+          'name': 'Panadol',
+          'barcode': '1234567890123',
+          'requiresPrescription': false,
+        },
+      ],
+      'pageNumber': 1,
+      'pageSize': 30,
+      'totalCount': 1,
+      'totalPages': 1,
+    });
+    final dio = Dio(BaseOptions(baseUrl: 'http://localhost/api/'))
+      ..httpClientAdapter = adapter;
+    final repository = PharmacyRepository(PharmacyRemoteDataSource(dio));
+
+    final first = await repository.searchCatalog('1234567890123');
+    final second = await repository.searchCatalog('1234567890123');
+
+    expect(first.items.single.barcode, '1234567890123');
+    expect(second.items.single.id, first.items.single.id);
+    expect(adapter.requestCount, 1);
+  });
 }
 
 class _JsonAdapter implements HttpClientAdapter {
@@ -86,6 +115,7 @@ class _JsonAdapter implements HttpClientAdapter {
 
   final Object payload;
   RequestOptions? lastRequest;
+  int requestCount = 0;
 
   @override
   Future<ResponseBody> fetch(
@@ -93,6 +123,7 @@ class _JsonAdapter implements HttpClientAdapter {
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
+    requestCount++;
     lastRequest = options;
     return ResponseBody.fromString(
       jsonEncode(payload),

@@ -28,4 +28,9 @@ class MedicinesRepository {
 
   Future<Medicine> createMedicine(CreateMedicine request) =>
       _remote.createMedicine(request);
+
+  Future<Medicine> updateLocalization(
+    String id,
+    UpdateMedicineLocalization request,
+  ) => _remote.updateLocalization(id, request);
 }

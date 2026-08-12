@@ -158,7 +158,7 @@ class _PharmacyPrescriptionOrdersPageState
       ..showSnackBar(
         SnackBar(
           content: Text(text),
-          backgroundColor: error ? context.appColors.danger : null,
+          backgroundColor: error ? AppColors.danger : null,
         ),
       );
   }
@@ -179,7 +179,7 @@ class _PharmacyOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = prescriptionStatusInfo(context.appColors, order.status);
+    final info = prescriptionStatusInfo(order.status);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -231,14 +231,14 @@ class _PharmacyOrderCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(11),
               decoration: BoxDecoration(
-                color: context.appColors.surfaceSoft,
+                color: AppColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.medication_outlined,
-                    color: context.appColors.primary,
+                    color: AppColors.primary,
                     size: 19,
                   ),
                   const SizedBox(width: 7),
@@ -246,8 +246,8 @@ class _PharmacyOrderCard extends StatelessWidget {
                   const Spacer(),
                   Text(
                     'تطابق ${order.matchPercentage.toStringAsFixed(0)}٪',
-                    style: TextStyle(
-                      color: context.appColors.primary,
+                    style: const TextStyle(
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -262,10 +262,10 @@ class _PharmacyOrderCard extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.circle,
                           size: 5,
-                          color: context.appColors.textMuted,
+                          color: AppColors.textMuted,
                         ),
                         const SizedBox(width: 7),
                         Expanded(child: Text(item.displayName)),
@@ -330,8 +330,8 @@ class _OrdersOverview extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
         begin: Alignment.topRight,
         end: Alignment.bottomLeft,
       ),
@@ -346,9 +346,9 @@ class _OrdersOverview extends StatelessWidget {
             color: Colors.white.withValues(alpha: .12),
             borderRadius: BorderRadius.circular(17),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.receipt_long_rounded,
-            color: context.appColors.secondary,
+            color: AppColors.secondary,
             size: 28,
           ),
         ),
@@ -410,9 +410,9 @@ class _EmptyOrders extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     physics: const AlwaysScrollableScrollPhysics(),
     padding: const EdgeInsets.all(32),
-    children: [
+    children: const [
       SizedBox(height: 80),
-      Icon(Icons.receipt_long_outlined, color: context.appColors.textMuted, size: 42),
+      Icon(Icons.receipt_long_outlined, color: AppColors.textMuted, size: 42),
       SizedBox(height: 12),
       Text('لا توجد طلبات وصفات للصيدلية', textAlign: TextAlign.center),
     ],

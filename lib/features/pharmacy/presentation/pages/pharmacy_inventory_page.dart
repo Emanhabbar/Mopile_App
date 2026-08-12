@@ -8,6 +8,7 @@ import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
 import '../widgets/batch_inventory_editor.dart';
+import 'pharmacy_barcode_scanner_page.dart';
 
 class PharmacyInventoryPage extends ConsumerStatefulWidget {
   const PharmacyInventoryPage({super.key});
@@ -20,6 +21,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
   final _search = TextEditingController();
   String? _stockStatus;
   String _query = '';
+  bool _showArabicNames = false;
 
   PharmacyInventoryFilter get _filter =>
       (search: _query, stockStatus: _stockStatus);
@@ -38,6 +40,23 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
       appBar: AppBar(
         title: const Text('مخزون الأدوية'),
         actions: [
+          IconButton(
+            onPressed: _searchByBarcode,
+            tooltip: 'مسح باركود',
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            child: FilterChip(
+              selected: _showArabicNames,
+              showCheckmark: false,
+              avatar: const Icon(Icons.translate_rounded, size: 17),
+              label: const Text('عربي'),
+              tooltip: 'إظهار الأسماء العربية',
+              onSelected: (value) => setState(() => _showArabicNames = value),
+            ),
+          ),
+          const SizedBox(width: 4),
           IconButton(
             onPressed: () => ref.invalidate(pharmacyInventoryProvider(_filter)),
             tooltip: 'تحديث المخزون',
@@ -109,6 +128,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) => _InventoryCard(
                           item: items[index],
+                          showArabicName: _showArabicNames,
                           onEdit: () => _editItem(items[index]),
                           onDelete: () => _delete(items[index]),
                         ),
@@ -130,17 +150,27 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
     if (!mounted || action == null) return;
     if (action == _AddMedicineAction.manual) {
       await _openManualEditor();
+    } else if (action == _AddMedicineAction.barcode) {
+      final barcode = await _scanBarcode(context);
+      if (barcode != null && mounted) await _openCatalog(initialQuery: barcode);
     } else {
       await _openCatalog();
     }
   }
 
-  Future<void> _openCatalog() async {
+  Future<void> _searchByBarcode() async {
+    final barcode = await _scanBarcode(context);
+    if (barcode == null || !mounted) return;
+    _search.text = barcode;
+    setState(() => _query = barcode);
+  }
+
+  Future<void> _openCatalog({String? initialQuery}) async {
     final selected = await showModalBottomSheet<List<PharmacyCatalogMedicine>>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => const _CatalogSheet(),
+      builder: (_) => _CatalogSheet(initialQuery: initialQuery),
     );
     if (selected == null || selected.isEmpty) return;
     if (selected.length == 1) {
@@ -185,7 +215,9 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
         medicine: PharmacyCatalogMedicine(
           id: 'manual',
           name: info.name,
+          arabicName: info.arabicName,
           scientificName: info.scientificName,
+          arabicScientificName: info.arabicScientificName,
           manufacturer: info.manufacturer,
           dosageForm: info.dosageForm,
           capacity: info.capacity,
@@ -200,7 +232,10 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           .remote
           .addManualInventory(
             name: info.name,
+            barcode: info.barcode,
+            arabicName: info.arabicName,
             scientificName: info.scientificName,
+            arabicScientificName: info.arabicScientificName,
             manufacturer: info.manufacturer,
             dosageForm: info.dosageForm,
             packageSize: info.packageSize,
@@ -215,6 +250,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
             lowStockThreshold: inventory.threshold,
             expiryDate: inventory.expiryDate,
           );
+      ref.read(pharmacyRepositoryProvider).clearCatalogCache();
       _refresh();
       _message('تم إنشاء الدواء وإضافته إلى المخزون.');
     } catch (error) {
@@ -276,7 +312,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             child: const Text('حذف'),
           ),
         ],
@@ -306,7 +342,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? context.appColors.danger : null,
+        backgroundColor: error ? AppColors.danger : null,
       ),
     );
   }
@@ -333,10 +369,10 @@ class _InventoryOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [context.appColors.primaryDeep, Color(0xFF185866)],
+          colors: [AppColors.primaryDeep, Color(0xFF185866)],
         ),
         borderRadius: BorderRadius.circular(24),
       ),
@@ -351,9 +387,9 @@ class _InventoryOverview extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.inventory_2_rounded,
-                  color: context.appColors.secondary,
+                  color: AppColors.secondary,
                 ),
               ),
               const SizedBox(width: 11),
@@ -381,8 +417,8 @@ class _InventoryOverview extends StatelessWidget {
                 onPressed: onAdd,
                 tooltip: 'إضافة دواء',
                 style: IconButton.styleFrom(
-                  backgroundColor: context.appColors.secondary,
-                  foregroundColor: context.appColors.primaryDeep,
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: AppColors.primaryDeep,
                 ),
                 icon: const Icon(Icons.add_rounded),
               ),
@@ -394,13 +430,13 @@ class _InventoryOverview extends StatelessWidget {
               _OverviewFact(
                 label: 'متوفر',
                 value: available,
-                color: context.appColors.primaryLight,
+                color: AppColors.primaryLight,
               ),
               const SizedBox(width: 8),
               _OverviewFact(
                 label: 'منخفض',
                 value: low,
-                color: context.appColors.secondary,
+                color: AppColors.secondary,
               ),
               const SizedBox(width: 8),
               _OverviewFact(
@@ -459,19 +495,21 @@ class _OverviewFact extends StatelessWidget {
 class _InventoryCard extends StatelessWidget {
   const _InventoryCard({
     required this.item,
+    required this.showArabicName,
     required this.onEdit,
     required this.onDelete,
   });
   final PharmacyInventoryItem item;
+  final bool showArabicName;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   @override
   Widget build(BuildContext context) {
-    final statusColor = _stockColor(context.appColors, item.stockStatus);
+    final statusColor = _stockColor(item.stockStatus);
     final details = [
+      if (showArabicName) item.arabicMedicineName,
       item.scientificName,
-      item.dosageForm,
-      item.capacity,
+      if (showArabicName) item.arabicScientificName,
     ].whereType<String>().where((value) => value.isNotEmpty).join(' · ');
     final expiry = item.expiryDateUtc == null
         ? null
@@ -536,7 +574,7 @@ class _InventoryCard extends StatelessWidget {
                             tooltip: 'خيارات الصنف',
                             onSelected: (value) =>
                                 value == 'edit' ? onEdit() : onDelete(),
-                            itemBuilder: (_) => [
+                            itemBuilder: (_) => const [
                               PopupMenuItem(
                                 value: 'edit',
                                 child: ListTile(
@@ -550,7 +588,7 @@ class _InventoryCard extends StatelessWidget {
                                 child: ListTile(
                                   leading: Icon(
                                     Icons.delete_outline_rounded,
-                                    color: context.appColors.danger,
+                                    color: AppColors.danger,
                                   ),
                                   title: Text('حذف'),
                                   contentPadding: EdgeInsets.zero,
@@ -564,7 +602,7 @@ class _InventoryCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: context.appColors.background,
+                          color: AppColors.background,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
@@ -591,11 +629,21 @@ class _InventoryCard extends StatelessWidget {
                         spacing: 7,
                         runSpacing: 7,
                         children: [
+                          if (item.capacity != null)
+                            _Chip(
+                              text: 'التركيز: ${item.capacity}',
+                              color: AppColors.primary,
+                            ),
+                          if (item.dosageForm != null)
+                            _Chip(
+                              text: 'الشكل: ${item.dosageForm}',
+                              color: const Color(0xFF6D5AA8),
+                            ),
                           _Chip(
                             text: item.isAvailable ? 'متاح للطلب' : 'غير متاح',
                             color: item.isAvailable
-                                ? context.appColors.success
-                                : context.appColors.textMuted,
+                                ? AppColors.success
+                                : AppColors.textMuted,
                           ),
                           if (item.requiresPrescription)
                             const _Chip(
@@ -608,8 +656,8 @@ class _InventoryCard extends StatelessWidget {
                               color:
                                   item.daysUntilExpiry != null &&
                                       item.daysUntilExpiry! <= 30
-                                  ? context.appColors.danger
-                                  : context.appColors.textMuted,
+                                  ? AppColors.danger
+                                  : AppColors.textMuted,
                             ),
                         ],
                       ),
@@ -643,8 +691,8 @@ class _InventoryFact extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: context.appColors.text,
+            style: const TextStyle(
+              color: AppColors.text,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
             ),
@@ -655,7 +703,7 @@ class _InventoryFact extends StatelessWidget {
   }
 }
 
-enum _AddMedicineAction { catalog, manual }
+enum _AddMedicineAction { catalog, barcode, manual }
 
 class _AddMedicineOptions extends StatelessWidget {
   const _AddMedicineOptions();
@@ -673,7 +721,7 @@ class _AddMedicineOptions extends StatelessWidget {
               width: 44,
               height: 4,
               decoration: BoxDecoration(
-                color: context.appColors.border,
+                color: AppColors.border,
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -694,6 +742,13 @@ class _AddMedicineOptions extends StatelessWidget {
             title: 'اختيار من دليل الأدوية',
             subtitle: 'اختر دواءً واحدًا أو عدة أدوية دفعة واحدة',
             onTap: () => Navigator.pop(context, _AddMedicineAction.catalog),
+          ),
+          const SizedBox(height: 10),
+          _AddOptionTile(
+            icon: Icons.qr_code_scanner_rounded,
+            title: 'مسح باركود العبوة',
+            subtitle: 'اعثر على الدواء مباشرة بالكاميرا',
+            onTap: () => Navigator.pop(context, _AddMedicineAction.barcode),
           ),
           const SizedBox(height: 10),
           _AddOptionTile(
@@ -722,7 +777,7 @@ class _AddOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: context.appColors.surfaceSoft,
+    color: AppColors.surfaceSoft,
     borderRadius: BorderRadius.circular(18),
     child: InkWell(
       onTap: onTap,
@@ -734,11 +789,11 @@ class _AddOptionTile extends StatelessWidget {
             Container(
               width: 46,
               height: 46,
-              decoration: BoxDecoration(
-                color: context.appColors.surface,
+              decoration: const BoxDecoration(
+                color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: context.appColors.primary),
+              child: Icon(icon, color: AppColors.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -754,7 +809,7 @@ class _AddOptionTile extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_left_rounded, color: context.appColors.primary),
+            const Icon(Icons.chevron_left_rounded, color: AppColors.primary),
           ],
         ),
       ),
@@ -771,7 +826,10 @@ class _ManualMedicineEditor extends StatefulWidget {
 
 class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
   final _name = TextEditingController();
+  final _arabicName = TextEditingController();
+  final _barcode = TextEditingController();
   final _scientificName = TextEditingController();
+  final _arabicScientificName = TextEditingController();
   final _manufacturer = TextEditingController();
   final _dosageForm = TextEditingController();
   final _packageSize = TextEditingController();
@@ -784,7 +842,10 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
   @override
   void dispose() {
     _name.dispose();
+    _arabicName.dispose();
+    _barcode.dispose();
     _scientificName.dispose();
+    _arabicScientificName.dispose();
     _manufacturer.dispose();
     _dosageForm.dispose();
     _packageSize.dispose();
@@ -811,7 +872,7 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
               width: 44,
               height: 4,
               decoration: BoxDecoration(
-                color: context.appColors.border,
+                color: AppColors.border,
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -828,14 +889,38 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           ),
           const SizedBox(height: 16),
           _TextField(
-            label: 'اسم الدواء *',
+            label: 'اسم الدواء بالإنكليزية *',
             controller: _name,
             icon: Icons.medication_outlined,
           ),
           _TextField(
-            label: 'الاسم العلمي',
+            label: 'اسم الدواء بالعربية',
+            controller: _arabicName,
+            icon: Icons.translate_rounded,
+          ),
+          _TextField(
+            label: 'الباركود',
+            controller: _barcode,
+            icon: Icons.qr_code_rounded,
+            keyboardType: TextInputType.number,
+            suffixIcon: IconButton(
+              onPressed: () async {
+                final value = await _scanBarcode(context);
+                if (value != null && mounted) _barcode.text = value;
+              },
+              tooltip: 'مسح بالكاميرا',
+              icon: const Icon(Icons.qr_code_scanner_rounded),
+            ),
+          ),
+          _TextField(
+            label: 'الاسم العلمي بالإنكليزية',
             controller: _scientificName,
             icon: Icons.science_outlined,
+          ),
+          _TextField(
+            label: 'الاسم العلمي بالعربية',
+            controller: _arabicScientificName,
+            icon: Icons.science_rounded,
           ),
           _TextField(
             label: 'الشركة المصنعة',
@@ -879,16 +964,16 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           Container(
             margin: const EdgeInsets.only(bottom: 13),
             decoration: BoxDecoration(
-              color: context.appColors.surfaceSoft,
+              color: AppColors.surfaceSoft,
               borderRadius: BorderRadius.circular(15),
             ),
             child: SwitchListTile(
               value: _requiresPrescription,
               onChanged: (value) =>
                   setState(() => _requiresPrescription = value),
-              secondary: Icon(
+              secondary: const Icon(
                 Icons.description_outlined,
-                color: context.appColors.primary,
+                color: AppColors.primary,
               ),
               title: const Text('يتطلب وصفة طبية'),
             ),
@@ -896,8 +981,8 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           if (_error != null) ...[
             Text(
               _error!,
-              style: TextStyle(
-                color: context.appColors.danger,
+              style: const TextStyle(
+                color: AppColors.danger,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -925,7 +1010,10 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
       context,
       _ManualMedicineInfo(
         name: _name.text.trim(),
+        barcode: _cleanText(_barcode.text),
+        arabicName: _cleanText(_arabicName.text),
         scientificName: _cleanText(_scientificName.text),
+        arabicScientificName: _cleanText(_arabicScientificName.text),
         manufacturer: _cleanText(_manufacturer.text),
         dosageForm: _cleanText(_dosageForm.text),
         packageSize: _cleanText(_packageSize.text),
@@ -944,22 +1032,28 @@ class _TextField extends StatelessWidget {
     required this.controller,
     this.icon,
     this.lines = 1,
+    this.suffixIcon,
+    this.keyboardType,
   });
   final String label;
   final TextEditingController controller;
   final IconData? icon;
   final int lines;
+  final Widget? suffixIcon;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: TextField(
       controller: controller,
+      keyboardType: keyboardType,
       minLines: lines,
       maxLines: lines,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: icon == null ? null : Icon(icon),
+        suffixIcon: suffixIcon,
         alignLabelWithHint: lines > 1,
       ),
     ),
@@ -970,7 +1064,10 @@ class _ManualMedicineInfo {
   const _ManualMedicineInfo({
     required this.name,
     required this.requiresPrescription,
+    this.barcode,
+    this.arabicName,
     this.scientificName,
+    this.arabicScientificName,
     this.manufacturer,
     this.dosageForm,
     this.packageSize,
@@ -979,7 +1076,10 @@ class _ManualMedicineInfo {
     this.description,
   });
   final String name;
+  final String? barcode;
+  final String? arabicName;
   final String? scientificName;
+  final String? arabicScientificName;
   final String? manufacturer;
   final String? dosageForm;
   final String? packageSize;
@@ -995,24 +1095,46 @@ String? _cleanText(String value) {
 }
 
 class _CatalogSheet extends ConsumerStatefulWidget {
-  const _CatalogSheet();
+  const _CatalogSheet({this.initialQuery});
+  final String? initialQuery;
   @override
   ConsumerState<_CatalogSheet> createState() => _CatalogSheetState();
 }
 
 class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
-  final _search = TextEditingController();
+  late final TextEditingController _search;
+  final _scroll = ScrollController();
   final Map<String, PharmacyCatalogMedicine> _selected = {};
-  String _query = '';
+  final List<PharmacyCatalogMedicine> _items = [];
+  late String _query;
+  bool _showArabicNames = false;
+  bool _initialLoading = true;
+  bool _loadingMore = false;
+  bool _hasNextPage = true;
+  int _pageNumber = 0;
+  int _totalCount = 0;
+  Object? _catalogError;
+
+  @override
+  void initState() {
+    super.initState();
+    _query = widget.initialQuery?.trim() ?? '';
+    _search = TextEditingController(text: _query);
+    _scroll.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadPage(reset: true));
+  }
+
   @override
   void dispose() {
     _search.dispose();
+    _scroll
+      ..removeListener(_onScroll)
+      ..dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(pharmacyCatalogProvider(_query));
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * .82,
       child: Column(
@@ -1027,7 +1149,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                     width: 44,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: context.appColors.border,
+                      color: AppColors.border,
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
@@ -1042,6 +1164,18 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                   'يمكنك اختيار دواء واحد أو عدة أدوية وإضافتها دفعة واحدة.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                const SizedBox(height: 9),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: FilterChip(
+                    selected: _showArabicNames,
+                    showCheckmark: false,
+                    avatar: const Icon(Icons.translate_rounded, size: 17),
+                    label: const Text('إظهار الاسم العربي'),
+                    onSelected: (value) =>
+                        setState(() => _showArabicNames = value),
+                  ),
+                ),
                 if (_selected.isNotEmpty) ...[
                   const SizedBox(height: 10),
                   Container(
@@ -1051,13 +1185,13 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                       vertical: 9,
                     ),
                     decoration: BoxDecoration(
-                      color: context.appColors.surfaceWarm,
+                      color: AppColors.surfaceWarm,
                       borderRadius: BorderRadius.circular(13),
                     ),
                     child: Text(
                       'تم اختيار ${_selected.length} دواء',
-                      style: TextStyle(
-                        color: context.appColors.warning,
+                      style: const TextStyle(
+                        color: AppColors.warning,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -1067,14 +1201,23 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                 TextField(
                   controller: _search,
                   textInputAction: TextInputAction.search,
-                  onSubmitted: (value) => setState(() => _query = value.trim()),
+                  onSubmitted: _startSearch,
                   decoration: InputDecoration(
                     hintText: 'اسم الدواء أو الاسم العلمي',
                     prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: IconButton(
-                      onPressed: () =>
-                          setState(() => _query = _search.text.trim()),
-                      icon: const Icon(Icons.arrow_forward_rounded),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: _scanCatalogBarcode,
+                          tooltip: 'مسح باركود',
+                          icon: const Icon(Icons.qr_code_scanner_rounded),
+                        ),
+                        IconButton(
+                          onPressed: () => _startSearch(_search.text),
+                          icon: const Icon(Icons.arrow_forward_rounded),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1082,76 +1225,125 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
             ),
           ),
           Expanded(
-            child: state.when(
-              loading: () => const AppLoadingState(),
-              error: (error, _) => AppErrorState(
-                error: error,
-                onRetry: () => ref.invalidate(pharmacyCatalogProvider(_query)),
-              ),
-              data: (items) => ListView.separated(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 9),
-                itemBuilder: (_, index) {
-                  final medicine = items[index];
-                  final selected = _selected.containsKey(medicine.id);
-                  return Card(
-                    margin: EdgeInsets.zero,
-                    clipBehavior: Clip.antiAlias,
-                    color: selected
-                        ? context.appColors.primary.withValues(alpha: .06)
-                        : null,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 7,
-                      ),
-                      leading: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: context.appColors.surfaceSoft,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Icon(
-                          Icons.medication_rounded,
-                          color: context.appColors.primary,
-                        ),
-                      ),
-                      title: Text(medicine.name),
-                      subtitle: Text(
-                        [
-                          medicine.scientificName,
-                          medicine.dosageForm,
-                          medicine.capacity,
-                        ].whereType<String>().join(' · '),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 160),
-                        child: Icon(
-                          selected
-                              ? Icons.check_circle_rounded
-                              : Icons.add_circle_outline_rounded,
-                          key: ValueKey(selected),
-                          color: selected
-                              ? context.appColors.primary
-                              : context.appColors.textMuted,
-                        ),
-                      ),
-                      onTap: () => setState(() {
-                        if (selected) {
-                          _selected.remove(medicine.id);
-                        } else {
-                          _selected[medicine.id] = medicine;
-                        }
-                      }),
+            child: _initialLoading
+                ? const AppLoadingState(label: 'جاري فتح دليل الأدوية...')
+                : _catalogError != null && _items.isEmpty
+                ? AppErrorState(
+                    error: _catalogError!,
+                    onRetry: () => _loadPage(reset: true),
+                  )
+                : _items.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text('لا توجد أدوية مطابقة لبحثك.'),
                     ),
-                  );
-                },
-              ),
-            ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => _loadPage(reset: true),
+                    child: ListView.separated(
+                      controller: _scroll,
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                      itemCount: _items.length + 1,
+                      separatorBuilder: (_, _) => const SizedBox(height: 9),
+                      itemBuilder: (_, index) {
+                        if (index == _items.length) {
+                          return _CatalogPaginationFooter(
+                            loading: _loadingMore,
+                            hasNextPage: _hasNextPage,
+                            loadedCount: _items.length,
+                            totalCount: _totalCount,
+                            error: _catalogError,
+                            onRetry: () => _loadPage(),
+                          );
+                        }
+                        final medicine = _items[index];
+                        final selected = _selected.containsKey(medicine.id);
+                        return Card(
+                          margin: EdgeInsets.zero,
+                          clipBehavior: Clip.antiAlias,
+                          color: selected
+                              ? AppColors.primary.withValues(alpha: .06)
+                              : null,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            leading: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceSoft,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(
+                                Icons.medication_rounded,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            title: Text(medicine.name),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  [
+                                    if (_showArabicNames) medicine.arabicName,
+                                    medicine.scientificName,
+                                    if (_showArabicNames)
+                                      medicine.arabicScientificName,
+                                  ].whereType<String>().join(' · '),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 5),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  children: [
+                                    if (medicine.capacity != null)
+                                      _CatalogIdentityChip(
+                                        icon: Icons.straighten_rounded,
+                                        text: medicine.capacity!,
+                                      ),
+                                    if (medicine.dosageForm != null)
+                                      _CatalogIdentityChip(
+                                        icon: Icons.category_outlined,
+                                        text: medicine.dosageForm!,
+                                      ),
+                                    if (medicine.packageSize != null)
+                                      _CatalogIdentityChip(
+                                        icon: Icons.inventory_2_outlined,
+                                        text: medicine.packageSize!,
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            trailing: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 160),
+                              child: Icon(
+                                selected
+                                    ? Icons.check_circle_rounded
+                                    : Icons.add_circle_outline_rounded,
+                                key: ValueKey(selected),
+                                color: selected
+                                    ? AppColors.primary
+                                    : AppColors.textMuted,
+                              ),
+                            ),
+                            onTap: () => setState(() {
+                              if (selected) {
+                                _selected.remove(medicine.id);
+                              } else {
+                                _selected[medicine.id] = medicine;
+                              }
+                            }),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
           SafeArea(
             top: false,
@@ -1178,7 +1370,143 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
       ),
     );
   }
+
+  Future<void> _scanCatalogBarcode() async {
+    final value = await _scanBarcode(context);
+    if (value == null || !mounted) return;
+    _search.text = value;
+    await _startSearch(value);
+  }
+
+  Future<void> _startSearch(String value) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    _query = value.trim();
+    await _loadPage(reset: true);
+  }
+
+  void _onScroll() {
+    if (!_scroll.hasClients ||
+        _scroll.position.extentAfter > 420 ||
+        _loadingMore ||
+        !_hasNextPage) {
+      return;
+    }
+    _loadPage();
+  }
+
+  Future<void> _loadPage({bool reset = false}) async {
+    if (!mounted || (_loadingMore && !reset)) return;
+    final nextPage = reset ? 1 : _pageNumber + 1;
+    setState(() {
+      if (reset) {
+        _initialLoading = true;
+        _catalogError = null;
+      } else {
+        _loadingMore = true;
+        _catalogError = null;
+      }
+    });
+    try {
+      final page = await ref
+          .read(pharmacyRepositoryProvider)
+          .searchCatalog(_query, pageNumber: nextPage, pageSize: 30);
+      if (!mounted) return;
+      setState(() {
+        if (reset) _items.clear();
+        final known = _items.map((item) => item.id).toSet();
+        _items.addAll(page.items.where((item) => known.add(item.id)));
+        _pageNumber = page.pageNumber;
+        _totalCount = page.totalCount;
+        _hasNextPage = page.hasNextPage;
+      });
+    } catch (error) {
+      if (mounted) setState(() => _catalogError = error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _initialLoading = false;
+          _loadingMore = false;
+        });
+      }
+    }
+  }
 }
+
+class _CatalogPaginationFooter extends StatelessWidget {
+  const _CatalogPaginationFooter({
+    required this.loading,
+    required this.hasNextPage,
+    required this.loadedCount,
+    required this.totalCount,
+    required this.error,
+    required this.onRetry,
+  });
+  final bool loading;
+  final bool hasNextPage;
+  final int loadedCount;
+  final int totalCount;
+  final Object? error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 14),
+    child: Center(
+      child: loading
+          ? const SizedBox.square(
+              dimension: 24,
+              child: CircularProgressIndicator(strokeWidth: 2.4),
+            )
+          : error != null
+          ? TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('إعادة تحميل المزيد'),
+            )
+          : Text(
+              hasNextPage
+                  ? 'مرّر للأسفل لعرض المزيد'
+                  : 'تم عرض $loadedCount من $totalCount دواء',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+    ),
+  );
+}
+
+class _CatalogIdentityChip extends StatelessWidget {
+  const _CatalogIdentityChip({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+    decoration: BoxDecoration(
+      color: AppColors.primary.withValues(alpha: .07),
+      borderRadius: BorderRadius.circular(9),
+      border: Border.all(color: AppColors.primary.withValues(alpha: .12)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: AppColors.primary),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700),
+        ),
+      ],
+    ),
+  );
+}
+
+Future<String?> _scanBarcode(BuildContext context) =>
+    Navigator.of(context).push(
+      MaterialPageRoute<String>(
+        fullscreenDialog: true,
+        builder: (_) => const PharmacyBarcodeScannerPage(),
+      ),
+    );
 
 class _InventoryEditor extends StatefulWidget {
   const _InventoryEditor({this.item, this.medicine});
@@ -1225,6 +1553,11 @@ class _InventoryEditorState extends State<_InventoryEditor> {
             widget.item?.medicineName ?? widget.medicine?.name ?? '',
             style: Theme.of(context).textTheme.titleLarge,
           ),
+          if ((widget.item?.arabicMedicineName ?? widget.medicine?.arabicName)
+              case final arabicName?) ...[
+            const SizedBox(height: 2),
+            Text(arabicName, style: Theme.of(context).textTheme.bodySmall),
+          ],
           const SizedBox(height: 4),
           Text(
             widget.item == null
@@ -1274,13 +1607,13 @@ class _InventoryEditorState extends State<_InventoryEditor> {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: context.appColors.danger.withValues(alpha: .07),
+                color: AppColors.danger.withValues(alpha: .07),
                 borderRadius: BorderRadius.circular(13),
               ),
               child: Text(
                 _validationError!,
-                style: TextStyle(
-                  color: context.appColors.danger,
+                style: const TextStyle(
+                  color: AppColors.danger,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1396,10 +1729,10 @@ class _InventoryEmpty extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 28),
     children: [
       const SizedBox(height: 80),
-      Icon(
+      const Icon(
         Icons.inventory_2_outlined,
         size: 48,
-        color: context.appColors.textMuted,
+        color: AppColors.textMuted,
       ),
       const SizedBox(height: 12),
       Text(
@@ -1429,9 +1762,8 @@ String _stock(String value) => switch (value.toLowerCase()) {
   'outofstock' => 'نافد',
   _ => value,
 };
-Color _stockColor(AppColors colors, String value) => switch (value
-    .toLowerCase()) {
-  'instock' => colors.success,
+Color _stockColor(String value) => switch (value.toLowerCase()) {
+  'instock' => AppColors.success,
   'lowstock' => const Color(0xFFB47618),
-  _ => colors.danger,
+  _ => AppColors.danger,
 };

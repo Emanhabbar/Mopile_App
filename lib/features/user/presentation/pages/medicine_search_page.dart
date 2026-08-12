@@ -224,12 +224,12 @@ class _LocationRequiredState extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: context.appColors.primary.withValues(alpha: 0.09),
+                  color: AppColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(21),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.add_location_alt_rounded,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                   size: 31,
                 ),
               ),
@@ -277,7 +277,7 @@ class _SearchHero extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: context.appColors.primaryDark.withValues(alpha: 0.17),
+            color: AppColors.primaryDark.withValues(alpha: 0.17),
             blurRadius: 26,
             offset: const Offset(0, 12),
           ),
@@ -361,7 +361,7 @@ class _SearchControls extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(23),
-        side: BorderSide(color: context.appColors.border),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -492,7 +492,8 @@ class _MedicineResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final details = [
-      result.scientificName,
+      if (result.arabicMedicineName != null) result.medicineName,
+      result.arabicScientificName ?? result.scientificName,
       result.dosageForm,
       result.capacity,
     ].whereType<String>().where((item) => item.isNotEmpty).join(' · ');
@@ -511,7 +512,7 @@ class _MedicineResultCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        result.medicineName,
+                        result.medicineDisplayName,
                         style: Theme.of(
                           context,
                         ).textTheme.titleLarge?.copyWith(fontSize: 18),
@@ -551,7 +552,7 @@ class _MedicineResultCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
-                color: context.appColors.background,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(17),
               ),
               child: Row(
@@ -573,9 +574,9 @@ class _MedicineResultCard extends StatelessWidget {
             const SizedBox(height: 14),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.local_pharmacy_rounded,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -603,8 +604,8 @@ class _MedicineResultCard extends StatelessWidget {
                       ? Icons.check_circle_rounded
                       : Icons.schedule_rounded,
                   color: result.pharmacy.isOpenNow
-                      ? context.appColors.success
-                      : context.appColors.textMuted,
+                      ? AppColors.success
+                      : AppColors.textMuted,
                 ),
               ],
             ),
@@ -645,8 +646,8 @@ class _Fact extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: context.appColors.text,
+            style: const TextStyle(
+              color: AppColors.text,
               fontWeight: FontWeight.w800,
               fontSize: 12,
             ),
@@ -694,7 +695,7 @@ class _DiscoveryEmpty extends StatelessWidget {
         padding: const EdgeInsets.all(30),
         child: Column(
           children: [
-            Icon(icon, color: context.appColors.textMuted, size: 37),
+            Icon(icon, color: AppColors.textMuted, size: 37),
             const SizedBox(height: 12),
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 5),

@@ -50,5 +50,32 @@ void main() {
       expect(ticker.title, 'إعلان');
       expect(ticker.isActive, isTrue);
     });
+
+    test('parses intelligent services health and license review', () {
+      final health = AdminAiServicesHealth.fromJson({
+        'licenseVerification': {'available': true, 'status': 'ok'},
+        'drugSearch': {'available': true, 'status': 'ok', 'drugsLoaded': 11075},
+        'smartPharmacyBot': {
+          'available': true,
+          'status': 'ok',
+          'medicinesLoaded': 16315,
+          'model': 'local-model',
+        },
+      });
+      final verification = AdminPharmacyLicenseVerification.fromJson({
+        'verificationId': 'verification-1',
+        'status': 'Approved',
+        'registeredName': 'أحمد',
+        'originalFileName': 'license.jpg',
+        'extractedName': 'أحمد',
+        'matchScore': 0.95,
+        'isNameMatch': true,
+      });
+
+      expect(health.drugSearch.itemsLoaded, 11075);
+      expect(health.smartPharmacyBot.model, 'local-model');
+      expect(verification.matchScore, 0.95);
+      expect(verification.isNameMatch, isTrue);
+    });
   });
 }

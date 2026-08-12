@@ -55,8 +55,8 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
                         icon: Icons.schedule_rounded,
                         text: pharmacy.isOpenNow ? 'مفتوحة الآن' : 'مغلقة الآن',
                         color: pharmacy.isOpenNow
-                            ? context.appColors.primary
-                            : context.appColors.danger,
+                            ? AppColors.primary
+                            : AppColors.danger,
                       ),
                       if (pharmacy.rating > 0) ...[
                         const SizedBox(height: 10),
@@ -125,12 +125,12 @@ class _PhotoHeader extends StatelessWidget {
       child: SizedBox(
         height: 210,
         child: photoUri == null
-            ? ColoredBox(
-                color: context.appColors.surfaceSoft,
+            ? const ColoredBox(
+                color: AppColors.surfaceSoft,
                 child: Center(
                   child: Icon(
                     Icons.local_pharmacy_rounded,
-                    color: context.appColors.primary,
+                    color: AppColors.primary,
                     size: 65,
                   ),
                 ),
@@ -138,12 +138,12 @@ class _PhotoHeader extends StatelessWidget {
             : Image.network(
                 photoUri.toString(),
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => ColoredBox(
-                  color: context.appColors.surfaceSoft,
+                errorBuilder: (_, _, _) => const ColoredBox(
+                  color: AppColors.surfaceSoft,
                   child: Center(
                     child: Icon(
                       Icons.local_pharmacy_rounded,
-                      color: context.appColors.primary,
+                      color: AppColors.primary,
                       size: 65,
                     ),
                   ),
@@ -158,18 +158,18 @@ class _InfoLine extends StatelessWidget {
   const _InfoLine({
     required this.icon,
     required this.text,
-    this.color,
+    this.color = AppColors.textMuted,
   });
 
   final IconData icon;
   final String text;
-  final Color? color;
+  final Color color;
 
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Icon(icon, color: color ?? context.appColors.textMuted, size: 21),
+      Icon(icon, color: color, size: 21),
       const SizedBox(width: 9),
       Expanded(child: Text(text)),
     ],

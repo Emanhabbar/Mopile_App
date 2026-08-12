@@ -71,10 +71,10 @@ class _OrganizationHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 28,
-                backgroundColor: context.appColors.surfaceSoft,
-                child: Icon(Icons.apartment_rounded, color: context.appColors.primary),
+                backgroundColor: AppColors.surfaceSoft,
+                child: Icon(Icons.apartment_rounded, color: AppColors.primary),
               ),
               const SizedBox(width: 13),
               Expanded(
@@ -86,12 +86,12 @@ class _OrganizationHeader extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 3),
-                    Row(
+                    const Row(
                       children: [
                         Icon(
                           Icons.verified_rounded,
                           size: 17,
-                          color: context.appColors.primary,
+                          color: AppColors.primary,
                         ),
                         SizedBox(width: 4),
                         Text('منظمة معتمدة'),
@@ -171,7 +171,7 @@ class _InfoLine extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Icon(icon, size: 20, color: context.appColors.primary),
+      Icon(icon, size: 20, color: AppColors.primary),
       const SizedBox(width: 8),
       Expanded(child: Text(text)),
     ],

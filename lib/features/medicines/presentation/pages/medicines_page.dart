@@ -157,9 +157,9 @@ class _CatalogHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
-      decoration: BoxDecoration(
-        color: context.appColors.surface,
-        border: Border(bottom: BorderSide(color: context.appColors.border)),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: TextField(
         controller: controller,
@@ -220,13 +220,13 @@ class _ResultSummary extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
           decoration: BoxDecoration(
-            color: context.appColors.primary.withValues(alpha: 0.08),
+            color: AppColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Text(
             '${page.pageNumber}/${page.totalPages}',
-            style: TextStyle(
-              color: context.appColors.primary,
+            style: const TextStyle(
+              color: AppColors.primary,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -256,12 +256,12 @@ class _MedicineCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: context.appColors.primary.withValues(alpha: 0.09),
+                  color: AppColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.medication_liquid_rounded,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 13),
@@ -270,12 +270,27 @@ class _MedicineCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      medicine.name,
+                      medicine.displayName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    if (medicine.scientificName case final name?) ...[
+                    if (medicine.arabicName != null &&
+                        medicine.name.trim().isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        medicine.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                    if ((medicine.arabicScientificName ??
+                            medicine.scientificName)
+                        case final name?) ...[
                       const SizedBox(height: 3),
                       Text(
                         name,
@@ -296,10 +311,10 @@ class _MedicineCard extends StatelessWidget {
                         if (medicine.dosageForm case final form?)
                           _Tag(icon: Icons.category_outlined, text: form),
                         if (medicine.requiresPrescription)
-                          _Tag(
+                          const _Tag(
                             icon: Icons.receipt_long_outlined,
                             text: 'بوصفة طبية',
-                            color: const Color(0xFFB47618),
+                            color: Color(0xFFB47618),
                           ),
                       ],
                     ),
@@ -320,39 +335,36 @@ class _Tag extends StatelessWidget {
   const _Tag({
     required this.icon,
     required this.text,
-    this.color,
+    this.color = AppColors.primary,
   });
 
   final IconData icon;
   final String text;
-  final Color? color;
+  final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    final tagColor = color ?? context.appColors.primary;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(
-        color: tagColor.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: tagColor),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              color: tagColor,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: color),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }
 
 class _Pagination extends StatelessWidget {
@@ -405,10 +417,10 @@ class _EmptyCatalog extends StatelessWidget {
     padding: const EdgeInsets.all(34),
     children: [
       const SizedBox(height: 90),
-      Icon(
+      const Icon(
         Icons.medication_outlined,
         size: 52,
-        color: context.appColors.textMuted,
+        color: AppColors.textMuted,
       ),
       const SizedBox(height: 14),
       Text(

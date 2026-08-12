@@ -111,15 +111,15 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                     Container(
                       margin: const EdgeInsets.only(bottom: 14),
                       decoration: BoxDecoration(
-                        color: context.appColors.surfaceSoft,
+                        color: AppColors.surfaceSoft,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: SwitchListTile(
                         value: _delivery,
                         onChanged: (value) => setState(() => _delivery = value),
-                        secondary: Icon(
+                        secondary: const Icon(
                           Icons.delivery_dining_outlined,
-                          color: context.appColors.primary,
+                          color: AppColors.primary,
                         ),
                         title: const Text('خدمة توصيل الأدوية'),
                         subtitle: const Text('أخبر المستخدمين بتوفر التوصيل'),
@@ -150,7 +150,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                       onTap: _saving ? null : _useGps,
                     ),
                     const SizedBox(height: 12),
-                    Row(
+                    const Row(
                       children: [
                         Expanded(child: Divider()),
                         Padding(
@@ -158,7 +158,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                           child: Text(
                             'أو أدخل الإحداثيات يدويًا',
                             style: TextStyle(
-                              color: context.appColors.textMuted,
+                              color: AppColors.textMuted,
                               fontSize: 11,
                             ),
                           ),
@@ -323,7 +323,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                       candidate.isBestMatch
                           ? Icons.verified_rounded
                           : Icons.location_on_outlined,
-                      color: context.appColors.primary,
+                      color: AppColors.primary,
                     ),
                     title: Text(candidate.name),
                     subtitle: Text(
@@ -395,7 +395,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? context.appColors.danger : null,
+        backgroundColor: error ? AppColors.danger : null,
       ),
     );
   }
@@ -411,8 +411,8 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
         begin: Alignment.topRight,
         end: Alignment.bottomLeft,
       ),
@@ -430,9 +430,9 @@ class _ProfileHeader extends StatelessWidget {
                 color: Colors.white.withValues(alpha: .12),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.local_pharmacy_rounded,
-                color: context.appColors.secondary,
+                color: AppColors.secondary,
                 size: 30,
               ),
             ),
@@ -459,7 +459,7 @@ class _ProfileHeader extends StatelessWidget {
               data.isApproved
                   ? Icons.verified_rounded
                   : Icons.hourglass_top_rounded,
-              color: data.isApproved ? context.appColors.secondary : Colors.white70,
+              color: data.isApproved ? AppColors.secondary : Colors.white70,
             ),
           ],
         ),
@@ -529,10 +529,10 @@ class _Section extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: context.appColors.surfaceSoft,
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: context.appColors.primary),
+                child: Icon(icon, color: AppColors.primary),
               ),
               const SizedBox(width: 11),
               Expanded(
@@ -602,7 +602,7 @@ class _LocationMethod extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: context.appColors.surfaceSoft,
+    color: AppColors.surfaceSoft,
     borderRadius: BorderRadius.circular(17),
     child: InkWell(
       onTap: onTap,
@@ -618,7 +618,7 @@ class _LocationMethod extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: context.appColors.primary),
+              child: Icon(icon, color: AppColors.primary),
             ),
             const SizedBox(width: 11),
             Expanded(
@@ -633,7 +633,7 @@ class _LocationMethod extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_left_rounded, color: context.appColors.primary),
+            const Icon(Icons.chevron_left_rounded, color: AppColors.primary),
           ],
         ),
       ),

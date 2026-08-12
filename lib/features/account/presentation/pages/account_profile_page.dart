@@ -41,14 +41,14 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('الملف الشخصي'),
             Text(
               'بيانات حسابك وصورتك',
               style: TextStyle(
-                color: context.appColors.textMuted,
+                color: AppColors.textMuted,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
@@ -84,9 +84,9 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                   child: Container(
                     padding: const EdgeInsets.all(17),
                     decoration: BoxDecoration(
-                      color: context.appColors.surface,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(23),
-                      border: Border.all(color: context.appColors.border),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,12 +97,12 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: context.appColors.surfaceSoft,
+                                color: AppColors.surfaceSoft,
                                 borderRadius: BorderRadius.circular(13),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.edit_note_rounded,
-                                color: context.appColors.primary,
+                                color: AppColors.primary,
                               ),
                             ),
                             const SizedBox(width: 9),
@@ -273,7 +273,7 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? context.appColors.danger : context.appColors.primary,
+        backgroundColor: isError ? AppColors.danger : AppColors.primary,
       ),
     );
   }
@@ -304,13 +304,13 @@ class _AvatarEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
       ),
       borderRadius: BorderRadius.circular(27),
       boxShadow: [
         BoxShadow(
-          color: context.appColors.primaryDeep.withValues(alpha: .15),
+          color: AppColors.primaryDeep.withValues(alpha: .15),
           blurRadius: 22,
           offset: const Offset(0, 10),
         ),
@@ -349,8 +349,8 @@ class _AvatarEditor extends StatelessWidget {
                   user.hasProfileImage ? 'تغيير الصورة' : 'إضافة صورة',
                 ),
                 style: FilledButton.styleFrom(
-                  backgroundColor: context.appColors.secondary,
-                  foregroundColor: context.appColors.primaryDeep,
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: AppColors.primaryDeep,
                 ),
               ),
               if (onDelete != null)

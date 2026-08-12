@@ -143,12 +143,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           width: 78,
           height: 78,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [context.appColors.primary, context.appColors.primaryDark],
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
             ),
             borderRadius: BorderRadius.circular(26),
           ),
-          child: Icon(icon, color: context.appColors.secondary, size: 35),
+          child: Icon(icon, color: AppColors.secondary, size: 35),
         ),
         const SizedBox(height: 20),
         Text(title, style: Theme.of(context).textTheme.headlineSmall),
@@ -315,10 +315,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     child: Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: context.appColors.danger.withValues(alpha: 0.07),
+        color: AppColors.danger.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Text(_error!, style: TextStyle(color: context.appColors.danger)),
+      child: Text(_error!, style: const TextStyle(color: AppColors.danger)),
     ),
   );
 

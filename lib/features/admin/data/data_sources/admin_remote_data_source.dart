@@ -10,6 +10,10 @@ class AdminRemoteDataSource {
 
   Future<AdminDashboard> getDashboard() async =>
       AdminDashboard.fromJson(await _get(ApiEndpoints.adminDashboard));
+  Future<AdminAiServicesHealth> getAiServicesHealth() async =>
+      AdminAiServicesHealth.fromJson(
+        await _get(ApiEndpoints.adminAiServicesHealth),
+      );
   Future<List<AdminPharmacy>> getPendingPharmacies() async =>
       _getList(ApiEndpoints.adminPendingPharmacies, AdminPharmacy.fromJson);
   Future<List<AdminOrganization>> getPendingOrganizations() async => _getList(
@@ -20,6 +24,34 @@ class AdminRemoteDataSource {
       _getList(ApiEndpoints.adminPendingWarehouses, AdminWarehouse.fromJson);
   Future<void> approvePharmacy(String id, bool approved) async =>
       _put(ApiEndpoints.adminPharmacyApproval(id), {'isApproved': approved});
+  Future<AdminPharmacyLicenseVerification> getPharmacyLicenseVerification(
+    String id,
+  ) async => AdminPharmacyLicenseVerification.fromJson(
+    await _get(ApiEndpoints.adminPharmacyLicenseVerification(id)),
+  );
+
+  Future<AdminDownloadedDocument> getPharmacyLicenseDocument(
+    String pharmacyId,
+    String verificationId,
+  ) async {
+    try {
+      final response = await _dio.get<List<int>>(
+        ApiEndpoints.adminPharmacyLicenseVerificationDocument(
+          pharmacyId,
+          verificationId,
+        ),
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return (
+        bytes: response.data ?? const [],
+        fileName: response.headers.value('content-disposition'),
+        contentType: response.headers.value('content-type'),
+      );
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
   Future<void> approveOrganization(String id, bool approved) async => _put(
     ApiEndpoints.adminOrganizationApproval(id),
     {'isApproved': approved},

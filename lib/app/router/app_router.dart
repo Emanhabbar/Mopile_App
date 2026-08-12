@@ -28,6 +28,7 @@ import '../../features/organization/presentation/pages/organization_workspace_pa
 import '../../features/organization/presentation/pages/public_organization_details_page.dart';
 import '../../features/organization/presentation/pages/public_organizations_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_inventory_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_license_verification_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_profile_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_request_details_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_requests_page.dart';
@@ -358,6 +359,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/pharmacy/inventory',
         name: 'pharmacy-inventory',
         builder: (context, state) => const PharmacyInventoryPage(),
+      ),
+      GoRoute(
+        path: '/pharmacy/license-verification',
+        name: 'pharmacy-license-verification',
+        builder: (context, state) => const PharmacyLicenseVerificationPage(),
       ),
       GoRoute(
         path: '/pharmacy/requests',

@@ -6,6 +6,10 @@ import '../../data/repositories/admin_repository.dart';
 final adminDashboardProvider = FutureProvider.autoDispose<AdminDashboard>(
   (ref) => ref.watch(adminRepositoryProvider).getDashboard(),
 );
+final adminAiServicesHealthProvider =
+    FutureProvider.autoDispose<AdminAiServicesHealth>(
+      (ref) => ref.watch(adminRepositoryProvider).getAiServicesHealth(),
+    );
 final adminPendingPharmaciesProvider =
     FutureProvider.autoDispose<List<AdminPharmacy>>(
       (ref) => ref.watch(adminRepositoryProvider).getPendingPharmacies(),

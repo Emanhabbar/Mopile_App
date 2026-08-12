@@ -1,4 +1,8 @@
 abstract final class ApiEndpoints {
+  // Service health.
+  static const healthLive = 'health/live';
+  static const healthReady = 'health/ready';
+
   // Authentication and shared account.
   static const authLogin = 'Auth/login';
   static const authRegisterUser = 'Auth/register/user';
@@ -56,6 +60,7 @@ abstract final class ApiEndpoints {
   static const pharmacyMe = 'pharmacy/me';
   static const pharmacyDashboard = 'pharmacy/me/dashboard';
   static const pharmacyProfile = 'pharmacy/me/profile';
+  static const pharmacyLicenseVerification = 'pharmacy/me/license-verification';
   static const pharmacyLocation = 'pharmacy/me/location';
   static const pharmacyLocationCandidates = 'pharmacy/me/location/candidates';
   static const pharmacyLocationLink = 'pharmacy/me/location/link';
@@ -72,10 +77,15 @@ abstract final class ApiEndpoints {
       'pharmacy/me/requests/$requestId';
   static String pharmacyRequestResponse(String requestId) =>
       'pharmacy/me/requests/$requestId/response';
+  static String pharmacyConfirmRequestPickup(String requestId) =>
+      'pharmacy/me/requests/$requestId/confirm-pickup';
+  static String pharmacyLicenseVerificationDocument(String verificationId) =>
+      'pharmacy/me/license-verification/$verificationId/document';
 
   // Medicines.
   static const medicines = 'Medicines';
   static String medicine(String id) => 'Medicines/$id';
+  static String medicineLocalization(String id) => 'Medicines/$id/localization';
 
   // Notifications.
   static const notifications = 'Notifications/me';
@@ -140,6 +150,7 @@ abstract final class ApiEndpoints {
 
   // Administration.
   static const adminDashboard = 'admin/dashboard';
+  static const adminAiServicesHealth = 'admin/ai-services/health';
   static const adminPendingPharmacies = 'admin/pharmacies/pending';
   static const adminPendingOrganizations = 'admin/organizations/pending';
   static const adminPendingWarehouses = 'admin/warehouses/pending';
@@ -148,6 +159,13 @@ abstract final class ApiEndpoints {
   static const adminHomeTickerPharmacies = 'admin/home-ticker/pharmacies';
   static String adminPharmacyApproval(String id) =>
       'admin/pharmacies/$id/approval';
+  static String adminPharmacyLicenseVerification(String id) =>
+      'admin/pharmacies/$id/license-verification';
+  static String adminPharmacyLicenseVerificationDocument(
+    String pharmacyId,
+    String verificationId,
+  ) =>
+      'admin/pharmacies/$pharmacyId/license-verification/$verificationId/document';
   static String adminOrganizationApproval(String id) =>
       'admin/organizations/$id/approval';
   static String adminWarehouseApproval(String id) =>

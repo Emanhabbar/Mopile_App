@@ -92,9 +92,9 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(
+        icon: const Icon(
           Icons.delete_sweep_outlined,
-          color: context.appColors.danger,
+          color: AppColors.danger,
           size: 38,
         ),
         title: const Text('مسح سجل البحث؟'),
@@ -109,7 +109,7 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             child: const Text('مسح السجل'),
           ),
         ],
@@ -137,7 +137,7 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
         content: Text(
           error is ApiException ? error.message : 'تعذر حذف سجل البحث حاليًا.',
         ),
-        backgroundColor: context.appColors.danger,
+        backgroundColor: AppColors.danger,
       ),
     );
   }
@@ -171,14 +171,14 @@ class _HistoryCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: context.appColors.primary.withValues(alpha: 0.09),
+                  color: AppColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   medicine
                       ? Icons.medication_outlined
                       : Icons.local_pharmacy_outlined,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 11),
@@ -214,7 +214,7 @@ class _HistoryCard extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.delete_outline_rounded),
-                color: context.appColors.danger,
+                color: AppColors.danger,
               ),
             ],
           ),
@@ -233,7 +233,7 @@ class _EmptyHistory extends StatelessWidget {
     padding: const EdgeInsets.all(32),
     children: [
       const SizedBox(height: 90),
-      Icon(Icons.history_rounded, color: context.appColors.textMuted, size: 48),
+      const Icon(Icons.history_rounded, color: AppColors.textMuted, size: 48),
       const SizedBox(height: 14),
       Text(
         'لا يوجد سجل بحث',

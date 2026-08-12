@@ -47,12 +47,29 @@ void main() {
             'endpoint': '/api/Users/me/nearest-pharmacies',
           },
         ],
+        'aiSources': [
+          {
+            'source_id': 12,
+            'medicineName': 'Paracetamol',
+            'arabicName': 'باراسيتامول',
+            'activeIngredient': 'Acetaminophen',
+            'strength': '500 mg',
+            'form': 'Tablet',
+            'manufacturer': 'Manufacturer',
+            'package': '20 tablets',
+            'source': 'catalog',
+            'score': 0.81,
+            'rerank_score': 0.93,
+          },
+        ],
         'requiresPharmacist': false,
       });
 
       expect(reply.detectedIntent, 'FindMedicine');
       expect(reply.requiresLocation, isTrue);
       expect(reply.suggestedActions.single.label, 'عرض الصيدليات');
+      expect(reply.aiSources.single.displayName, 'باراسيتامول');
+      expect(reply.aiSources.single.rerankScore, 0.93);
     });
   });
 }

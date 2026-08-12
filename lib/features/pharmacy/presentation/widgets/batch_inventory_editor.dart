@@ -155,7 +155,7 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
           width: 44,
           height: 4,
           decoration: BoxDecoration(
-            color: context.appColors.border,
+            color: AppColors.border,
             borderRadius: BorderRadius.circular(20),
           ),
         ),
@@ -166,12 +166,12 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: context.appColors.surfaceSoft,
+                color: AppColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.playlist_add_check_circle_outlined,
-                color: context.appColors.primary,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(width: 12),
@@ -209,8 +209,8 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
             const SizedBox(width: 10),
             Text(
               '$_completedPrices/${_entries.length} أسعار',
-              style: TextStyle(
-                color: context.appColors.primary,
+              style: const TextStyle(
+                color: AppColors.primary,
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),
@@ -234,7 +234,7 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
     padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      border: Border(top: BorderSide(color: context.appColors.border)),
+      border: const Border(top: BorderSide(color: AppColors.border)),
     ),
     child: SizedBox(
       width: double.infinity,
@@ -266,7 +266,9 @@ class _BatchMedicineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final details = [
+      entry.medicine.arabicName,
       entry.medicine.scientificName,
+      entry.medicine.arabicScientificName,
       entry.medicine.dosageForm,
       entry.medicine.capacity,
     ].whereType<String>().where((value) => value.trim().isNotEmpty).join(' · ');
@@ -287,13 +289,13 @@ class _BatchMedicineCard extends StatelessWidget {
                   height: 42,
                   decoration: BoxDecoration(
                     color: hasPrice
-                        ? context.appColors.success.withValues(alpha: .1)
-                        : context.appColors.surfaceSoft,
+                        ? AppColors.success.withValues(alpha: .1)
+                        : AppColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: Icon(
                     hasPrice ? Icons.check_rounded : Icons.medication_outlined,
-                    color: hasPrice ? context.appColors.success : context.appColors.primary,
+                    color: hasPrice ? AppColors.success : AppColors.primary,
                   ),
                 ),
                 const SizedBox(width: 11),
@@ -325,6 +327,35 @@ class _BatchMedicineCard extends StatelessWidget {
                   ),
               ],
             ),
+            if (entry.medicine.capacity != null ||
+                entry.medicine.dosageForm != null ||
+                entry.medicine.packageSize != null) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: [
+                  if (entry.medicine.capacity != null)
+                    _MedicineIdentityBadge(
+                      icon: Icons.straighten_rounded,
+                      label: 'التركيز',
+                      value: entry.medicine.capacity!,
+                    ),
+                  if (entry.medicine.dosageForm != null)
+                    _MedicineIdentityBadge(
+                      icon: Icons.category_outlined,
+                      label: 'الشكل',
+                      value: entry.medicine.dosageForm!,
+                    ),
+                  if (entry.medicine.packageSize != null)
+                    _MedicineIdentityBadge(
+                      icon: Icons.inventory_2_outlined,
+                      label: 'العبوة',
+                      value: entry.medicine.packageSize!,
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 14),
             TextFormField(
               key: ValueKey('batch-price-${entry.medicine.id}'),
@@ -460,6 +491,38 @@ class _BatchMedicineCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MedicineIdentityBadge extends StatelessWidget {
+  const _MedicineIdentityBadge({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+    decoration: BoxDecoration(
+      color: AppColors.primary.withValues(alpha: .07),
+      borderRadius: BorderRadius.circular(11),
+      border: Border.all(color: AppColors.primary.withValues(alpha: .12)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: AppColors.primary, size: 15),
+        const SizedBox(width: 5),
+        Text(
+          '$label: $value',
+          style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800),
+        ),
+      ],
+    ),
+  );
 }
 
 class _BatchDefaultsDialog extends StatefulWidget {

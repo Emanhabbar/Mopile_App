@@ -25,6 +25,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   bool _sending = false;
   bool _ending = false;
   List<ChatAction> _actions = const [];
+  List<ChatAiSource> _sources = const [];
 
   @override
   void dispose() {
@@ -51,8 +52,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               session?.isEnded == true ? 'محادثة منتهية' : 'جاهز لمساعدتك',
               style: TextStyle(
                 color: session?.isEnded == true
-                    ? context.appColors.textMuted
-                    : context.appColors.success,
+                    ? AppColors.textMuted
+                    : AppColors.success,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
@@ -115,6 +116,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                         .toList(growable: false),
                   ),
                 ),
+              if (_sources.isNotEmpty) _SourcesPanel(sources: _sources),
               _Composer(
                 controller: _message,
                 disabled: data.isEnded || _sending,
@@ -138,7 +140,10 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           .read(chatRepositoryProvider)
           .sendMessage(widget.sessionId, message: text);
       _message.clear();
-      setState(() => _actions = reply.suggestedActions);
+      setState(() {
+        _actions = reply.suggestedActions;
+        _sources = reply.aiSources;
+      });
       ref
         ..invalidate(chatSessionProvider(widget.sessionId))
         ..invalidate(chatSessionsProvider);
@@ -195,10 +200,86 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         content: Text(
           error is ApiException ? error.message : 'تعذر إرسال الرسالة.',
         ),
-        backgroundColor: context.appColors.danger,
+        backgroundColor: AppColors.danger,
       ),
     );
   }
+}
+
+class _SourcesPanel extends StatelessWidget {
+  const _SourcesPanel({required this.sources});
+  final List<ChatAiSource> sources;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: AppColors.surfaceSoft,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: AppColors.border),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.menu_book_rounded, color: AppColors.primary, size: 18),
+            SizedBox(width: 7),
+            Text(
+              'مراجع دوائية مرتبطة بالإجابة',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 9),
+        SizedBox(
+          height: 76,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: sources.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final source = sources[index];
+              final details = [
+                source.activeIngredient,
+                source.strength,
+              ].where((value) => value.trim().isNotEmpty).join(' · ');
+              return Container(
+                width: 205,
+                padding: const EdgeInsets.all(11),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      source.displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      details.isEmpty ? 'بيانات دوائية مرجعية' : details,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _ConversationNotice extends StatelessWidget {
@@ -207,21 +288,21 @@ class _ConversationNotice extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
     decoration: BoxDecoration(
-      color: context.appColors.surfaceWarm,
+      color: AppColors.surfaceWarm,
       borderRadius: BorderRadius.circular(15),
     ),
-    child: Row(
+    child: const Row(
       children: [
         Icon(
           Icons.lightbulb_outline_rounded,
-          color: context.appColors.warning,
+          color: AppColors.warning,
           size: 19,
         ),
         SizedBox(width: 8),
         Expanded(
           child: Text(
             'اكتب سؤالك بوضوح لتحصل على نتيجة أدق، ولا تعتمد على المحادثة في الحالات الطارئة.',
-            style: TextStyle(fontSize: 10, color: context.appColors.textMuted),
+            style: TextStyle(fontSize: 10, color: AppColors.textMuted),
           ),
         ),
       ],
@@ -243,12 +324,12 @@ class _MessageBubble extends StatelessWidget {
           : MainAxisAlignment.end,
       children: [
         if (!message.isUser) ...[
-          CircleAvatar(
+          const CircleAvatar(
             radius: 15,
-            backgroundColor: context.appColors.primaryDeep,
+            backgroundColor: AppColors.primaryDeep,
             child: Icon(
               Icons.auto_awesome_rounded,
-              color: context.appColors.secondary,
+              color: AppColors.secondary,
               size: 15,
             ),
           ),
@@ -260,14 +341,14 @@ class _MessageBubble extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
-            color: message.isUser ? context.appColors.primary : context.appColors.surface,
+            color: message.isUser ? AppColors.primary : AppColors.surface,
             borderRadius: BorderRadiusDirectional.only(
               topStart: const Radius.circular(18),
               topEnd: const Radius.circular(18),
               bottomStart: Radius.circular(message.isUser ? 5 : 18),
               bottomEnd: Radius.circular(message.isUser ? 18 : 5),
             ),
-            border: message.isUser ? null : Border.all(color: context.appColors.border),
+            border: message.isUser ? null : Border.all(color: AppColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +356,7 @@ class _MessageBubble extends StatelessWidget {
               Text(
                 message.content,
                 style: TextStyle(
-                  color: message.isUser ? Colors.white : context.appColors.text,
+                  color: message.isUser ? Colors.white : AppColors.text,
                   height: 1.5,
                 ),
               ),
@@ -284,7 +365,7 @@ class _MessageBubble extends StatelessWidget {
                 '${message.sentAtUtc.hour.toString().padLeft(2, '0')}:'
                 '${message.sentAtUtc.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
-                  color: message.isUser ? Colors.white60 : context.appColors.textMuted,
+                  color: message.isUser ? Colors.white60 : AppColors.textMuted,
                   fontSize: 8,
                 ),
               ),
@@ -293,12 +374,12 @@ class _MessageBubble extends StatelessWidget {
         ),
         if (message.isUser) ...[
           const SizedBox(width: 7),
-          CircleAvatar(
+          const CircleAvatar(
             radius: 15,
-            backgroundColor: context.appColors.surfaceSoft,
+            backgroundColor: AppColors.surfaceSoft,
             child: Icon(
               Icons.person_outline,
-              color: context.appColors.primary,
+              color: AppColors.primary,
               size: 16,
             ),
           ),
@@ -326,9 +407,9 @@ class _Composer extends StatelessWidget {
     top: false,
     child: Container(
       padding: const EdgeInsets.fromLTRB(12, 9, 12, 12),
-      decoration: BoxDecoration(
-        color: context.appColors.surface,
-        border: Border(top: BorderSide(color: context.appColors.border)),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
@@ -344,7 +425,7 @@ class _Composer extends StatelessWidget {
                 hintText: disabled ? 'تم إنهاء هذه المحادثة' : 'اكتب رسالتك...',
                 counterText: '',
                 filled: true,
-                fillColor: context.appColors.surfaceSoft,
+                fillColor: AppColors.surfaceSoft,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,

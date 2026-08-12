@@ -19,7 +19,10 @@ class CreateMedicinePage extends ConsumerStatefulWidget {
 class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
+  final _arabicName = TextEditingController();
+  final _barcode = TextEditingController();
   final _scientificName = TextEditingController();
+  final _arabicScientificName = TextEditingController();
   final _purchasePrice = TextEditingController(text: '0');
   final _sellingPrice = TextEditingController(text: '0');
   final _quantity = TextEditingController(text: '0');
@@ -34,7 +37,10 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
 
   Iterable<TextEditingController> get _controllers => [
     _name,
+    _arabicName,
+    _barcode,
     _scientificName,
+    _arabicScientificName,
     _purchasePrice,
     _sellingPrice,
     _quantity,
@@ -71,9 +77,9 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'اسم الدواء',
+              label: 'الاسم التجاري بالإنكليزية',
               controller: _name,
-              hint: 'الاسم التجاري',
+              hint: 'مثال: Paracetamol 500',
               icon: Icons.medication_liquid_outlined,
               textInputAction: TextInputAction.next,
               validator: (value) => _requiredLength(
@@ -84,10 +90,37 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الاسم العلمي',
+              label: 'الاسم التجاري بالعربية',
+              controller: _arabicName,
+              hint: 'مثال: باراسيتامول 500',
+              icon: Icons.translate_rounded,
+              textInputAction: TextInputAction.next,
+              validator: (value) => _maximum(value, 500),
+            ),
+            const SizedBox(height: 14),
+            AppTextField(
+              label: 'الباركود',
+              controller: _barcode,
+              hint: 'أرقام أو أحرف أو شرطة',
+              icon: Icons.qr_code_rounded,
+              textInputAction: TextInputAction.next,
+              validator: _barcodeValidator,
+            ),
+            const SizedBox(height: 14),
+            AppTextField(
+              label: 'الاسم العلمي بالإنكليزية',
               controller: _scientificName,
               hint: 'اختياري',
               icon: Icons.science_outlined,
+              textInputAction: TextInputAction.next,
+              validator: (value) => _maximum(value, 2000),
+            ),
+            const SizedBox(height: 14),
+            AppTextField(
+              label: 'الاسم العلمي بالعربية',
+              controller: _arabicScientificName,
+              hint: 'اختياري',
+              icon: Icons.science_rounded,
               textInputAction: TextInputAction.next,
               validator: (value) => _maximum(value, 2000),
             ),
@@ -239,7 +272,10 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
           .createMedicine(
             CreateMedicine(
               name: _name.text,
+              barcode: _barcode.text,
+              arabicName: _arabicName.text,
               scientificName: _scientificName.text,
+              arabicScientificName: _arabicScientificName.text,
               purchasePrice: _number(_purchasePrice.text),
               sellingPrice: _number(_sellingPrice.text),
               quantityInStock: int.parse(_quantity.text.trim()),
@@ -265,7 +301,7 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
           content: Text(
             error is ApiException ? error.message : 'تعذر إضافة الدواء حاليًا.',
           ),
-          backgroundColor: context.appColors.danger,
+          backgroundColor: AppColors.danger,
         ),
       );
     } finally {
@@ -281,14 +317,14 @@ class _Intro extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
-      color: context.appColors.primary.withValues(alpha: 0.07),
+      color: AppColors.primary.withValues(alpha: 0.07),
       borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.13)),
+      border: Border.all(color: AppColors.primary.withValues(alpha: 0.13)),
     ),
-    child: Row(
+    child: const Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.library_add_rounded, color: context.appColors.primary),
+        Icon(Icons.library_add_rounded, color: AppColors.primary),
         SizedBox(width: 11),
         Expanded(
           child: Text(
@@ -309,7 +345,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, color: context.appColors.primary, size: 21),
+      Icon(icon, color: AppColors.primary, size: 21),
       const SizedBox(width: 8),
       Text(title, style: Theme.of(context).textTheme.titleLarge),
     ],
@@ -327,9 +363,9 @@ class _PrescriptionSwitch extends StatelessWidget {
     child: SwitchListTile(
       value: value,
       onChanged: onChanged,
-      secondary: Icon(
+      secondary: const Icon(
         Icons.receipt_long_outlined,
-        color: context.appColors.primary,
+        color: AppColors.primary,
       ),
       title: const Text('يتطلب وصفة طبية'),
       subtitle: const Text('فعّل الخيار إذا كان صرف الدواء يحتاج وصفة'),
@@ -351,6 +387,15 @@ String? _maximum(String? value, int maximum) =>
     (value?.trim().length ?? 0) > maximum
     ? 'الحد الأقصى $maximum حرفًا.'
     : null;
+
+String? _barcodeValidator(String? value) {
+  final text = value?.trim() ?? '';
+  if (text.isEmpty) return null;
+  if (text.length > 64) return 'الحد الأقصى 64 محرفًا.';
+  return RegExp(r'^[0-9A-Za-z-]+$').hasMatch(text)
+      ? null
+      : 'استخدم الأرقام أو الأحرف الإنكليزية أو الشرطة فقط.';
+}
 
 String? _nonNegativeNumber(String? value) {
   final number = double.tryParse((value ?? '').trim().replaceAll(',', '.'));

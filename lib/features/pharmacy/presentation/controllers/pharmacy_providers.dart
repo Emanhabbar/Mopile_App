@@ -13,6 +13,10 @@ final pharmacyOpenStatusProvider =
     FutureProvider.autoDispose<PharmacyOpenStatus>(
       (ref) => ref.watch(pharmacyRepositoryProvider).getOpenStatus(),
     );
+final pharmacyLicenseVerificationProvider =
+    FutureProvider.autoDispose<PharmacyLicenseVerification?>(
+      (ref) => ref.watch(pharmacyRepositoryProvider).getLicenseVerification(),
+    );
 final pharmacyWorkingHoursProvider =
     FutureProvider.autoDispose<List<PharmacyWorkingPeriod>>(
       (ref) => ref.watch(pharmacyRepositoryProvider).getWorkingHours(),
@@ -28,12 +32,6 @@ final pharmacyInventoryProvider = FutureProvider.autoDispose
             stockStatus: filter.stockStatus,
           ),
     );
-final pharmacyCatalogProvider = FutureProvider.autoDispose
-    .family<List<PharmacyCatalogMedicine>, String>(
-      (ref, query) =>
-          ref.watch(pharmacyRepositoryProvider).searchCatalog(query),
-    );
-
 typedef PharmacyRequestFilter = ({String search, String? status});
 final pharmacyRequestsProvider = FutureProvider.autoDispose
     .family<List<PharmacyRequest>, PharmacyRequestFilter>(

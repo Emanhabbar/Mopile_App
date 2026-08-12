@@ -82,5 +82,22 @@ void main() {
       expect(item.isPriceVisibleToUsers, isFalse);
       expect(item.sellingPrice, 15000);
     });
+
+    test('parses pharmacy license verification result', () {
+      final verification = PharmacyLicenseVerification.fromJson({
+        'verificationId': 'verification-1',
+        'pharmacyId': 'pharmacy-1',
+        'status': 'Processing',
+        'registeredName': 'أحمد',
+        'originalFileName': 'license.png',
+        'contentType': 'image/png',
+        'fileSizeBytes': 500000,
+        'attemptCount': 1,
+        'submittedAtUtc': '2026-08-09T12:00:00Z',
+      });
+
+      expect(verification.isPending, isTrue);
+      expect(verification.originalFileName, 'license.png');
+    });
   });
 }

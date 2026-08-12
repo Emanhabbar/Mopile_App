@@ -94,6 +94,7 @@ class ChatReply {
     required this.sessionEnded,
     required this.newMessages,
     required this.suggestedActions,
+    required this.aiSources,
     required this.requiresPharmacist,
     this.aiEngine,
     this.aiRetrievalConfidence,
@@ -107,6 +108,7 @@ class ChatReply {
     sessionEnded: json['sessionEnded'] == true,
     newMessages: _list(json['newMessages'], ChatMessage.fromJson),
     suggestedActions: _list(json['suggestedActions'], ChatAction.fromJson),
+    aiSources: _list(json['aiSources'], ChatAiSource.fromJson),
     aiEngine: _optional(json['aiEngine']),
     aiRetrievalConfidence: _optional(json['aiRetrievalConfidence']),
     requiresPharmacist: json['requiresPharmacist'] == true,
@@ -119,9 +121,58 @@ class ChatReply {
   final bool sessionEnded;
   final List<ChatMessage> newMessages;
   final List<ChatAction> suggestedActions;
+  final List<ChatAiSource> aiSources;
   final String? aiEngine;
   final String? aiRetrievalConfidence;
   final bool requiresPharmacist;
+}
+
+class ChatAiSource {
+  const ChatAiSource({
+    required this.sourceId,
+    required this.medicineName,
+    required this.arabicName,
+    required this.activeIngredient,
+    required this.strength,
+    required this.form,
+    required this.manufacturer,
+    required this.packageName,
+    required this.source,
+    required this.score,
+    required this.rerankScore,
+  });
+
+  factory ChatAiSource.fromJson(Map<String, dynamic> json) => ChatAiSource(
+    sourceId: _integer(json['source_id'] ?? json['sourceId']),
+    medicineName: _text(json['medicineName']),
+    arabicName: _text(json['arabicName']),
+    activeIngredient: _text(json['activeIngredient']),
+    strength: _text(json['strength']),
+    form: _text(json['form']),
+    manufacturer: _text(json['manufacturer']),
+    packageName: _text(json['package']),
+    source: _text(json['source']),
+    score: _number(json['score']),
+    rerankScore: _number(json['rerank_score'] ?? json['rerankScore']),
+  );
+
+  final int sourceId;
+  final String medicineName;
+  final String arabicName;
+  final String activeIngredient;
+  final String strength;
+  final String form;
+  final String manufacturer;
+  final String packageName;
+  final String source;
+  final double score;
+  final double rerankScore;
+
+  String get displayName => arabicName.trim().isNotEmpty
+      ? arabicName.trim()
+      : medicineName.trim().isNotEmpty
+      ? medicineName.trim()
+      : 'مرجع دوائي';
 }
 
 class ChatAction {
@@ -170,6 +221,8 @@ String? _optional(Object? value) {
 
 int _integer(Object? value) =>
     value is num ? value.toInt() : int.tryParse('$value') ?? 0;
+double _number(Object? value) =>
+    value is num ? value.toDouble() : double.tryParse('$value') ?? 0;
 DateTime _date(Object? value) =>
     DateTime.tryParse(value?.toString() ?? '') ?? DateTime.now().toUtc();
 DateTime? _optionalDate(Object? value) =>

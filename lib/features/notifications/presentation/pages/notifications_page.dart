@@ -32,14 +32,14 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final summary = ref.watch(notificationSummaryProvider).valueOrNull;
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('الإشعارات'),
             Text(
               'كل جديد في مكان واحد',
               style: TextStyle(
-                color: context.appColors.textMuted,
+                color: AppColors.textMuted,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
@@ -181,7 +181,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       ..showSnackBar(
         SnackBar(
           content: Text(text),
-          backgroundColor: error ? context.appColors.danger : null,
+          backgroundColor: error ? AppColors.danger : null,
         ),
       );
   }
@@ -200,8 +200,8 @@ class _NotificationsHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(17),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
       ),
       borderRadius: BorderRadius.circular(24),
     ),
@@ -214,9 +214,9 @@ class _NotificationsHero extends StatelessWidget {
             color: Colors.white.withValues(alpha: .12),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.notifications_active_outlined,
-            color: context.appColors.secondary,
+            color: AppColors.secondary,
           ),
         ),
         const SizedBox(width: 12),
@@ -276,7 +276,7 @@ class _Filters extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(9),
         decoration: BoxDecoration(
-          color: context.appColors.surfaceSoft,
+          color: AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
@@ -292,11 +292,11 @@ class _Filters extends StatelessWidget {
               child: DropdownButtonFormField<String?>(
                 initialValue: selectedType,
                 isExpanded: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'نوع الإشعار',
                   isDense: true,
                   filled: true,
-                  fillColor: context.appColors.surface,
+                  fillColor: Colors.white,
                 ),
                 items: [
                   const DropdownMenuItem<String?>(
@@ -328,12 +328,12 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = _typeInfo(context.appColors, notification.type);
+    final info = _typeInfo(notification.type);
     return AppReveal(
       child: Card(
         color: notification.isRead
-            ? context.appColors.surface
-            : context.appColors.primary.withValues(alpha: 0.045),
+            ? AppColors.surface
+            : AppColors.primary.withValues(alpha: 0.045),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
@@ -357,7 +357,7 @@ class _NotificationCard extends StatelessWidget {
                             child: Text(
                               notification.title,
                               style: TextStyle(
-                                color: context.appColors.text,
+                                color: AppColors.text,
                                 fontWeight: notification.isRead
                                     ? FontWeight.w700
                                     : FontWeight.w900,
@@ -365,9 +365,9 @@ class _NotificationCard extends StatelessWidget {
                             ),
                           ),
                           if (!notification.isRead)
-                            CircleAvatar(
+                            const CircleAvatar(
                               radius: 4,
-                              backgroundColor: context.appColors.primary,
+                              backgroundColor: AppColors.primary,
                             ),
                         ],
                       ),
@@ -400,11 +400,11 @@ class _EmptyNotifications extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     physics: const AlwaysScrollableScrollPhysics(),
     padding: const EdgeInsets.all(32),
-    children: [
+    children: const [
       SizedBox(height: 80),
       Icon(
         Icons.notifications_none_rounded,
-        color: context.appColors.textMuted,
+        color: AppColors.textMuted,
         size: 42,
       ),
       SizedBox(height: 12),
@@ -413,21 +413,21 @@ class _EmptyNotifications extends StatelessWidget {
   );
 }
 
-({IconData icon, Color color}) _typeInfo(AppColors colors, String type) {
+({IconData icon, Color color}) _typeInfo(String type) {
   final value = type.toLowerCase();
   if (value.contains('prescription')) {
     return (icon: Icons.receipt_long_rounded, color: const Color(0xFF7557B7));
   }
   if (value.contains('request')) {
-    return (icon: Icons.inventory_2_rounded, color: colors.primary);
+    return (icon: Icons.inventory_2_rounded, color: AppColors.primary);
   }
   if (value.contains('reminder')) {
     return (icon: Icons.alarm_rounded, color: const Color(0xFFB47618));
   }
   if (value.contains('approval') || value.contains('verification')) {
-    return (icon: Icons.verified_rounded, color: colors.success);
+    return (icon: Icons.verified_rounded, color: AppColors.success);
   }
-  return (icon: Icons.notifications_rounded, color: colors.primary);
+  return (icon: Icons.notifications_rounded, color: AppColors.primary);
 }
 
 String _typeText(String type) {

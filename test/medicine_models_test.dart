@@ -10,7 +10,10 @@ void main() {
           {
             'id': 'medicine-1',
             'name': 'Paracetamol',
+            'arabicName': 'باراسيتامول',
+            'displayName': 'باراسيتامول',
             'scientificName': 'Acetaminophen',
+            'arabicScientificName': 'أسيتامينوفين',
             'purchasePrice': 1200,
             'sellingPrice': 1500.5,
             'quantityInStock': 40,
@@ -25,6 +28,8 @@ void main() {
 
       expect(page.items, hasLength(1));
       expect(page.items.single.sellingPrice, 1500.5);
+      expect(page.items.single.displayName, 'باراسيتامول');
+      expect(page.items.single.arabicScientificName, 'أسيتامينوفين');
       expect(page.pageNumber, 2);
       expect(page.hasPreviousPage, isTrue);
       expect(page.hasNextPage, isTrue);
@@ -43,7 +48,10 @@ void main() {
 
       expect(request.toJson(), {
         'name': 'Paracetamol',
+        'barcode': null,
+        'arabicName': null,
         'scientificName': null,
+        'arabicScientificName': null,
         'purchasePrice': 1000,
         'sellingPrice': 1300,
         'quantityInStock': 20,

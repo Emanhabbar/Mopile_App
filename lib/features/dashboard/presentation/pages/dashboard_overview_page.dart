@@ -36,7 +36,7 @@ class DashboardOverviewPage extends StatelessWidget {
                 _subtitle(role),
                 style: Theme.of(
                   context,
-                ).textTheme.bodyLarge?.copyWith(color: context.appColors.textMuted),
+                ).textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: 22),
               Container(
@@ -50,7 +50,7 @@ class DashboardOverviewPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(26),
                   boxShadow: [
                     BoxShadow(
-                      color: context.appColors.primary.withValues(alpha: 0.2),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       blurRadius: 24,
                       offset: const Offset(0, 12),
                     ),
@@ -109,7 +109,7 @@ class DashboardOverviewPage extends StatelessWidget {
                   Text(
                     '${modules.length} خدمات',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: context.appColors.primary,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

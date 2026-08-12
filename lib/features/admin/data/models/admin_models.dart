@@ -138,6 +138,53 @@ class AdminPharmacy {
   final bool isApproved;
 }
 
+class AdminPharmacyLicenseVerification {
+  const AdminPharmacyLicenseVerification({
+    required this.verificationId,
+    required this.status,
+    required this.registeredName,
+    required this.originalFileName,
+    this.extractedName,
+    this.registryNumber,
+    this.ocrConfidence,
+    this.matchScore,
+    this.isNameMatch,
+    this.rejectionReason,
+    this.failureReason,
+    this.manualReviewNote,
+  });
+
+  factory AdminPharmacyLicenseVerification.fromJson(
+    Map<String, dynamic> json,
+  ) => AdminPharmacyLicenseVerification(
+    verificationId: _text(json['verificationId']),
+    status: _text(json['status']),
+    registeredName: _text(json['registeredName']),
+    originalFileName: _text(json['originalFileName']),
+    extractedName: _optional(json['extractedName']),
+    registryNumber: _optional(json['registryNumber']),
+    ocrConfidence: _optionalDouble(json['ocrConfidence']),
+    matchScore: _optionalDouble(json['matchScore']),
+    isNameMatch: json['isNameMatch'] as bool?,
+    rejectionReason: _optional(json['rejectionReason']),
+    failureReason: _optional(json['failureReason']),
+    manualReviewNote: _optional(json['manualReviewNote']),
+  );
+
+  final String verificationId;
+  final String status;
+  final String registeredName;
+  final String originalFileName;
+  final String? extractedName;
+  final String? registryNumber;
+  final double? ocrConfidence;
+  final double? matchScore;
+  final bool? isNameMatch;
+  final String? rejectionReason;
+  final String? failureReason;
+  final String? manualReviewNote;
+}
+
 class AdminOrganization {
   const AdminOrganization({
     required this.organizationId,
@@ -266,11 +313,63 @@ class HomeTickerPharmacy {
   final String name;
 }
 
+class AdminAiServicesHealth {
+  const AdminAiServicesHealth({
+    required this.licenseVerification,
+    required this.drugSearch,
+    required this.smartPharmacyBot,
+  });
+
+  factory AdminAiServicesHealth.fromJson(Map<String, dynamic> json) =>
+      AdminAiServicesHealth(
+        licenseVerification: AdminAiServiceStatus.fromJson(
+          _map(json['licenseVerification']),
+        ),
+        drugSearch: AdminAiServiceStatus.fromJson(_map(json['drugSearch'])),
+        smartPharmacyBot: AdminAiServiceStatus.fromJson(
+          _map(json['smartPharmacyBot']),
+        ),
+      );
+
+  final AdminAiServiceStatus licenseVerification;
+  final AdminAiServiceStatus drugSearch;
+  final AdminAiServiceStatus smartPharmacyBot;
+}
+
+class AdminAiServiceStatus {
+  const AdminAiServiceStatus({
+    required this.available,
+    required this.status,
+    this.itemsLoaded,
+    this.model,
+  });
+
+  factory AdminAiServiceStatus.fromJson(Map<String, dynamic> json) =>
+      AdminAiServiceStatus(
+        available: json['available'] == true,
+        status: _text(json['status']),
+        itemsLoaded: json['drugsLoaded'] is num
+            ? (json['drugsLoaded'] as num).toInt()
+            : json['medicinesLoaded'] is num
+            ? (json['medicinesLoaded'] as num).toInt()
+            : null,
+        model: _optional(json['model']),
+      );
+
+  final bool available;
+  final String status;
+  final int? itemsLoaded;
+  final String? model;
+}
+
 typedef AdminDownloadedDocument = ({
   List<int> bytes,
   String? fileName,
   String? contentType,
 });
+
+Map<String, dynamic> _map(Object? value) =>
+    value is Map ? Map<String, dynamic>.from(value) : const {};
 
 String _text(Object? value) => value?.toString() ?? '';
 String? _optional(Object? value) {
@@ -282,6 +381,8 @@ int _int(Object? value) =>
     value is num ? value.toInt() : int.tryParse('$value') ?? 0;
 double _double(Object? value) =>
     value is num ? value.toDouble() : double.tryParse('$value') ?? 0;
+double? _optionalDouble(Object? value) =>
+    value is num ? value.toDouble() : double.tryParse('$value');
 DateTime _date(Object? value) =>
     DateTime.tryParse(value?.toString() ?? '') ?? DateTime.now().toUtc();
 DateTime? _optionalDate(Object? value) =>

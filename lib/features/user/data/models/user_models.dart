@@ -207,12 +207,17 @@ class UserMedicineRequestSummary {
     required this.statusDisplayText,
     required this.canCancel,
     required this.createdAtUtc,
-  });
+    this.arabicMedicineName,
+    String? medicineDisplayName,
+  }) : medicineDisplayName =
+           medicineDisplayName ?? arabicMedicineName ?? medicineName;
 
   final String requestId;
   final String requestCode;
   final String pharmacyName;
   final String medicineName;
+  final String? arabicMedicineName;
+  final String medicineDisplayName;
   final int requestedQuantity;
   final String status;
   final String statusDisplayText;
@@ -225,6 +230,8 @@ class UserMedicineRequestSummary {
       requestCode: _text(json['requestCode']),
       pharmacyName: _text(json['pharmacyName']),
       medicineName: _text(json['medicineName']),
+      arabicMedicineName: _nullableText(json['arabicMedicineName']),
+      medicineDisplayName: _nullableText(json['medicineDisplayName']),
       requestedQuantity: _integer(json['requestedQuantity']),
       status: _text(json['status']),
       statusDisplayText: _text(json['statusDisplayText']),

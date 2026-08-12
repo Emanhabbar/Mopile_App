@@ -143,15 +143,15 @@ class _RequestsOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.appColors.primaryDeep, context.appColors.primary],
+        gradient: const LinearGradient(
+          colors: [AppColors.primaryDeep, AppColors.primary],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: context.appColors.primaryDeep.withValues(alpha: .14),
+            color: AppColors.primaryDeep.withValues(alpha: .14),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -166,9 +166,9 @@ class _RequestsOverview extends StatelessWidget {
               color: Colors.white.withValues(alpha: .12),
               borderRadius: BorderRadius.circular(17),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.assignment_turned_in_outlined,
-              color: context.appColors.secondary,
+              color: AppColors.secondary,
               size: 28,
             ),
           ),
@@ -234,7 +234,7 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _statusColor(context.appColors, request.status);
+    final color = _statusColor(request.status);
     final label = request.statusDisplayText.trim().isNotEmpty
         ? request.statusDisplayText
         : _statusLabel(request.status);
@@ -296,7 +296,7 @@ class _RequestCard extends StatelessWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: context.appColors.surfaceSoft,
+                          color: AppColors.surfaceSoft,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Row(
@@ -312,12 +312,12 @@ class _RequestCard extends StatelessWidget {
                             ),
                             const Spacer(),
                             if (request.canRespond)
-                              Row(
+                              const Row(
                                 children: [
                                   Text(
                                     'الرد الآن',
                                     style: TextStyle(
-                                      color: context.appColors.primary,
+                                      color: AppColors.primary,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -326,14 +326,14 @@ class _RequestCard extends StatelessWidget {
                                   Icon(
                                     Icons.arrow_back_rounded,
                                     size: 16,
-                                    color: context.appColors.primary,
+                                    color: AppColors.primary,
                                   ),
                                 ],
                               )
                             else
-                              Icon(
+                              const Icon(
                                 Icons.chevron_left_rounded,
-                                color: context.appColors.textMuted,
+                                color: AppColors.textMuted,
                               ),
                           ],
                         ),
@@ -382,11 +382,11 @@ class _RequestFact extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, size: 15, color: context.appColors.textMuted),
+      Icon(icon, size: 15, color: AppColors.textMuted),
       const SizedBox(width: 4),
       Text(
         text,
-        style: TextStyle(fontSize: 11, color: context.appColors.textMuted),
+        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
       ),
     ],
   );
@@ -400,7 +400,7 @@ class _FactDivider extends StatelessWidget {
     width: 1,
     height: 15,
     margin: const EdgeInsets.symmetric(horizontal: 9),
-    color: context.appColors.border,
+    color: AppColors.border,
   );
 }
 
@@ -417,13 +417,13 @@ class _RequestsEmpty extends StatelessWidget {
         width: 72,
         height: 72,
         margin: const EdgeInsets.symmetric(horizontal: 100),
-        decoration: BoxDecoration(
-          color: context.appColors.surfaceSoft,
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceSoft,
           shape: BoxShape.circle,
         ),
-        child: Icon(
+        child: const Icon(
           Icons.assignment_turned_in_outlined,
-          color: context.appColors.primary,
+          color: AppColors.primary,
           size: 34,
         ),
       ),
@@ -450,10 +450,9 @@ String _statusLabel(String value) => switch (value.toLowerCase()) {
   _ => 'بانتظار الرد',
 };
 
-Color _statusColor(AppColors colors, String value) => switch (value
-    .toLowerCase()) {
-  'available' => colors.success,
-  'unavailable' => colors.danger,
-  'cancelled' => colors.textMuted,
-  _ => colors.warning,
+Color _statusColor(String value) => switch (value.toLowerCase()) {
+  'available' => AppColors.success,
+  'unavailable' => AppColors.danger,
+  'cancelled' => AppColors.textMuted,
+  _ => AppColors.warning,
 };

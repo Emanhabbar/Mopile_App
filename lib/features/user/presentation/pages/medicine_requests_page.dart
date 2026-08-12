@@ -152,7 +152,7 @@ class _RequestsIntro extends StatelessWidget {
             tooltip: 'طلب جديد',
             style: IconButton.styleFrom(
               backgroundColor: const Color(0xFFF5CB72),
-              foregroundColor: context.appColors.primaryDark,
+              foregroundColor: AppColors.primaryDark,
             ),
             icon: const Icon(Icons.add_rounded),
           ),
@@ -195,8 +195,8 @@ class _StatusFilters extends StatelessWidget {
                     _filterIcon(entry.key),
                     size: 16,
                     color: value == entry.key
-                        ? context.appColors.primary
-                        : context.appColors.textMuted,
+                        ? AppColors.primary
+                        : AppColors.textMuted,
                   ),
                 ),
               ),
@@ -223,7 +223,7 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = _statusStyle(context.appColors, request.status);
+    final status = _statusStyle(request.status);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -250,7 +250,7 @@ class _RequestCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          request.medicineName,
+                          request.medicineDisplayName,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
@@ -269,7 +269,7 @@ class _RequestCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: context.appColors.background,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
@@ -311,9 +311,9 @@ class _EmptyRequests extends StatelessWidget {
       padding: const EdgeInsets.all(32),
       children: [
         const SizedBox(height: 80),
-        Icon(
+        const Icon(
           Icons.inventory_2_outlined,
-          color: context.appColors.textMuted,
+          color: AppColors.textMuted,
           size: 48,
         ),
         const SizedBox(height: 14),
@@ -349,8 +349,8 @@ class _Fact extends StatelessWidget {
           value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: context.appColors.text,
+          style: const TextStyle(
+            color: AppColors.text,
             fontWeight: FontWeight.w800,
             fontSize: 12,
           ),
@@ -383,11 +383,11 @@ class _StatusBadge extends StatelessWidget {
   );
 }
 
-({Color color, IconData icon}) _statusStyle(AppColors colors, String status) =>
-    switch (status.toLowerCase()) {
-  'available' => (color: colors.success, icon: Icons.check_circle_rounded),
-  'unavailable' => (color: colors.danger, icon: Icons.cancel_rounded),
-  'cancelled' => (color: colors.textMuted, icon: Icons.block_rounded),
+({Color color, IconData icon}) _statusStyle(String status) => switch (status
+    .toLowerCase()) {
+  'available' => (color: AppColors.success, icon: Icons.check_circle_rounded),
+  'unavailable' => (color: AppColors.danger, icon: Icons.cancel_rounded),
+  'cancelled' => (color: AppColors.textMuted, icon: Icons.block_rounded),
   _ => (color: const Color(0xFFB47618), icon: Icons.schedule_rounded),
 };
 

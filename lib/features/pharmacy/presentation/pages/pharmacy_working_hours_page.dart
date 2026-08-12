@@ -71,12 +71,12 @@ class _PharmacyWorkingHoursPageState
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: context.appColors.surfaceWarm,
+                  color: AppColors.surfaceWarm,
                   borderRadius: BorderRadius.circular(17),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    Icon(Icons.nights_stay_outlined, color: context.appColors.warning),
+                    Icon(Icons.nights_stay_outlined, color: AppColors.warning),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -127,16 +127,16 @@ class _PharmacyWorkingHoursPageState
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: period.isClosed
-                        ? context.appColors.background
-                        : context.appColors.surfaceSoft,
+                        ? AppColors.background
+                        : AppColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: Text(
                     _days[index].substring(0, 2),
                     style: TextStyle(
                       color: period.isClosed
-                          ? context.appColors.textMuted
-                          : context.appColors.primary,
+                          ? AppColors.textMuted
+                          : AppColors.primary,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -158,8 +158,8 @@ class _PharmacyWorkingHoursPageState
                             : '${period.openTime!.substring(0, 5)} – ${period.closeTime!.substring(0, 5)}',
                         style: TextStyle(
                           color: overnight
-                              ? context.appColors.warning
-                              : context.appColors.textMuted,
+                              ? AppColors.warning
+                              : AppColors.textMuted,
                           fontSize: 11,
                         ),
                       ),
@@ -202,18 +202,18 @@ class _PharmacyWorkingHoursPageState
               ),
               if (overnight) ...[
                 const SizedBox(height: 9),
-                Row(
+                const Row(
                   children: [
                     Icon(
                       Icons.dark_mode_outlined,
                       size: 15,
-                      color: context.appColors.warning,
+                      color: AppColors.warning,
                     ),
                     SizedBox(width: 5),
                     Text(
                       'ينتهي الدوام في اليوم التالي',
                       style: TextStyle(
-                        color: context.appColors.warning,
+                        color: AppColors.warning,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),
@@ -282,7 +282,7 @@ class _PharmacyWorkingHoursPageState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(text),
-        backgroundColor: error ? context.appColors.danger : null,
+        backgroundColor: error ? AppColors.danger : null,
       ),
     );
   }
@@ -315,8 +315,8 @@ class _HoursOverview extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
         begin: Alignment.topRight,
         end: Alignment.bottomLeft,
       ),
@@ -331,9 +331,9 @@ class _HoursOverview extends StatelessWidget {
             color: Colors.white.withValues(alpha: .12),
             borderRadius: BorderRadius.circular(17),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.schedule_rounded,
-            color: context.appColors.secondary,
+            color: AppColors.secondary,
             size: 28,
           ),
         ),

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,14 +49,14 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
               dashboard.valueOrNull!.pendingWarehouses;
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('مركز الإدارة'),
             Text(
               'إدارة منصة دوائي ومتابعة عملياتها',
               style: TextStyle(
-                color: context.appColors.textMuted,
+                color: AppColors.textMuted,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w500,
               ),
@@ -262,12 +264,12 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
                       width: 47,
                       height: 47,
                       decoration: BoxDecoration(
-                        color: context.appColors.surfaceSoft,
+                        color: AppColors.surfaceSoft,
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.campaign_outlined,
-                        color: context.appColors.primary,
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 11),
@@ -282,10 +284,10 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
                               fontWeight: FontWeight.w900,
                             ),
                           ),
-                          Text(
+                          const Text(
                             'سيظهر هذا المحتوى في الصفحة الرئيسية للمستخدمين.',
                             style: TextStyle(
-                              color: context.appColors.textMuted,
+                              color: AppColors.textMuted,
                               fontSize: 11,
                             ),
                           ),
@@ -358,7 +360,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: context.appColors.surfaceSoft,
+                    color: AppColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: SwitchListTile(
@@ -434,7 +436,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
                 health.isHealthy
                     ? Icons.check_circle_rounded
                     : Icons.error_outline_rounded,
-                color: health.isHealthy ? context.appColors.primary : context.appColors.danger,
+                color: health.isHealthy ? AppColors.primary : AppColors.danger,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -474,7 +476,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_error(error)),
-            backgroundColor: context.appColors.danger,
+            backgroundColor: AppColors.danger,
           ),
         );
       }
@@ -505,7 +507,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_error(error)),
-            backgroundColor: context.appColors.danger,
+            backgroundColor: AppColors.danger,
           ),
         );
       }
@@ -549,13 +551,13 @@ class _AdminSectionNavigation extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsetsDirectional.only(end: 8),
                 child: Material(
-                  color: selected ? context.appColors.primaryDeep : context.appColors.surface,
+                  color: selected ? AppColors.primaryDeep : AppColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(17),
                     side: BorderSide(
                       color: selected
-                          ? context.appColors.primaryDeep
-                          : context.appColors.border,
+                          ? AppColors.primaryDeep
+                          : AppColors.border,
                     ),
                   ),
                   child: InkWell(
@@ -572,13 +574,13 @@ class _AdminSectionNavigation extends StatelessWidget {
                           Icon(
                             item.icon,
                             size: 19,
-                            color: selected ? Colors.white : context.appColors.primary,
+                            color: selected ? Colors.white : AppColors.primary,
                           ),
                           const SizedBox(width: 7),
                           Text(
                             item.label,
                             style: TextStyle(
-                              color: selected ? Colors.white : context.appColors.text,
+                              color: selected ? Colors.white : AppColors.text,
                               fontSize: 12.5,
                               fontWeight: FontWeight.w800,
                             ),
@@ -592,14 +594,14 @@ class _AdminSectionNavigation extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: context.appColors.secondary,
+                                color: AppColors.secondary,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 '${item.count}',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: context.appColors.primaryDeep,
+                                style: const TextStyle(
+                                  color: AppColors.primaryDeep,
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -718,8 +720,8 @@ class _AdminHero extends StatelessWidget {
         data.pendingWarehouses;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.appColors.primaryDeep, context.appColors.primary],
+        gradient: const LinearGradient(
+          colors: [AppColors.primaryDeep, AppColors.primary],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
@@ -748,7 +750,7 @@ class _AdminHero extends StatelessWidget {
               height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: context.appColors.secondary.withValues(alpha: .065),
+                color: AppColors.secondary.withValues(alpha: .065),
               ),
             ),
           ),
@@ -765,9 +767,9 @@ class _AdminHero extends StatelessWidget {
                         color: Colors.white.withValues(alpha: .12),
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.admin_panel_settings_rounded,
-                        color: context.appColors.secondary,
+                        color: AppColors.secondary,
                         size: 30,
                       ),
                     ),
@@ -801,7 +803,7 @@ class _AdminHero extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: pending > 0
-                            ? context.appColors.secondary.withValues(alpha: .18)
+                            ? AppColors.secondary.withValues(alpha: .18)
                             : Colors.white.withValues(alpha: .1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
@@ -907,14 +909,12 @@ class _MetricCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: highlighted
-          ? context.appColors.surfaceWarm
-          : context.appColors.surface,
+      color: highlighted ? AppColors.surfaceWarm : Colors.white,
       borderRadius: BorderRadius.circular(19),
       border: Border.all(
         color: highlighted
-            ? context.appColors.secondary.withValues(alpha: .38)
-            : context.appColors.border,
+            ? AppColors.secondary.withValues(alpha: .38)
+            : AppColors.border,
       ),
     ),
     child: Row(
@@ -924,13 +924,13 @@ class _MetricCard extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             color: highlighted
-                ? context.appColors.secondary.withValues(alpha: .18)
-                : context.appColors.surfaceSoft,
+                ? AppColors.secondary.withValues(alpha: .18)
+                : AppColors.surfaceSoft,
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(
             icon,
-            color: highlighted ? context.appColors.warning : context.appColors.primary,
+            color: highlighted ? AppColors.warning : AppColors.primary,
             size: 21,
           ),
         ),
@@ -1002,17 +1002,18 @@ class _ApprovalsTab extends ConsumerWidget {
           _ApprovalGroup<AdminPharmacy>(
             title: 'الصيدليات',
             icon: Icons.local_pharmacy_outlined,
-            color: context.appColors.primary,
+            color: AppColors.primary,
             state: pharmacies,
             builder: (item) => _ApprovalCard(
               icon: Icons.local_pharmacy_outlined,
-              color: context.appColors.primary,
+              color: AppColors.primary,
               title: item.pharmacyName,
               subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
               location: '${item.city}، ${item.area}',
               working: workingId == item.pharmacyId,
               onApprove: () => onPharmacy(item.pharmacyId, true),
               onReject: () => onPharmacy(item.pharmacyId, false),
+              onDetails: () => _showPharmacyLicense(context, ref, item),
             ),
           ),
           const SizedBox(height: 18),
@@ -1053,6 +1054,120 @@ class _ApprovalsTab extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showPharmacyLicense(
+    BuildContext context,
+    WidgetRef ref,
+    AdminPharmacy pharmacy,
+  ) async {
+    try {
+      final verification = await ref
+          .read(adminRepositoryProvider)
+          .getPharmacyLicenseVerification(pharmacy.pharmacyId);
+      if (!context.mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('تفاصيل ترخيص الصيدلية'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _licenseRow('الحالة', verification.status),
+                _licenseRow('الاسم المسجل', verification.registeredName),
+                if (verification.extractedName != null)
+                  _licenseRow('الاسم في الوثيقة', verification.extractedName!),
+                if (verification.registryNumber != null)
+                  _licenseRow('رقم السجل', verification.registryNumber!),
+                if (verification.matchScore != null)
+                  _licenseRow(
+                    'درجة التطابق',
+                    '${(verification.matchScore! * 100).toStringAsFixed(1)}%',
+                  ),
+                if (verification.rejectionReason != null)
+                  _licenseRow('سبب الرفض', verification.rejectionReason!),
+                if (verification.failureReason != null)
+                  _licenseRow('مشكلة القراءة', verification.failureReason!),
+                if (verification.manualReviewNote != null)
+                  _licenseRow(
+                    'ملاحظة المراجعة',
+                    verification.manualReviewNote!,
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () => _showLicenseDocument(
+                dialogContext,
+                ref,
+                pharmacy.pharmacyId,
+                verification.verificationId,
+              ),
+              icon: const Icon(Icons.image_outlined),
+              label: const Text('عرض الوثيقة'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('إغلاق'),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_error(error)),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
+  }
+
+  Widget _licenseRow(String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Text('$label: $value'),
+  );
+
+  Future<void> _showLicenseDocument(
+    BuildContext context,
+    WidgetRef ref,
+    String pharmacyId,
+    String verificationId,
+  ) async {
+    try {
+      final document = await ref
+          .read(adminRepositoryProvider)
+          .getPharmacyLicenseDocument(pharmacyId, verificationId);
+      if (!context.mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (documentContext) => Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: InteractiveViewer(
+              minScale: .8,
+              maxScale: 5,
+              child: Image.memory(
+                Uint8List.fromList(document.bytes),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_error(error)),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 }
 
@@ -1207,7 +1322,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_error(error)),
-          backgroundColor: context.appColors.danger,
+          backgroundColor: AppColors.danger,
         ),
       );
     }
@@ -1302,8 +1417,8 @@ class _AdminSectionHeading extends StatelessWidget {
           children: [
             Text(
               eyebrow,
-              style: TextStyle(
-                color: context.appColors.primary,
+              style: const TextStyle(
+                color: AppColors.primary,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
                 letterSpacing: .3,
@@ -1377,7 +1492,7 @@ class _ApprovalGroup<T> extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: context.appColors.surfaceSoft,
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(17),
                 ),
                 child: Row(
@@ -1413,6 +1528,7 @@ class _ApprovalCard extends StatelessWidget {
     required this.working,
     required this.onApprove,
     required this.onReject,
+    this.onDetails,
   });
   final IconData icon;
   final Color color;
@@ -1422,6 +1538,7 @@ class _ApprovalCard extends StatelessWidget {
   final bool working;
   final VoidCallback onApprove;
   final VoidCallback onReject;
+  final VoidCallback? onDetails;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -1464,16 +1581,27 @@ class _ApprovalCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.location_on_outlined,
                 size: 17,
-                color: context.appColors.textMuted,
+                color: AppColors.textMuted,
               ),
               const SizedBox(width: 5),
               Text(location, style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
           const Divider(height: 23),
+          if (onDetails != null) ...[
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: working ? null : onDetails,
+                icon: const Icon(Icons.badge_outlined),
+                label: const Text('مراجعة الترخيص والوثيقة'),
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
           Row(
             children: [
               Expanded(
@@ -1515,13 +1643,13 @@ class _RoleFilter extends StatelessWidget {
       showCheckmark: false,
       onSelected: (_) => onTap(),
       labelStyle: TextStyle(
-        color: selected ? Colors.white : context.appColors.text,
+        color: selected ? Colors.white : AppColors.text,
         fontWeight: FontWeight.w800,
       ),
-      selectedColor: context.appColors.primaryDeep,
-      backgroundColor: context.appColors.surface,
+      selectedColor: AppColors.primaryDeep,
+      backgroundColor: AppColors.surface,
       side: BorderSide(
-        color: selected ? context.appColors.primaryDeep : context.appColors.border,
+        color: selected ? AppColors.primaryDeep : AppColors.border,
       ),
     ),
   );
@@ -1541,7 +1669,7 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _roleColor(context.appColors, account.role);
+    final color = _roleColor(account.role);
     return Card(
       child: InkWell(
         onTap: onDetails,
@@ -1587,8 +1715,8 @@ class _AccountCard extends StatelessWidget {
                         _AdminPill(
                           label: account.isActive ? 'نشط' : 'موقوف',
                           color: account.isActive
-                              ? context.appColors.success
-                              : context.appColors.danger,
+                              ? AppColors.success
+                              : AppColors.danger,
                         ),
                       ],
                     ),
@@ -1658,14 +1786,12 @@ class _AccountDetailsSheet extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: _roleColor(context.appColors, account.role).withValues(
-                    alpha: .09,
-                  ),
+                  color: _roleColor(account.role).withValues(alpha: .09),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   _roleIcon(account.role),
-                  color: _roleColor(context.appColors, account.role),
+                  color: _roleColor(account.role),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1681,8 +1807,8 @@ class _AccountDetailsSheet extends StatelessWidget {
                       account.isActive ? 'حساب نشط' : 'حساب موقوف',
                       style: TextStyle(
                         color: account.isActive
-                            ? context.appColors.success
-                            : context.appColors.danger,
+                            ? AppColors.success
+                            : AppColors.danger,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -1698,7 +1824,7 @@ class _AccountDetailsSheet extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(row.icon, color: context.appColors.primary, size: 20),
+                  Icon(row.icon, color: AppColors.primary, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -1740,7 +1866,7 @@ class _TickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duty = item.type == 'DutyPharmacy';
-    final color = duty ? const Color(0xFF3977C4) : context.appColors.primary;
+    final color = duty ? const Color(0xFF3977C4) : AppColors.primary;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(15),
@@ -1782,8 +1908,8 @@ class _TickerCard extends StatelessWidget {
                 _AdminPill(
                   label: item.isActive ? 'منشور' : 'متوقف',
                   color: item.isActive
-                      ? context.appColors.success
-                      : context.appColors.textMuted,
+                      ? AppColors.success
+                      : AppColors.textMuted,
                 ),
                 PopupMenuButton<String>(
                   enabled: !working,
@@ -1802,10 +1928,10 @@ class _TickerCard extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.local_pharmacy_rounded,
                     size: 17,
-                    color: context.appColors.primary,
+                    color: AppColors.primary,
                   ),
                   const SizedBox(width: 6),
                   Text(
@@ -1859,10 +1985,10 @@ class _AdminEmptyState extends StatelessWidget {
           width: 58,
           height: 58,
           decoration: BoxDecoration(
-            color: context.appColors.surfaceSoft,
+            color: AppColors.surfaceSoft,
             borderRadius: BorderRadius.circular(19),
           ),
-          child: Icon(icon, color: context.appColors.primary, size: 28),
+          child: Icon(icon, color: AppColors.primary, size: 28),
         ),
       ),
       const SizedBox(height: 14),
@@ -1899,11 +2025,11 @@ IconData _roleIcon(String role) => switch (role.toLowerCase()) {
   'representative' => Icons.delivery_dining_outlined,
   _ => Icons.person_outline_rounded,
 };
-Color _roleColor(AppColors colors, String role) => switch (role.toLowerCase()) {
+Color _roleColor(String role) => switch (role.toLowerCase()) {
   'admin' => const Color(0xFFD14E62),
-  'pharmacy' => colors.primary,
+  'pharmacy' => AppColors.primary,
   'organization' => const Color(0xFF8A5AC2),
   'warehouse' => const Color(0xFF3977C4),
-  'representative' => colors.warning,
+  'representative' => AppColors.warning,
   _ => const Color(0xFF4E6B8B),
 };

@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:http_parser/http_parser.dart';
 
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/network/api_endpoints.dart';
@@ -14,6 +16,43 @@ class PharmacyRemoteDataSource {
       PharmacyDashboard.fromJson(await _get(ApiEndpoints.pharmacyMe));
   Future<PharmacyOpenStatus> getOpenStatus() async =>
       PharmacyOpenStatus.fromJson(await _get(ApiEndpoints.pharmacyOpenStatus));
+
+  Future<PharmacyLicenseVerification?> getLicenseVerification() async {
+    try {
+      final response = await _dio.get<Object?>(
+        ApiEndpoints.pharmacyLicenseVerification,
+      );
+      return response.data is Map
+          ? PharmacyLicenseVerification.fromJson(
+              Map<String, dynamic>.from(response.data! as Map),
+            )
+          : null;
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  Future<PharmacyLicenseVerification> submitLicenseVerification(
+    XFile file,
+  ) async {
+    final bytes = await file.readAsBytes();
+    final contentType = _licenseMediaType(file.name);
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.pharmacyLicenseVerification,
+        data: FormData.fromMap({
+          'File': MultipartFile.fromBytes(
+            bytes,
+            filename: file.name,
+            contentType: contentType,
+          ),
+        }),
+      );
+      return PharmacyLicenseVerification.fromJson(response.data ?? const {});
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
 
   Future<PharmacyDashboard> updateProfile({
     required String pharmacyName,
@@ -152,7 +191,10 @@ class PharmacyRemoteDataSource {
     required bool isAvailable,
     required int lowStockThreshold,
     required bool requiresPrescription,
+    String? barcode,
+    String? arabicName,
     String? scientificName,
+    String? arabicScientificName,
     String? manufacturer,
     String? dosageForm,
     String? packageSize,
@@ -163,7 +205,10 @@ class PharmacyRemoteDataSource {
   }) async => PharmacyInventoryItem.fromJson(
     await _post(ApiEndpoints.pharmacyMedicinesManual, {
       'name': name,
+      'barcode': barcode,
+      'arabicName': arabicName,
       'scientificName': scientificName,
+      'arabicScientificName': arabicScientificName,
       'manufacturer': manufacturer,
       'dosageForm': dosageForm,
       'packageSize': packageSize,
@@ -216,12 +261,20 @@ class PharmacyRemoteDataSource {
     }
   }
 
-  Future<List<PharmacyCatalogMedicine>> searchCatalog(String searchTerm) async {
-    final response = await _getList(
+  Future<PharmacyCatalogPage> searchCatalog(
+    String searchTerm, {
+    int pageNumber = 1,
+    int pageSize = 30,
+  }) async {
+    final response = await _get(
       ApiEndpoints.pharmacyMedicineCatalog,
-      query: {'searchTerm': searchTerm.trim(), 'pageNumber': 1, 'pageSize': 50},
+      query: {
+        'searchTerm': searchTerm.trim(),
+        'pageNumber': pageNumber,
+        'pageSize': pageSize,
+      },
     );
-    return _parseList(response, PharmacyCatalogMedicine.fromJson);
+    return PharmacyCatalogPage.fromJson(response);
   }
 
   Future<List<PharmacyRequest>> getRequests({
@@ -259,6 +312,11 @@ class PharmacyRemoteDataSource {
           : null,
     }),
   );
+
+  Future<PharmacyRequestDetails> confirmRequestPickup(String requestId) async =>
+      PharmacyRequestDetails.fromJson(
+        await _post(ApiEndpoints.pharmacyConfirmRequestPickup(requestId), {}),
+      );
 
   Future<Map<String, dynamic>> _get(
     String path, {
@@ -331,6 +389,15 @@ class PharmacyRemoteDataSource {
       throw ApiException.fromDio(error);
     }
   }
+}
+
+MediaType _licenseMediaType(String fileName) {
+  final extension = fileName.split('.').last.toLowerCase();
+  return switch (extension) {
+    'png' => MediaType('image', 'png'),
+    'webp' => MediaType('image', 'webp'),
+    _ => MediaType('image', 'jpeg'),
+  };
 }
 
 List<T> _parseList<T>(

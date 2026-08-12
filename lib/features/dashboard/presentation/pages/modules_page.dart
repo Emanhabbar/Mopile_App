@@ -30,9 +30,9 @@ class ModulesPage extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: context.appColors.surfaceSoft,
+                color: AppColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: context.appColors.border),
+                border: Border.all(color: AppColors.border),
               ),
               child: Row(
                 children: [
@@ -40,7 +40,7 @@ class ModulesPage extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: context.appColors.primary,
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(

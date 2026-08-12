@@ -59,7 +59,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.appColors.primaryDeep,
+      backgroundColor: AppColors.primaryDeep,
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
@@ -187,7 +187,7 @@ class _AmbientShapes extends StatelessWidget {
             end: -84 + (progress * 16),
             child: _Orb(
               size: 260,
-              color: context.appColors.primary.withValues(alpha: 0.45),
+              color: AppColors.primary.withValues(alpha: 0.45),
             ),
           ),
           PositionedDirectional(
@@ -195,8 +195,8 @@ class _AmbientShapes extends StatelessWidget {
             start: -68 + (progress * 15),
             child: _Orb(
               size: 148,
-              color: context.appColors.primaryLight.withValues(alpha: 0.07),
-              borderColor: context.appColors.primaryLight.withValues(alpha: 0.08),
+              color: AppColors.primaryLight.withValues(alpha: 0.07),
+              borderColor: AppColors.primaryLight.withValues(alpha: 0.08),
             ),
           ),
           PositionedDirectional(
@@ -204,7 +204,7 @@ class _AmbientShapes extends StatelessWidget {
             start: -90 + (progress * 10),
             child: _Orb(
               size: 278,
-              color: context.appColors.primary.withValues(alpha: 0.2),
+              color: AppColors.primary.withValues(alpha: 0.2),
             ),
           ),
           PositionedDirectional(
@@ -212,8 +212,8 @@ class _AmbientShapes extends StatelessWidget {
             end: -42 + (progress * 12),
             child: _Orb(
               size: 112,
-              color: context.appColors.secondary.withValues(alpha: 0.035),
-              borderColor: context.appColors.secondary.withValues(alpha: 0.08),
+              color: AppColors.secondary.withValues(alpha: 0.035),
+              borderColor: AppColors.secondary.withValues(alpha: 0.08),
             ),
           ),
         ],
@@ -252,9 +252,9 @@ class _TopCaption extends StatelessWidget {
         Container(
           width: 7,
           height: 7,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: context.appColors.secondary,
+            color: AppColors.secondary,
           ),
         ),
         const SizedBox(width: 9),
@@ -301,9 +301,9 @@ class _AssemblingLogo extends StatelessWidget {
                 height: 176,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: context.appColors.secondary.withValues(alpha: 0.08),
+                  color: AppColors.secondary.withValues(alpha: 0.08),
                   border: Border.all(
-                    color: context.appColors.secondary.withValues(alpha: 0.16),
+                    color: AppColors.secondary.withValues(alpha: 0.16),
                   ),
                 ),
               ),
@@ -348,7 +348,7 @@ class _AssemblingLogo extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: context.appColors.secondary.withValues(alpha: 0.3),
+                    color: AppColors.secondary.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -412,13 +412,13 @@ class _LoadingTrack extends StatelessWidget {
                 child: Container(
                   width: 148,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [context.appColors.secondary, Color(0xFFFFE6A7)],
+                    gradient: const LinearGradient(
+                      colors: [AppColors.secondary, Color(0xFFFFE6A7)],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: context.appColors.secondary.withValues(alpha: 0.28),
+                        color: AppColors.secondary.withValues(alpha: 0.28),
                         blurRadius: 9,
                       ),
                     ],

@@ -47,14 +47,14 @@ class AppearanceSettingsPage extends ConsumerWidget {
                   onTap: () => ref
                       .read(settingsControllerProvider.notifier)
                       .setThemeMode(value),
-                  leading: Icon(data.$3, color: context.appColors.primary),
+                  leading: Icon(data.$3, color: AppColors.primary),
                   title: Text(data.$1),
                   subtitle: Text(data.$2),
                   trailing: Icon(
                     selected
                         ? Icons.check_circle_rounded
                         : Icons.circle_outlined,
-                    color: selected ? context.appColors.primary : context.appColors.border,
+                    color: selected ? AppColors.primary : AppColors.border,
                   ),
                 );
               }).toList(),
@@ -197,7 +197,7 @@ class _PermissionsSettingsPageState extends State<PermissionsSettingsPage> {
                         : 'غير مسموح حاليًا',
                   ),
                   trailing: granted
-                      ? Icon(Icons.check_circle, color: context.appColors.success)
+                      ? const Icon(Icons.check_circle, color: AppColors.success)
                       : TextButton(
                           onPressed: _requestLocation,
                           child: const Text('سماح'),
@@ -378,8 +378,8 @@ class _IntroCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primary, context.appColors.primaryDark],
+      gradient: const LinearGradient(
+        colors: [AppColors.primary, AppColors.primaryDark],
       ),
       borderRadius: BorderRadius.circular(22),
     ),
@@ -392,7 +392,7 @@ class _IntroCard extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(17),
           ),
-          child: Icon(icon, color: context.appColors.secondary),
+          child: Icon(icon, color: AppColors.secondary),
         ),
         const SizedBox(width: 14),
         Expanded(

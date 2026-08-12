@@ -16,10 +16,9 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 class AuthRepository {
   const AuthRepository({
-    required AuthRemoteDataSource remoteDataSource,
-    required SessionStorage sessionStorage,
-  }) : _remoteDataSource = remoteDataSource,
-       _sessionStorage = sessionStorage;
+    required this._remoteDataSource,
+    required this._sessionStorage,
+  });
 
   final AuthRemoteDataSource _remoteDataSource;
   final SessionStorage _sessionStorage;

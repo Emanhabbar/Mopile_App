@@ -37,6 +37,8 @@ class _LoginPageState extends ConsumerState<LoginPage>
   static const Color _textPrimary = Color(0xFF153F45);
   static const Color _textSecondary = Color(0xFF7C9397);
 
+  static const String _fontFamily = 'IBM Plex Sans Arabic';
+
   static const String _logoPath =
       'assets/brand/dawaai-icon-foreground.png';
 
@@ -106,10 +108,44 @@ class _LoginPageState extends ConsumerState<LoginPage>
             : 'تعذر تسجيل الدخول. تحقق من البيانات وحاول مجددًا.'
         : null;
 
+    final baseTheme = Theme.of(context);
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Theme(
-        data: Theme.of(context),
+        data: baseTheme.copyWith(
+          textTheme: baseTheme.textTheme.apply(
+            fontFamily: _fontFamily,
+          ),
+          primaryTextTheme: baseTheme.primaryTextTheme.apply(
+            fontFamily: _fontFamily,
+          ),
+          inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
+            labelStyle: const TextStyle(
+              fontFamily: _fontFamily,
+            ),
+            hintStyle: const TextStyle(
+              fontFamily: _fontFamily,
+            ),
+            errorStyle: const TextStyle(
+              fontFamily: _fontFamily,
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              textStyle: const TextStyle(
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              textStyle: const TextStyle(
+                fontFamily: _fontFamily,
+              ),
+            ),
+          ),
+        ),
         child: Scaffold(
         backgroundColor: _background,
         resizeToAvoidBottomInset: true,
@@ -590,14 +626,14 @@ class _LoginTextField extends StatelessWidget {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
           borderSide: BorderSide(
-            color: context.appColors.danger.withValues(alpha: 0.55),
+            color: AppColors.danger.withValues(alpha: 0.55),
             width: 0.95,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
           borderSide: BorderSide(
-            color: context.appColors.danger.withValues(alpha: 0.68),
+            color: AppColors.danger.withValues(alpha: 0.68),
             width: 1.1,
           ),
         ),
@@ -777,10 +813,10 @@ class _ErrorMessage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: context.appColors.danger.withValues(alpha: 0.055),
+        color: AppColors.danger.withValues(alpha: 0.055),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: context.appColors.danger.withValues(alpha: 0.13),
+          color: AppColors.danger.withValues(alpha: 0.13),
           width: 0.9,
         ),
       ),
@@ -789,7 +825,7 @@ class _ErrorMessage extends StatelessWidget {
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: context.appColors.danger.withValues(alpha: 0.88),
+            color: AppColors.danger.withValues(alpha: 0.88),
             size: 23,
           ),
           const SizedBox(width: 10),
@@ -797,7 +833,7 @@ class _ErrorMessage extends StatelessWidget {
             child: Text(
               message,
               style: TextStyle(
-                color: context.appColors.danger.withValues(alpha: 0.92),
+                color: AppColors.danger.withValues(alpha: 0.92),
                 fontSize: 13,
                 height: 1.45,
                 fontWeight: FontWeight.w600,

@@ -94,8 +94,8 @@ class _MedicineRequestDetailsPageState
                       : const Icon(Icons.close_rounded),
                   label: Text(_cancelling ? 'جاري الإلغاء...' : 'إلغاء الطلب'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: context.appColors.danger,
-                    side: BorderSide(color: context.appColors.danger),
+                    foregroundColor: AppColors.danger,
+                    side: const BorderSide(color: AppColors.danger),
                   ),
                 ),
               ],
@@ -127,7 +127,7 @@ class _MedicineRequestDetailsPageState
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             child: const Text('تأكيد الإلغاء'),
           ),
         ],
@@ -157,7 +157,7 @@ class _MedicineRequestDetailsPageState
                   ? error.message
                   : 'تعذر إلغاء الطلب حاليًا.',
             ),
-            backgroundColor: context.appColors.danger,
+            backgroundColor: AppColors.danger,
           ),
         );
       }
@@ -205,9 +205,9 @@ class _RequestProgress extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 15),
       decoration: BoxDecoration(
-        color: context.appColors.surface,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.appColors.border),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: steps
@@ -216,10 +216,10 @@ class _RequestProgress extends StatelessWidget {
             .expand((entry) {
               final step = entry.value;
               final color = step.danger
-                  ? context.appColors.danger
+                  ? AppColors.danger
                   : step.active
-                  ? context.appColors.primary
-                  : context.appColors.textMuted;
+                  ? AppColors.primary
+                  : AppColors.textMuted;
               final widgets = <Widget>[
                 Expanded(
                   child: Column(
@@ -253,8 +253,8 @@ class _RequestProgress extends StatelessWidget {
                     width: 18,
                     height: 2,
                     color: steps[entry.key + 1].active
-                        ? context.appColors.primary.withValues(alpha: 0.35)
-                        : context.appColors.border,
+                        ? AppColors.primary.withValues(alpha: 0.35)
+                        : AppColors.border,
                   ),
                 );
               }
@@ -274,7 +274,7 @@ class _RequestHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = details.request;
-    final style = _statusStyle(context.appColors, request.status);
+    final style = _statusStyle(request.status);
     return Container(
       padding: const EdgeInsets.all(21),
       decoration: BoxDecoration(
@@ -325,7 +325,7 @@ class _DetailsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              request.medicineName,
+              request.medicineDisplayName,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 14),
@@ -376,14 +376,14 @@ class _PharmacyResponse extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(Icons.mark_chat_read_outlined, color: Color(0xFFB47618)),
               SizedBox(width: 8),
               Text(
                 'رد الصيدلية',
                 style: TextStyle(
-                  color: context.appColors.text,
+                  color: AppColors.text,
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
                 ),
@@ -404,8 +404,8 @@ class _PharmacyResponse extends StatelessWidget {
             const SizedBox(height: 5),
             Text(
               [
-                alternative.medicineName,
-                alternative.scientificName,
+                alternative.medicineDisplayName,
+                alternative.arabicScientificName ?? alternative.scientificName,
                 alternative.dosageForm,
                 alternative.capacity,
               ].whereType<String>().join(' · '),
@@ -432,9 +432,9 @@ class _PharmacyCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.local_pharmacy_rounded,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -519,15 +519,15 @@ class _Row extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 11),
     child: Row(
       children: [
-        Icon(icon, color: context.appColors.textMuted, size: 19),
+        Icon(icon, color: AppColors.textMuted, size: 19),
         const SizedBox(width: 9),
         Expanded(
           child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
         ),
         Text(
           value,
-          style: TextStyle(
-            color: context.appColors.text,
+          style: const TextStyle(
+            color: AppColors.text,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -536,11 +536,11 @@ class _Row extends StatelessWidget {
   );
 }
 
-({Color color, IconData icon}) _statusStyle(AppColors colors, String status) =>
-    switch (status.toLowerCase()) {
-  'available' => (color: colors.success, icon: Icons.check_circle_rounded),
-  'unavailable' => (color: colors.danger, icon: Icons.cancel_rounded),
-  'cancelled' => (color: colors.textMuted, icon: Icons.block_rounded),
+({Color color, IconData icon}) _statusStyle(String status) => switch (status
+    .toLowerCase()) {
+  'available' => (color: AppColors.success, icon: Icons.check_circle_rounded),
+  'unavailable' => (color: AppColors.danger, icon: Icons.cancel_rounded),
+  'cancelled' => (color: AppColors.textMuted, icon: Icons.block_rounded),
   _ => (color: const Color(0xFFB47618), icon: Icons.schedule_rounded),
 };
 

@@ -26,7 +26,7 @@ class RoleDashboardHero extends StatelessWidget {
       gradient: LinearGradient(
         begin: AlignmentDirectional.topStart,
         end: AlignmentDirectional.bottomEnd,
-        colors: [context.appColors.primaryDeep, accent],
+        colors: [AppColors.primaryDeep, accent],
       ),
       borderRadius: BorderRadius.circular(30),
       boxShadow: [
@@ -72,8 +72,8 @@ class RoleDashboardHero extends StatelessWidget {
                         ),
                         child: Text(
                           badge!,
-                          style: TextStyle(
-                            color: context.appColors.secondary,
+                          style: const TextStyle(
+                            color: AppColors.secondary,
                             fontSize: 10.5,
                             fontWeight: FontWeight.w800,
                           ),
@@ -106,7 +106,7 @@ class RoleDashboardHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(21),
                   border: Border.all(color: Colors.white.withValues(alpha: .1)),
                 ),
-                child: Icon(icon, color: context.appColors.secondary, size: 31),
+                child: Icon(icon, color: AppColors.secondary, size: 31),
               ),
             ],
           ),
@@ -155,9 +155,9 @@ class RoleMetricsGrid extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: context.appColors.surface,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(21),
-            border: Border.all(color: context.appColors.border),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             children: [

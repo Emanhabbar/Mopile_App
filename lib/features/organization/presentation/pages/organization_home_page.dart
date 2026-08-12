@@ -46,13 +46,13 @@ class OrganizationHomePage extends ConsumerWidget {
                   label: 'إجمالي الحملات',
                   value: '${data.totalCampaignsCount}',
                   icon: Icons.campaign_rounded,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                 ),
                 RoleMetricData(
                   label: 'حملات نشطة',
                   value: '${data.activeCampaignsCount}',
                   icon: Icons.track_changes_rounded,
-                  color: context.appColors.success,
+                  color: AppColors.success,
                 ),
                 RoleMetricData(
                   label: 'عروض بانتظارك',
@@ -83,7 +83,7 @@ class OrganizationHomePage extends ConsumerWidget {
                       ? '${data.activeCampaignsCount}'
                       : null,
                   icon: Icons.campaign_outlined,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                   onTap: () =>
                       context.push('/organization/workspace?section=campaigns'),
                 ),
@@ -130,7 +130,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   ? Icons.verified_outlined
                   : Icons.upload_file_outlined,
               color: data.isApproved
-                  ? context.appColors.success
+                  ? AppColors.success
                   : const Color(0xFFB7791F),
               onTap: () =>
                   context.push('/organization/workspace?section=profile'),
@@ -161,7 +161,7 @@ class OrganizationHomePage extends ConsumerWidget {
                             : Icons.campaign_outlined,
                         color: campaign.isUrgent
                             ? const Color(0xFFD14E62)
-                            : context.appColors.primary,
+                            : AppColors.primary,
                         onTap: () => context.push(
                           '/organization/workspace?section=campaigns',
                         ),

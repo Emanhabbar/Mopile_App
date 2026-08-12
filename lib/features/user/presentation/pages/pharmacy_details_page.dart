@@ -185,9 +185,9 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          icon: Icon(
+          icon: const Icon(
             Icons.check_circle_rounded,
-            color: context.appColors.success,
+            color: AppColors.success,
             size: 42,
           ),
           title: const Text('تم إرسال الطلب'),
@@ -251,7 +251,7 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
       ..showSnackBar(
         SnackBar(
           content: Text(message),
-          backgroundColor: error ? context.appColors.danger : null,
+          backgroundColor: error ? AppColors.danger : null,
         ),
       );
   }
@@ -410,7 +410,7 @@ class _MedicineChoice extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(19),
         side: BorderSide(
-          color: selected ? context.appColors.primary : context.appColors.border,
+          color: selected ? AppColors.primary : AppColors.border,
           width: selected ? 1.5 : 1,
         ),
       ),
@@ -424,12 +424,12 @@ class _MedicineChoice extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: context.appColors.primary.withValues(alpha: 0.09),
+                  color: AppColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.medication_rounded,
-                  color: context.appColors.primary,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 11),
@@ -438,13 +438,16 @@ class _MedicineChoice extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      medicine.medicineName,
+                      medicine.medicineDisplayName,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 3),
                     Text(
                       [
-                        medicine.scientificName,
+                        if (medicine.arabicMedicineName != null)
+                          medicine.medicineName,
+                        medicine.arabicScientificName ??
+                            medicine.scientificName,
                         medicine.dosageForm,
                         medicine.capacity,
                       ].whereType<String>().join(' · '),
@@ -460,8 +463,8 @@ class _MedicineChoice extends StatelessWidget {
                 children: [
                   Text(
                     _price(medicine.sellingPrice),
-                    style: TextStyle(
-                      color: context.appColors.primary,
+                    style: const TextStyle(
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -475,11 +478,11 @@ class _MedicineChoice extends StatelessWidget {
                       ),
                     ),
                   if (selected)
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.only(top: 4),
                       child: Icon(
                         Icons.check_circle_rounded,
-                        color: context.appColors.primary,
+                        color: AppColors.primary,
                         size: 18,
                       ),
                     ),
@@ -539,7 +542,7 @@ class _RequestForm extends StatelessWidget {
                   .map(
                     (medicine) => DropdownMenuItem(
                       value: medicine.medicineId,
-                      child: Text(medicine.medicineName),
+                      child: Text(medicine.medicineDisplayName),
                     ),
                   )
                   .toList(growable: false),
@@ -649,7 +652,7 @@ class _RatingForm extends StatelessWidget {
                     Icons.star_rounded,
                     color: index < rating
                         ? const Color(0xFFE4A84B)
-                        : context.appColors.border,
+                        : AppColors.border,
                   ),
                 ),
               ),
@@ -716,8 +719,8 @@ class _WorkingHours extends StatelessWidget {
                         : '${_time(hour.openTime)} - ${_time(hour.closeTime)}',
                     style: TextStyle(
                       color: hour.isClosed
-                          ? context.appColors.textMuted
-                          : context.appColors.primary,
+                          ? AppColors.textMuted
+                          : AppColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -749,10 +752,10 @@ class _FormHeading extends StatelessWidget {
           width: 43,
           height: 43,
           decoration: BoxDecoration(
-            color: context.appColors.primary.withValues(alpha: 0.09),
+            color: AppColors.primary.withValues(alpha: 0.09),
             borderRadius: BorderRadius.circular(13),
           ),
-          child: Icon(icon, color: context.appColors.primary),
+          child: Icon(icon, color: AppColors.primary),
         ),
         const SizedBox(width: 11),
         Expanded(
@@ -824,12 +827,12 @@ class _EmptyMedicines extends StatelessWidget {
   const _EmptyMedicines();
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) => const Card(
     child: Padding(
       padding: EdgeInsets.all(28),
       child: Column(
         children: [
-          Icon(Icons.medication_outlined, color: context.appColors.textMuted, size: 34),
+          Icon(Icons.medication_outlined, color: AppColors.textMuted, size: 34),
           SizedBox(height: 10),
           Text('لا توجد أدوية متاحة حاليًا'),
         ],

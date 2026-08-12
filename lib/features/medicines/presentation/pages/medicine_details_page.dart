@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
+import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/medicine_models.dart';
+import '../../data/repositories/medicines_repository.dart';
 import '../controllers/medicines_providers.dart';
 
 class MedicineDetailsPage extends ConsumerWidget {
@@ -41,7 +43,16 @@ class MedicineDetailsPage extends ConsumerWidget {
                 title: 'المعلومات الدوائية',
                 icon: Icons.science_outlined,
                 children: [
-                  _InfoRow(label: 'الاسم العلمي', value: data.scientificName),
+                  _InfoRow(
+                    label: 'الاسم العلمي العربي',
+                    value: data.arabicScientificName,
+                  ),
+                  _InfoRow(
+                    label: 'الاسم العلمي الإنكليزي',
+                    value: data.scientificName,
+                  ),
+                  _InfoRow(label: 'الاسم الإنكليزي', value: data.name),
+                  _InfoRow(label: 'الباركود', value: data.barcode),
                   _InfoRow(label: 'التركيب', value: data.composition),
                   _InfoRow(label: 'الشكل الدوائي', value: data.dosageForm),
                   _InfoRow(label: 'السعة أو التركيز', value: data.capacity),
@@ -73,6 +84,14 @@ class MedicineDetailsPage extends ConsumerWidget {
                 const SizedBox(height: 13),
                 _Description(text: description),
               ],
+              if (isAdmin) ...[
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: () => _editLocalization(context, ref, data),
+                  icon: const Icon(Icons.translate_rounded),
+                  label: const Text('تعديل الاسم العربي وأسماء البحث'),
+                ),
+              ],
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(15),
@@ -100,6 +119,106 @@ class MedicineDetailsPage extends ConsumerWidget {
       ),
     );
   }
+
+  Future<void> _editLocalization(
+    BuildContext context,
+    WidgetRef ref,
+    Medicine medicine,
+  ) async {
+    final arabicName = TextEditingController(text: medicine.arabicName);
+    final arabicScientific = TextEditingController(
+      text: medicine.arabicScientificName,
+    );
+    final aliases = TextEditingController(
+      text: medicine.aliases
+          .where((item) => item.language.toLowerCase() == 'ar')
+          .map((item) => item.value)
+          .join('، '),
+    );
+    final request = await showDialog<UpdateMedicineLocalization>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('البيانات العربية للدواء'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: arabicName,
+                decoration: const InputDecoration(labelText: 'الاسم العربي'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: arabicScientific,
+                decoration: const InputDecoration(
+                  labelText: 'الاسم العلمي العربي',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: aliases,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'أسماء أخرى للبحث',
+                  hintText: 'افصل بين الأسماء بفاصلة',
+                  alignLabelWithHint: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final values = aliases.text
+                  .split(RegExp(r'[,،]'))
+                  .map((value) => value.trim())
+                  .where((value) => value.isNotEmpty)
+                  .map((value) => MedicineAliasInput(value: value))
+                  .toList(growable: false);
+              Navigator.pop(
+                dialogContext,
+                UpdateMedicineLocalization(
+                  arabicName: arabicName.text,
+                  arabicScientificName: arabicScientific.text,
+                  aliases: values,
+                ),
+              );
+            },
+            child: const Text('حفظ'),
+          ),
+        ],
+      ),
+    );
+    arabicName.dispose();
+    arabicScientific.dispose();
+    aliases.dispose();
+    if (request == null || !context.mounted) return;
+    try {
+      await ref
+          .read(medicinesRepositoryProvider)
+          .updateLocalization(medicine.id, request);
+      ref.invalidate(medicineDetailsProvider(medicine.id));
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث البيانات العربية للدواء.')),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error is ApiException ? error.message : 'تعذر حفظ البيانات.',
+          ),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
+  }
 }
 
 class _MedicineHero extends StatelessWidget {
@@ -119,7 +238,7 @@ class _MedicineHero extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       boxShadow: [
         BoxShadow(
-          color: context.appColors.primary.withValues(alpha: 0.18),
+          color: AppColors.primary.withValues(alpha: 0.18),
           blurRadius: 27,
           offset: const Offset(0, 12),
         ),
@@ -158,13 +277,21 @@ class _MedicineHero extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Text(
-          medicine.name,
+          medicine.displayName,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             color: Colors.white,
             fontSize: 27,
           ),
         ),
-        if (medicine.scientificName case final name?) ...[
+        if (medicine.arabicName != null && medicine.name.trim().isNotEmpty) ...[
+          const SizedBox(height: 5),
+          Text(
+            medicine.name,
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
+          ),
+        ],
+        if ((medicine.arabicScientificName ?? medicine.scientificName)
+            case final name?) ...[
           const SizedBox(height: 6),
           Text(
             name,
@@ -247,7 +374,7 @@ class _Section extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: context.appColors.primary),
+                Icon(icon, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(title, style: Theme.of(context).textTheme.titleMedium),
               ],
@@ -304,7 +431,7 @@ class _Description extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.notes_rounded, color: context.appColors.primary),
+              const Icon(Icons.notes_rounded, color: AppColors.primary),
               const SizedBox(width: 8),
               Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
             ],

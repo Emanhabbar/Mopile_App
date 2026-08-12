@@ -21,6 +21,7 @@ version: 1.0.0+1
 environment:
   sdk: ">=3.8.1 <4.0.0"
 
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -47,6 +48,7 @@ dependencies:
   latlong2: ^0.10.1
   url_launcher: ^6.3.2
   file_selector: ^1.0.4
+  mobile_scanner: ^7.4.0
 
 dev_dependencies:
   flutter_test:

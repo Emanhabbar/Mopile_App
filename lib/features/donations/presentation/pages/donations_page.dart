@@ -43,14 +43,14 @@ class _DonationsPageState extends ConsumerState<DonationsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('التبرعات والمساعدة'),
             Text(
               'دواء يصل إلى من يحتاجه',
               style: TextStyle(
-                color: context.appColors.textMuted,
+                color: AppColors.textMuted,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
@@ -103,8 +103,8 @@ class _DonationHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
+      gradient: const LinearGradient(
+        colors: [AppColors.primaryDeep, AppColors.primary],
       ),
       borderRadius: BorderRadius.circular(25),
     ),
@@ -150,9 +150,9 @@ class _DonationHeroIcon extends StatelessWidget {
       color: Colors.white.withValues(alpha: .12),
       borderRadius: BorderRadius.circular(17),
     ),
-    child: Icon(
+    child: const Icon(
       Icons.volunteer_activism_rounded,
-      color: context.appColors.secondary,
+      color: AppColors.secondary,
       size: 27,
     ),
   );
@@ -169,20 +169,19 @@ class _DonationSegment extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: context.appColors.surfaceSoft,
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         children: [
-          _item(context, 0, Icons.redeem_outlined, 'عروض التبرع'),
-          _item(context, 1, Icons.health_and_safety_outlined, 'طلبات المساعدة'),
+          _item(0, Icons.redeem_outlined, 'عروض التبرع'),
+          _item(1, Icons.health_and_safety_outlined, 'طلبات المساعدة'),
         ],
       ),
     ),
   );
 
-  Widget _item(BuildContext context, int index, IconData icon, String label) {
-    final colors = context.appColors;
+  Widget _item(int index, IconData icon, String label) {
     final active = selected == index;
     return Expanded(
       child: InkWell(
@@ -197,7 +196,7 @@ class _DonationSegment extends StatelessWidget {
             boxShadow: active
                 ? [
                     BoxShadow(
-                      color: colors.shadow.withValues(alpha: .08),
+                      color: AppColors.shadow.withValues(alpha: .08),
                       blurRadius: 10,
                     ),
                   ]
@@ -206,7 +205,7 @@ class _DonationSegment extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: colors.primary, size: 18),
+              Icon(icon, color: AppColors.primary, size: 18),
               const SizedBox(width: 6),
               Text(
                 label,
@@ -375,7 +374,7 @@ class _OfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = donationStatus(context.appColors, offer.status);
+    final status = donationStatus(offer.status);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -415,7 +414,7 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = donationStatus(context.appColors, request.status);
+    final status = donationStatus(request.status);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -462,7 +461,7 @@ class _CardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, color: context.appColors.primary),
+      Icon(icon, color: AppColors.primary),
       const SizedBox(width: 9),
       Expanded(
         child: Text(title, style: Theme.of(context).textTheme.titleMedium),
@@ -498,25 +497,25 @@ class _EmptyList extends StatelessWidget {
     padding: const EdgeInsets.all(32),
     children: [
       const SizedBox(height: 70),
-      Icon(icon, color: context.appColors.textMuted, size: 42),
+      Icon(icon, color: AppColors.textMuted, size: 42),
       const SizedBox(height: 12),
       Text(text, textAlign: TextAlign.center),
     ],
   );
 }
 
-({String label, Color color}) donationStatus(AppColors colors, String value) =>
-    switch (value.toLowerCase()) {
-  'approved' => (label: 'مقبول', color: colors.success),
+({String label, Color color}) donationStatus(String value) => switch (value
+    .toLowerCase()) {
+  'approved' => (label: 'مقبول', color: AppColors.success),
   'received' || 'fulfilled' => (
     label: value.toLowerCase() == 'received' ? 'تم الاستلام' : 'تمت المساعدة',
-    color: colors.success,
+    color: AppColors.success,
   ),
-  'rejected' => (label: 'مرفوض', color: colors.danger),
-  'cancelled' => (label: 'ملغى', color: colors.textMuted),
+  'rejected' => (label: 'مرفوض', color: AppColors.danger),
+  'cancelled' => (label: 'ملغى', color: AppColors.textMuted),
   'underreview' ||
   'pendingreview' => (label: 'قيد المراجعة', color: const Color(0xFFB47618)),
-  _ => (label: 'مفتوح', color: colors.primary),
+  _ => (label: 'مفتوح', color: AppColors.primary),
 };
 
 String _date(DateTime value) => '${value.year}/${value.month}/${value.day}';

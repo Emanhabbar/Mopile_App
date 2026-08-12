@@ -16,15 +16,15 @@ class AppBrand extends StatelessWidget {
           width: compact ? 42 : 54,
           height: compact ? 42 : 54,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
-              colors: [context.appColors.primary, context.appColors.primaryDark],
+              colors: [AppColors.primary, AppColors.primaryDark],
             ),
             borderRadius: BorderRadius.circular(compact ? 14 : 18),
             boxShadow: [
               BoxShadow(
-                color: context.appColors.shadow.withValues(alpha: 0.14),
+                color: AppColors.shadow.withValues(alpha: 0.14),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -49,7 +49,7 @@ class AppBrand extends StatelessWidget {
             Text(
               'دوائي',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: context.appColors.text,
+                color: AppColors.primaryDark,
                 fontSize: compact ? 17 : 22,
                 letterSpacing: -0.25,
               ),

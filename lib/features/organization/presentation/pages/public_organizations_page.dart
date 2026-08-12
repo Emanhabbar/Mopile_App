@@ -108,8 +108,8 @@ class _IntroCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primary, context.appColors.primaryDark],
+      gradient: const LinearGradient(
+        colors: [AppColors.primary, AppColors.primaryDark],
       ),
       borderRadius: BorderRadius.circular(24),
     ),
@@ -161,10 +161,10 @@ class _OrganizationCard extends StatelessWidget {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: context.appColors.surfaceSoft,
+          color: AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(Icons.apartment_rounded, color: context.appColors.primary),
+        child: const Icon(Icons.apartment_rounded, color: AppColors.primary),
       ),
       title: Text(
         organization.organizationName,
@@ -211,8 +211,8 @@ class _CampaignCard extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             campaign.organizationName,
-            style: TextStyle(
-              color: context.appColors.primary,
+            style: const TextStyle(
+              color: AppColors.primary,
               fontWeight: FontWeight.w700,
             ),
           ),

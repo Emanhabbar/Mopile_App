@@ -43,7 +43,7 @@ class AppTextField extends StatelessWidget {
           label,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontSize: 14,
-            color: context.appColors.text,
+            color: AppColors.text,
           ),
         ),
         const SizedBox(height: 9),
@@ -70,7 +70,7 @@ class AppTextField extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: context.appColors.surfaceSoft,
+                        color: AppColors.surfaceSoft,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(icon, size: 21),

@@ -253,7 +253,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: context.appColors.border),
+                side: const BorderSide(color: AppColors.border),
               ),
               leading: const Icon(Icons.event_outlined),
               title: Text(_isOffer ? 'تاريخ انتهاء الدواء' : 'مطلوب قبل تاريخ'),
@@ -406,7 +406,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                 ? error.message
                 : 'تعذر إرسال البيانات حاليًا.',
           ),
-          backgroundColor: context.appColors.danger,
+          backgroundColor: AppColors.danger,
         ),
       );
     } finally {
@@ -422,12 +422,12 @@ class _DonationFormHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      color: isOffer ? context.appColors.surfaceWarm : context.appColors.surfaceSoft,
+      color: isOffer ? AppColors.surfaceWarm : AppColors.surfaceSoft,
       borderRadius: BorderRadius.circular(23),
       border: Border.all(
         color: isOffer
-            ? context.appColors.secondary.withValues(alpha: .45)
-            : context.appColors.primaryLight.withValues(alpha: .45),
+            ? AppColors.secondary.withValues(alpha: .45)
+            : AppColors.primaryLight.withValues(alpha: .45),
       ),
     ),
     child: Row(
@@ -436,14 +436,14 @@ class _DonationFormHero extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: isOffer ? context.appColors.secondary : context.appColors.primary,
+            color: isOffer ? AppColors.secondary : AppColors.primary,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Icon(
             isOffer
                 ? Icons.volunteer_activism_rounded
                 : Icons.health_and_safety_outlined,
-            color: isOffer ? context.appColors.primaryDeep : Colors.white,
+            color: isOffer ? AppColors.primaryDeep : Colors.white,
           ),
         ),
         const SizedBox(width: 12),
@@ -462,8 +462,8 @@ class _DonationFormHero extends StatelessWidget {
                 isOffer
                     ? 'أدخل بيانات دقيقة لتسهيل التحقق والاستلام.'
                     : 'أدخل احتياجك واختر المنظمة المناسبة للطلب.',
-                style: TextStyle(
-                  color: context.appColors.textMuted,
+                style: const TextStyle(
+                  color: AppColors.textMuted,
                   fontSize: 10.5,
                   height: 1.5,
                 ),
@@ -491,13 +491,13 @@ class _FormSectionTitle extends StatelessWidget {
         height: 36,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: context.appColors.primaryDeep,
+          color: AppColors.primaryDeep,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           number,
-          style: TextStyle(
-            color: context.appColors.secondary,
+          style: const TextStyle(
+            color: AppColors.secondary,
             fontSize: 11,
             fontWeight: FontWeight.w900,
           ),
@@ -511,7 +511,7 @@ class _FormSectionTitle extends StatelessWidget {
             Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
             Text(
               subtitle,
-              style: TextStyle(color: context.appColors.textMuted, fontSize: 9.5),
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 9.5),
             ),
           ],
         ),
