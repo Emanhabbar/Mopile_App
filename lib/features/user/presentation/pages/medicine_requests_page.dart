@@ -40,7 +40,7 @@ class _MedicineRequestsPageState extends ConsumerState<MedicineRequestsPage> {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 2),
             child: AppReveal(
               child: _RequestsIntro(
-                onNewRequest: () => context.push('/user/search'),
+                onNewRequest: () => context.go('/user/search'),
               ),
             ),
           ),
@@ -87,7 +87,7 @@ class _MedicineRequestsPageState extends ConsumerState<MedicineRequestsPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/user/search'),
+        onPressed: () => context.go('/user/search'),
         icon: const Icon(Icons.add_rounded),
         label: const Text('طلب جديد'),
       ),

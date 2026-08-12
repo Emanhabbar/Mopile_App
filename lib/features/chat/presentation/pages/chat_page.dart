@@ -174,9 +174,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final key = '${action.actionType} ${action.endpoint} ${action.label}'
         .toLowerCase();
     if (key.contains('pharmac') || key.contains('صيدلي')) {
-      context.push('/user/nearby-pharmacies');
+      context.go('/user/nearby-pharmacies');
     } else if (key.contains('medicine') || key.contains('دواء')) {
-      context.push('/user/search');
+      context.go('/user/search');
     } else if (key.contains('health') || key.contains('صحي')) {
       context.push('/user/health');
     } else if (key.contains('donat') || key.contains('تبرع')) {

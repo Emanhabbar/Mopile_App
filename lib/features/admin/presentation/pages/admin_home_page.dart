@@ -101,7 +101,7 @@ class AdminHomePage extends ConsumerWidget {
                     icon: Icons.fact_check_rounded,
                     color: context.appColors.primary,
                     onTap: () =>
-                        context.push('/admin/workspace?section=approvals'),
+                        context.go('/admin/workspace?section=approvals'),
                   ),
                   RoleActionData(
                     title: 'الحسابات',
@@ -109,7 +109,7 @@ class AdminHomePage extends ConsumerWidget {
                     icon: Icons.manage_accounts_rounded,
                     color: const Color(0xFF3977C4),
                     onTap: () =>
-                        context.push('/admin/workspace?section=accounts'),
+                        context.go('/admin/workspace?section=accounts'),
                   ),
                   RoleActionData(
                     title: 'شريط المنصة',
@@ -117,14 +117,14 @@ class AdminHomePage extends ConsumerWidget {
                     icon: Icons.campaign_rounded,
                     color: const Color(0xFFE08A3E),
                     onTap: () =>
-                        context.push('/admin/workspace?section=ticker'),
+                        context.go('/admin/workspace?section=ticker'),
                   ),
                   RoleActionData(
                     title: 'دليل الأدوية',
                     subtitle: 'مراجعة وإضافة بيانات الدواء',
                     icon: Icons.medication_rounded,
                     color: const Color(0xFF8059A8),
-                    onTap: () => context.push('/medicines'),
+                    onTap: () => context.go('/medicines'),
                   ),
                 ],
               ),
@@ -137,7 +137,7 @@ class AdminHomePage extends ConsumerWidget {
                 color: pendingApprovals > 0
                     ? const Color(0xFFB7791F)
                     : context.appColors.success,
-                onTap: () => context.push('/admin/workspace'),
+                onTap: () => context.go('/admin/workspace'),
               ),
               const SizedBox(height: 14),
               const HomeTickerPanel(),

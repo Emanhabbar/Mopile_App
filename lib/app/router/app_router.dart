@@ -1,10 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_roles.dart';
 import '../../features/account/presentation/pages/account_profile_page.dart';
 import '../../features/account/presentation/pages/change_password_page.dart';
+import '../../features/admin/presentation/pages/admin_home_page.dart';
 import '../../features/admin/presentation/pages/admin_workspace_page.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/controllers/splash_controller.dart';
@@ -24,9 +25,11 @@ import '../../features/medicines/presentation/pages/medicine_details_page.dart';
 import '../../features/medicines/presentation/pages/medicines_page.dart';
 import '../../features/intelligence/presentation/pages/intelligence_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/organization/presentation/pages/organization_home_page.dart';
 import '../../features/organization/presentation/pages/organization_workspace_page.dart';
 import '../../features/organization/presentation/pages/public_organization_details_page.dart';
 import '../../features/organization/presentation/pages/public_organizations_page.dart';
+import '../../features/pharmacy/presentation/pages/pharmacy_dashboard_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_inventory_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_license_verification_page.dart';
 import '../../features/pharmacy/presentation/pages/pharmacy_profile_page.dart';
@@ -37,7 +40,9 @@ import '../../features/pharmacy_discovery/presentation/pages/external_pharmacy_d
 import '../../features/prescriptions/presentation/pages/pharmacy_prescription_orders_page.dart';
 import '../../features/prescriptions/presentation/pages/prescription_details_page.dart';
 import '../../features/prescriptions/presentation/pages/prescriptions_page.dart';
+import '../../features/supply_chain/presentation/pages/representative_home_page.dart';
 import '../../features/supply_chain/presentation/pages/supply_chain_workspace_page.dart';
+import '../../features/supply_chain/presentation/pages/warehouse_home_page.dart';
 import '../../features/settings/presentation/pages/settings_details_pages.dart';
 import '../../features/user/presentation/pages/health_profile_page.dart';
 import '../../features/user/presentation/pages/medicine_request_details_page.dart';
@@ -46,6 +51,8 @@ import '../../features/user/presentation/pages/medicine_search_page.dart';
 import '../../features/user/presentation/pages/nearby_pharmacies_page.dart';
 import '../../features/user/presentation/pages/pharmacy_details_page.dart';
 import '../../features/user/presentation/pages/search_history_page.dart';
+import '../../features/user/presentation/pages/user_dashboard_page.dart';
+import '../../features/auth/data/models/auth_session.dart';
 
 final _routerRefreshProvider = Provider<_RouterRefreshNotifier>((ref) {
   final notifier = _RouterRefreshNotifier();
@@ -56,9 +63,26 @@ final _routerRefreshProvider = Provider<_RouterRefreshNotifier>((ref) {
 });
 
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final splashCompleted = ref.watch(splashCompletedProvider);
+  final role = ref.watch(
+    authControllerProvider.select(
+      (auth) => splashCompleted ? auth.valueOrNull?.user.primaryRole : null,
+    ),
+  );
   final refreshNotifier = ref.watch(_routerRefreshProvider);
+
+  final auth = ref.read(authControllerProvider);
+  final isAuthenticated = auth.valueOrNull != null;
+  final initialLocation = !splashCompleted
+      ? '/splash'
+      : !isAuthenticated
+      ? '/login'
+      : ref.read(registrationCompletedProvider)
+      ? '/registration-success'
+      : '/home';
+
   final router = GoRouter(
-    initialLocation: '/splash',
+    initialLocation: initialLocation,
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
       final auth = ref.read(authControllerProvider);
@@ -92,20 +116,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           location == '/splash') {
         return '/home';
       }
-      if (location.startsWith('/user/') &&
-          auth.valueOrNull?.user.primaryRole != AppRole.user) {
+
+      final userRole = auth.valueOrNull?.user.primaryRole;
+      if (location.startsWith('/user/') && userRole != AppRole.user) {
         return '/home';
       }
       if (location.startsWith('/pharmacy/') &&
-          auth.valueOrNull?.user.primaryRole != AppRole.pharmacy) {
+          userRole != AppRole.pharmacy) {
         return '/home';
       }
       if (location.startsWith('/organization/') &&
-          auth.valueOrNull?.user.primaryRole != AppRole.organization) {
+          userRole != AppRole.organization) {
         return '/home';
       }
-      if (location.startsWith('/admin/') &&
-          auth.valueOrNull?.user.primaryRole != AppRole.admin) {
+      if (location.startsWith('/admin/') && userRole != AppRole.admin) {
+        return '/home';
+      }
+      if (location.startsWith('/medicines') && userRole != AppRole.admin) {
         return '/home';
       }
       if (location.startsWith('/supply-chain') &&
@@ -113,7 +140,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             AppRole.pharmacy,
             AppRole.warehouse,
             AppRole.representative,
-          }.contains(auth.valueOrNull?.user.primaryRole)) {
+          }.contains(userRole)) {
         return '/home';
       }
       return null;
@@ -144,10 +171,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'registration-success',
         builder: (context, state) => const RegistrationSuccessPage(),
       ),
-      GoRoute(
-        path: '/home',
-        name: 'home',
-        builder: (context, state) => const HomeShell(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => HomeShell(
+          navigationShell: navigationShell,
+          role: role ?? AppRole.user,
+        ),
+        branches: _shellBranches(ref, role ?? AppRole.user),
       ),
       GoRoute(
         path: '/notifications',
@@ -209,34 +238,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             const InformationPage(kind: InformationPageKind.about),
       ),
       GoRoute(
-        path: '/medicines',
-        name: 'medicines',
-        builder: (context, state) => const MedicinesPage(),
-        routes: [
-          GoRoute(
-            path: 'create',
-            name: 'medicine-create',
-            redirect: (context, state) =>
-                ref
-                        .read(authControllerProvider)
-                        .valueOrNull
-                        ?.user
-                        .primaryRole ==
-                    AppRole.admin
-                ? null
-                : '/medicines',
-            builder: (context, state) => const CreateMedicinePage(),
-          ),
-          GoRoute(
-            path: ':medicineId',
-            name: 'medicine-details',
-            builder: (context, state) => MedicineDetailsPage(
-              medicineId: state.pathParameters['medicineId']!,
-            ),
-          ),
-        ],
-      ),
-      GoRoute(
         path: '/organizations',
         name: 'public-organizations',
         builder: (context, state) => const PublicOrganizationsPage(),
@@ -263,29 +264,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const HealthProfilePage(),
       ),
       GoRoute(
-        path: '/user/search',
-        name: 'user-medicine-search',
-        builder: (context, state) => MedicineSearchPage(
-          initialQuery: state.extra is String ? state.extra! as String : null,
-        ),
-      ),
-      GoRoute(
-        path: '/user/nearby-pharmacies',
-        name: 'user-nearby-pharmacies',
-        builder: (context, state) => const NearbyPharmaciesPage(),
-      ),
-      GoRoute(
         path: '/user/pharmacies/:pharmacyId',
         name: 'user-pharmacy-details',
         builder: (context, state) => PharmacyDetailsPage(
           pharmacyId: state.pathParameters['pharmacyId']!,
           initialMedicineId: state.uri.queryParameters['medicine'],
         ),
-      ),
-      GoRoute(
-        path: '/user/requests',
-        name: 'user-medicine-requests',
-        builder: (context, state) => const MedicineRequestsPage(),
       ),
       GoRoute(
         path: '/user/requests/:requestId',
@@ -356,19 +340,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const PharmacyWorkingHoursPage(),
       ),
       GoRoute(
-        path: '/pharmacy/inventory',
-        name: 'pharmacy-inventory',
-        builder: (context, state) => const PharmacyInventoryPage(),
-      ),
-      GoRoute(
         path: '/pharmacy/license-verification',
         name: 'pharmacy-license-verification',
         builder: (context, state) => const PharmacyLicenseVerificationPage(),
-      ),
-      GoRoute(
-        path: '/pharmacy/requests',
-        name: 'pharmacy-requests',
-        builder: (context, state) => const PharmacyRequestsPage(),
       ),
       GoRoute(
         path: '/pharmacy/requests/:requestId',
@@ -387,41 +361,207 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'pharmacy-donations',
         builder: (context, state) => const PharmacyDonationsPage(),
       ),
-      GoRoute(
-        path: '/organization/workspace',
-        name: 'organization-workspace',
-        builder: (context, state) => OrganizationWorkspacePage(
-          initialSection: switch (state.uri.queryParameters['section']) {
-            'campaigns' => 1,
-            'donations' => 2,
-            'assistance' => 3,
-            'profile' => 4,
-            _ => 0,
-          },
-        ),
-      ),
-      GoRoute(
-        path: '/admin/workspace',
-        name: 'admin-workspace',
-        builder: (context, state) => AdminWorkspacePage(
-          initialSection: switch (state.uri.queryParameters['section']) {
-            'approvals' => 1,
-            'accounts' => 2,
-            'ticker' => 3,
-            _ => 0,
-          },
-        ),
-      ),
-      GoRoute(
-        path: '/supply-chain',
-        name: 'supply-chain',
-        builder: (context, state) => const SupplyChainWorkspacePage(),
-      ),
     ],
   );
   ref.onDispose(router.dispose);
   return router;
 });
+
+List<StatefulShellBranch> _shellBranches(Ref ref, AppRole role) {
+  return switch (role) {
+    AppRole.user => [
+      _branch([
+        _homeRoute(
+          ref,
+          (user) => HomeTabShell(child: UserDashboardPage(user: user)),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/user/search',
+          name: 'user-medicine-search',
+          builder: (context, state) => MedicineSearchPage(
+            initialQuery: state.extra is String ? state.extra! as String : null,
+          ),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/user/nearby-pharmacies',
+          name: 'user-nearby-pharmacies',
+          builder: (context, state) => const NearbyPharmaciesPage(),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/user/requests',
+          name: 'user-medicine-requests',
+          builder: (context, state) => const MedicineRequestsPage(),
+        ),
+      ]),
+      _branch([_accountRoute]),
+    ],
+    AppRole.pharmacy => [
+      _branch([
+        _homeRoute(
+          ref,
+          (_) => const HomeTabShell(child: PharmacyDashboardPage()),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/pharmacy/inventory',
+          name: 'pharmacy-inventory',
+          builder: (context, state) => const PharmacyInventoryPage(),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/pharmacy/requests',
+          name: 'pharmacy-requests',
+          builder: (context, state) => const PharmacyRequestsPage(),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/supply-chain',
+          name: 'supply-chain-workspace',
+          builder: (context, state) => const SupplyChainWorkspacePage(),
+        ),
+      ]),
+      _branch([_accountRoute]),
+    ],
+    AppRole.admin => [
+      _branch([
+        _homeRoute(
+          ref,
+          (_) => const HomeTabShell(child: AdminHomePage()),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/admin/workspace',
+          name: 'admin-workspace',
+          builder: (context, state) => AdminWorkspacePage(
+            initialSection: switch (state.uri.queryParameters['section']) {
+              'approvals' => 1,
+              'accounts' => 2,
+              'ticker' => 3,
+              _ => 0,
+            },
+          ),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/medicines',
+          name: 'medicines',
+          builder: (context, state) => const MedicinesPage(),
+          routes: [
+            GoRoute(
+              path: 'create',
+              name: 'medicine-create',
+              redirect: (context, state) =>
+                  ref
+                          .read(authControllerProvider)
+                          .valueOrNull
+                          ?.user
+                          .primaryRole ==
+                      AppRole.admin
+                  ? null
+                  : '/medicines',
+              builder: (context, state) => const CreateMedicinePage(),
+            ),
+            GoRoute(
+              path: ':medicineId',
+              name: 'medicine-details',
+              builder: (context, state) => MedicineDetailsPage(
+                medicineId: state.pathParameters['medicineId']!,
+              ),
+            ),
+          ],
+        ),
+      ]),
+      _branch([_accountRoute]),
+    ],
+    AppRole.organization => [
+      _branch([
+        _homeRoute(
+          ref,
+          (_) => const HomeTabShell(child: OrganizationHomePage()),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/organization/workspace',
+          name: 'organization-workspace',
+          builder: (context, state) => OrganizationWorkspacePage(
+            initialSection: switch (state.uri.queryParameters['section']) {
+              'campaigns' => 1,
+              'donations' => 2,
+              'assistance' => 3,
+              'profile' => 4,
+              _ => 0,
+            },
+          ),
+        ),
+      ]),
+      _branch([_accountRoute]),
+    ],
+    AppRole.warehouse => [
+      _branch([
+        _homeRoute(
+          ref,
+          (_) => const HomeTabShell(child: WarehouseHomePage()),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/supply-chain',
+          name: 'supply-chain-workspace',
+          builder: (context, state) => const SupplyChainWorkspacePage(),
+        ),
+      ]),
+      _branch([_accountRoute]),
+    ],
+    AppRole.representative => [
+      _branch([
+        _homeRoute(
+          ref,
+          (_) => const HomeTabShell(child: RepresentativeHomePage()),
+        ),
+      ]),
+      _branch([
+        GoRoute(
+          path: '/supply-chain',
+          name: 'supply-chain-workspace',
+          builder: (context, state) => const SupplyChainWorkspacePage(),
+        ),
+      ]),
+      _branch([_accountRoute]),
+    ],
+  };
+}
+
+StatefulShellBranch _branch(List<GoRoute> routes) =>
+    StatefulShellBranch(routes: routes);
+
+GoRoute _homeRoute(Ref ref, Widget Function(AuthUser) pageBuilder) =>
+    GoRoute(
+      path: '/home',
+      name: 'home',
+      builder: (context, state) {
+        final user = ref.read(authControllerProvider).valueOrNull?.user;
+        if (user == null) return const SizedBox.shrink();
+        return pageBuilder(user);
+      },
+    );
+
+final _accountRoute = GoRoute(
+  path: '/account',
+  name: 'account-tab',
+  builder: (context, state) => const AccountTabPage(),
+);
 
 class _RouterRefreshNotifier extends ChangeNotifier {
   void refresh() => notifyListeners();

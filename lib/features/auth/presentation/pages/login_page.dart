@@ -121,8 +121,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
                 onBack: () {
                   if (context.canPop()) {
                     context.pop();
-                  } else {
-                    context.go('/');
                   }
                 },
               ),

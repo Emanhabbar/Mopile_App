@@ -85,7 +85,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   icon: Icons.campaign_outlined,
                   color: context.appColors.primary,
                   onTap: () =>
-                      context.push('/organization/workspace?section=campaigns'),
+                      context.go('/organization/workspace?section=campaigns'),
                 ),
                 RoleActionData(
                   title: 'عروض التبرع',
@@ -96,7 +96,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   icon: Icons.volunteer_activism_outlined,
                   color: const Color(0xFFE08A3E),
                   onTap: () =>
-                      context.push('/organization/workspace?section=donations'),
+                      context.go('/organization/workspace?section=donations'),
                 ),
                 RoleActionData(
                   title: 'طلبات المساعدة',
@@ -116,7 +116,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   icon: Icons.verified_user_outlined,
                   color: const Color(0xFF8059A8),
                   onTap: () =>
-                      context.push('/organization/workspace?section=profile'),
+                      context.go('/organization/workspace?section=profile'),
                 ),
               ],
             ),
@@ -133,7 +133,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   ? context.appColors.success
                   : const Color(0xFFB7791F),
               onTap: () =>
-                  context.push('/organization/workspace?section=profile'),
+                  context.go('/organization/workspace?section=profile'),
             ),
             if (data.recentCampaigns.isNotEmpty) ...[
               const SizedBox(height: 24),
@@ -142,7 +142,7 @@ class OrganizationHomePage extends ConsumerWidget {
                 subtitle: 'آخر المبادرات المضافة إلى حساب المنظمة',
                 action: TextButton(
                   onPressed: () =>
-                      context.push('/organization/workspace?section=campaigns'),
+                      context.go('/organization/workspace?section=campaigns'),
                   child: const Text('عرض الكل'),
                 ),
               ),

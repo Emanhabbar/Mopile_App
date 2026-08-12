@@ -67,9 +67,9 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
 
   void _repeat(UserSearchRecord item) {
     if (_isMedicine(item.searchType) && item.query.trim().isNotEmpty) {
-      context.push('/user/search', extra: item.query.trim());
+      context.go('/user/search', extra: item.query.trim());
     } else {
-      context.push('/user/nearby-pharmacies');
+      context.go('/user/nearby-pharmacies');
     }
   }
 

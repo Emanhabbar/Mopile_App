@@ -94,7 +94,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                     badge: active.isNotEmpty ? '${active.length}' : null,
                     icon: Icons.delivery_dining_rounded,
                     color: context.appColors.primary,
-                    onTap: () => context.push('/supply-chain'),
+                    onTap: () => context.go('/supply-chain'),
                   ),
                   RoleActionData(
                     title: 'الإشعارات',
@@ -114,7 +114,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                 action: active.isEmpty
                     ? null
                     : TextButton(
-                        onPressed: () => context.push('/supply-chain'),
+                        onPressed: () => context.go('/supply-chain'),
                         child: const Text('عرض الكل'),
                       ),
               ),
@@ -136,7 +136,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 9),
                         child: _DeliverySummaryCard(
                           order: order,
-                          onTap: () => context.push('/supply-chain'),
+                          onTap: () => context.go('/supply-chain'),
                         ),
                       ),
                     ),

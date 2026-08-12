@@ -12,14 +12,9 @@ import '../../data/models/user_models.dart';
 import '../controllers/user_providers.dart';
 
 class UserDashboardPage extends ConsumerWidget {
-  const UserDashboardPage({
-    required this.user,
-    required this.onOpenServices,
-    super.key,
-  });
+  const UserDashboardPage({required this.user, super.key});
 
   final AuthUser user;
-  final VoidCallback onOpenServices;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +37,6 @@ class UserDashboardPage extends ConsumerWidget {
         child: _DashboardContent(
           data: data,
           fallbackUser: user,
-          onOpenServices: onOpenServices,
         ),
       ),
     );
@@ -53,12 +47,10 @@ class _DashboardContent extends StatelessWidget {
   const _DashboardContent({
     required this.data,
     required this.fallbackUser,
-    required this.onOpenServices,
   });
 
   final UserDashboard data;
   final AuthUser fallbackUser;
-  final VoidCallback onOpenServices;
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +72,6 @@ class _DashboardContent extends StatelessWidget {
                 child: _HeroSection(
                   firstName: firstName,
                   hasSavedLocation: data.profile.hasSavedLocation,
-                  onOpenServices: onOpenServices,
                   onOpenHealth: () => context.push('/user/health'),
                 ),
               ),
@@ -122,7 +113,7 @@ class _DashboardContent extends StatelessWidget {
                 child: _LocationSummary(
                   profile: data.profile,
                   contextData: data.locationContext,
-                  onTap: () => context.push('/user/nearby-pharmacies'),
+                  onTap: () => context.go('/user/nearby-pharmacies'),
                 ),
               ),
               if (pharmacies.isNotEmpty) ...[
@@ -203,13 +194,11 @@ class _HeroSection extends StatelessWidget {
   const _HeroSection({
     required this.firstName,
     required this.hasSavedLocation,
-    required this.onOpenServices,
     required this.onOpenHealth,
   });
 
   final String firstName;
   final bool hasSavedLocation;
-  final VoidCallback onOpenServices;
   final VoidCallback onOpenHealth;
 
   @override
@@ -268,7 +257,7 @@ class _HeroSection extends StatelessWidget {
             children: [
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: onOpenServices,
+                  onPressed: () => context.go('/user/search'),
                   icon: const Icon(Icons.search_rounded),
                   label: const Text('ابحث عن دواء'),
                   style: FilledButton.styleFrom(
@@ -985,11 +974,11 @@ String _searchType(String value) => switch (value.toLowerCase()) {
 
 void _openSearchActivity(BuildContext context, UserSearchHistory item) {
   final type = item.searchType.toLowerCase();
-  if (type.contains('medicine') &&
-      type != 'medicinerequest' &&
-      item.query.trim().isNotEmpty) {
-    context.push('/user/search', extra: item.query.trim());
-    return;
-  }
-  context.push('/user/nearby-pharmacies');
+if (type.contains('medicine') &&
+        type != 'medicinerequest' &&
+        item.query.trim().isNotEmpty) {
+      context.go('/user/search', extra: item.query.trim());
+      return;
+    }
+    context.go('/user/nearby-pharmacies');
 }

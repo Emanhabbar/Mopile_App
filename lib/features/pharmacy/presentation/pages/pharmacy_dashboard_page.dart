@@ -9,9 +9,7 @@ import '../../data/models/pharmacy_models.dart';
 import '../controllers/pharmacy_providers.dart';
 
 class PharmacyDashboardPage extends ConsumerWidget {
-  const PharmacyDashboardPage({required this.onOpenServices, super.key});
-
-  final VoidCallback onOpenServices;
+  const PharmacyDashboardPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -58,8 +56,8 @@ class PharmacyDashboardPage extends ConsumerWidget {
                     child: _OperationsGrid(
                       pendingRequests: data.pendingRequestsCount,
                       lowStock: data.lowStockCount,
-                      onInventory: onOpenServices,
-                      onRequests: () => context.push('/pharmacy/requests'),
+                      onInventory: () => context.go('/pharmacy/inventory'),
+                      onRequests: () => context.go('/pharmacy/requests'),
                       onHours: () => context.push('/pharmacy/working-hours'),
                       onProfile: () => context.push('/pharmacy/profile'),
                     ),
@@ -81,7 +79,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                       data: data,
                       onLocation: () => context.push('/pharmacy/profile'),
                       onHours: () => context.push('/pharmacy/working-hours'),
-                      onInventory: onOpenServices,
+                      onInventory: () => context.go('/pharmacy/inventory'),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -89,7 +87,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                     title: 'تنبيهات المخزون',
                     subtitle: 'الأصناف التي تحتاج تدخلك قريبًا',
                     action: TextButton.icon(
-                      onPressed: onOpenServices,
+                      onPressed: () => context.go('/pharmacy/inventory'),
                       icon: const Icon(Icons.arrow_back_rounded, size: 17),
                       label: const Text('عرض الكل'),
                     ),
@@ -115,7 +113,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                               ),
                               child: _InventoryAlertCard(
                                 alert: entry.value,
-                                onTap: onOpenServices,
+                                onTap: () => context.go('/pharmacy/inventory'),
                               ),
                             ),
                           ),

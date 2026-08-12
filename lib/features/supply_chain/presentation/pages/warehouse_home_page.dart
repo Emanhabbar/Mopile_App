@@ -76,7 +76,7 @@ class WarehouseHomePage extends ConsumerWidget {
                   '${_money(data.inventoryValue)} ل.س ضمن التشغيلات النشطة',
               icon: Icons.account_balance_wallet_outlined,
               color: const Color(0xFF6D5AA8),
-              onTap: () => context.push('/supply-chain'),
+              onTap: () => context.go('/supply-chain'),
             ),
             const SizedBox(height: 24),
             const RoleSectionHeader(
@@ -94,7 +94,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       : null,
                   icon: Icons.inventory_rounded,
                   color: context.appColors.primary,
-                  onTap: () => context.push('/supply-chain'),
+                  onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
                   title: 'طلبات التوريد',
@@ -104,7 +104,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       : null,
                   icon: Icons.receipt_long_rounded,
                   color: const Color(0xFF3977C4),
-                  onTap: () => context.push('/supply-chain'),
+                  onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
                   title: 'الشحن والتوصيل',
@@ -114,7 +114,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       : null,
                   icon: Icons.local_shipping_outlined,
                   color: const Color(0xFFE08A3E),
-                  onTap: () => context.push('/supply-chain'),
+                  onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
                   title: 'تحليل المخزون',
@@ -131,7 +131,7 @@ class WarehouseHomePage extends ConsumerWidget {
                 title: 'تنبيهات المخزون',
                 subtitle: 'التشغيلات التي تحتاج تدخلاً قريباً',
                 action: TextButton(
-                  onPressed: () => context.push('/supply-chain'),
+                  onPressed: () => context.go('/supply-chain'),
                   child: const Text('عرض الكل'),
                 ),
               ),
@@ -151,7 +151,7 @@ class WarehouseHomePage extends ConsumerWidget {
                         color: batch.sellableQuantity <= 0
                             ? context.appColors.danger
                             : const Color(0xFFE08A3E),
-                        onTap: () => context.push('/supply-chain'),
+                        onTap: () => context.go('/supply-chain'),
                       ),
                     ),
                   ),
@@ -174,7 +174,7 @@ class WarehouseHomePage extends ConsumerWidget {
                             '${order.orderCode} · ${_orderStatus(order.status)} · ${_money(order.totalAmount)} ل.س',
                         icon: Icons.receipt_long_outlined,
                         color: _orderColor(context.appColors, order.status),
-                        onTap: () => context.push('/supply-chain'),
+                        onTap: () => context.go('/supply-chain'),
                       ),
                     ),
                   ),

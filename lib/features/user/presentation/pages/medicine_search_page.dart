@@ -58,7 +58,7 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
         title: const Text('البحث عن دواء'),
         actions: [
           IconButton(
-            onPressed: () => context.push('/user/nearby-pharmacies'),
+            onPressed: () => context.go('/user/nearby-pharmacies'),
             tooltip: 'الصيدليات القريبة',
             icon: const Icon(Icons.map_outlined),
           ),
@@ -72,7 +72,7 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
             sliver: SliverToBoxAdapter(
               child: AppReveal(
                 child: _SearchHero(
-                  onLocation: () => context.push('/user/nearby-pharmacies'),
+                  onLocation: () => context.go('/user/nearby-pharmacies'),
                 ),
               ),
             ),
@@ -134,7 +134,7 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
         hasScrollBody: false,
         child: _isMissingLocation(error)
             ? _LocationRequiredState(
-                onSetLocation: () => context.push('/user/nearby-pharmacies'),
+                onSetLocation: () => context.go('/user/nearby-pharmacies'),
               )
             : AppErrorState(error: error, onRetry: _search),
       ),
