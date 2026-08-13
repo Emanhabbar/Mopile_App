@@ -72,9 +72,17 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
           Expanded(
             child: state.isLoading
                 ? const AppLoadingState(label: 'جاري تحميل دليل الأدوية...')
-                : state.items.isEmpty
-                    ? _EmptyCatalog(hasSearch: _search.text.trim().isNotEmpty)
-                    : RefreshIndicator(
+                : state.error != null && state.items.isEmpty
+                    ? AppErrorState(
+                        error: state.error!,
+                        onRetry: () =>
+                            ref.read(medicinesListProvider.notifier).refresh(),
+                      )
+                    : state.items.isEmpty
+                        ? _EmptyCatalog(
+                            hasSearch: _search.text.trim().isNotEmpty,
+                          )
+                        : RefreshIndicator(
                         onRefresh: () =>
                             ref.read(medicinesListProvider.notifier).refresh(),
                         child: ListView.builder(

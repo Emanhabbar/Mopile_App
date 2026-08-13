@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="launch_background_color">#102F37</color>
-    <color name="dawaai_icon_background">#102F37</color>
+  <color name="launch_background_color">#102F37</color>
 </resources>
