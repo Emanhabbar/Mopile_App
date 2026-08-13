@@ -20,7 +20,7 @@ class SettingsPage extends ConsumerWidget {
     final locale = ref.watch(localeControllerProvider);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 112),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
       children: [
         Row(
           children: [
@@ -40,203 +40,151 @@ class SettingsPage extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           'بياناتك وتفضيلات استخدام التطبيق',
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: context.appColors.text,
+            fontSize: 13,
+          ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 22),
         AppReveal(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [context.appColors.primary, context.appColors.primaryDark],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: context.appColors.shadow.withValues(alpha: 0.15),
-                  blurRadius: 22,
-                  offset: const Offset(0, 9),
-                ),
-              ],
-            ),
+          child: _ProfileHero(user: user),
+        ),
+        const SizedBox(height: 28),
+        _SectionLabel(
+          title: 'التفضيلات والحساب',
+          subtitle: 'إدارة بياناتك وطريقة استخدام التطبيق',
+        ),
+        const SizedBox(height: 12),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primary,
+          icon: Icons.person_outline_rounded,
+          title: 'الملف الشخصي',
+          subtitle: 'الاسم ورقم الهاتف والصورة',
+          onTap: () => context.push('/account/profile'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryDark,
+          icon: Icons.language_rounded,
+          title: 'لغة التطبيق',
+          subtitle: locale.languageCode == 'ar' ? 'العربية' : 'English',
+          onTap: () =>
+              ref.read(localeControllerProvider.notifier).toggle(),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryLight,
+          icon: Icons.palette_outlined,
+          title: 'المظهر',
+          subtitle: 'فاتح أو داكن أو حسب إعداد الجهاز',
+          onTap: () => context.push('/settings/appearance'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primary,
+          icon: Icons.notifications_none_rounded,
+          title: 'تفضيلات الإشعارات',
+          subtitle: 'الطلبات والتذكيرات والحملات',
+          onTap: () => context.push('/settings/notifications'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryDark,
+          icon: Icons.lock_outline_rounded,
+          title: 'تغيير كلمة المرور',
+          subtitle: 'تحديث كلمة مرور حسابك',
+          onTap: () => context.push('/account/password'),
+        ),
+        const SizedBox(height: 28),
+        _SectionLabel(
+          title: 'الخصوصية والمساعدة',
+          subtitle: 'الصلاحيات والمعلومات المهمة عن استخدام دوائي',
+        ),
+        const SizedBox(height: 12),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primary,
+          icon: Icons.inbox_outlined,
+          title: 'مركز الإشعارات',
+          subtitle: 'عرض التنبيهات الواردة وحالتها',
+          onTap: () => context.push('/notifications'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryDark,
+          icon: Icons.admin_panel_settings_outlined,
+          title: 'صلاحيات الجهاز',
+          subtitle: 'الموقع والكاميرا والملفات',
+          onTap: () => context.push('/settings/permissions'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryLight,
+          icon: Icons.shield_outlined,
+          title: 'الخصوصية',
+          subtitle: 'بياناتك الآمنة وخصوصيتك',
+          onTap: () => context.push('/settings/privacy'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primary,
+          icon: Icons.description_outlined,
+          title: 'شروط الاستخدام',
+          subtitle: 'البنود والأحكام العامة',
+          onTap: () => context.push('/settings/terms'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryDark,
+          icon: Icons.help_outline_rounded,
+          title: 'المساعدة',
+          subtitle: 'الدعم الفني والأسئلة الشائعة',
+          onTap: () => context.push('/settings/help'),
+        ),
+        const SizedBox(height: 6),
+        _AccentSettingsItem(
+          accentColor: context.appColors.primaryLight,
+          icon: Icons.info_outline_rounded,
+          title: 'عن دوائي',
+          subtitle: 'الإصدار 1.0.0',
+          onTap: () => context.push('/settings/about'),
+        ),
+        const SizedBox(height: 28),
+        Material(
+          color: context.appColors.danger.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            onTap: () => _confirmLogout(context, ref),
+            borderRadius: BorderRadius.circular(18),
             child: Padding(
-              padding: const EdgeInsets.all(19),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 children: [
-                  ProfileAvatar(user: user, radius: 30),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: context.appColors.danger.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Icon(
+                      Icons.logout_rounded,
+                      color: context.appColors.danger,
+                      size: 21,
+                    ),
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.fullName,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(color: Colors.white, fontSize: 18),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          user.email,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 7),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Text(
-                            _roleLabel(user.primaryRole),
-                            style: TextStyle(
-                              color: context.appColors.secondary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'تسجيل الخروج',
+                      style: TextStyle(
+                        color: context.appColors.danger,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        const _SettingsSectionTitle(
-          icon: Icons.settings_suggest_outlined,
-          title: 'التفضيلات والحساب',
-          subtitle: 'إدارة بياناتك وطريقة استخدام التطبيق',
-        ),
-        const SizedBox(height: 9),
-        Card(
-          child: Column(
-            children: [
-              ListTile(
-                onTap: () => context.push('/account/profile'),
-                leading: const _SettingsIcon(
-                  icon: Icons.person_outline_rounded,
-                ),
-                title: const Text('الملف الشخصي'),
-                subtitle: const Text('الاسم ورقم الهاتف والصورة'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                leading: const _SettingsIcon(icon: Icons.language_rounded),
-                title: const Text('لغة التطبيق'),
-                subtitle: Text(
-                  locale.languageCode == 'ar' ? 'العربية' : 'English',
-                ),
-                trailing: Switch(
-                  value: locale.languageCode == 'en',
-                  onChanged: (_) =>
-                      ref.read(localeControllerProvider.notifier).toggle(),
-                ),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/appearance'),
-                leading: const _SettingsIcon(icon: Icons.palette_outlined),
-                title: const Text('المظهر'),
-                subtitle: const Text('فاتح أو داكن أو حسب إعداد الجهاز'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/notifications'),
-                leading: _SettingsIcon(icon: Icons.notifications_none_rounded),
-                title: const Text('تفضيلات الإشعارات'),
-                subtitle: const Text('الطلبات والتذكيرات والحملات'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/account/password'),
-                leading: const _SettingsIcon(icon: Icons.lock_outline_rounded),
-                title: const Text('تغيير كلمة المرور'),
-                subtitle: const Text('تحديث كلمة مرور حسابك'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 22),
-        const _SettingsSectionTitle(
-          icon: Icons.security_outlined,
-          title: 'الخصوصية والمساعدة',
-          subtitle: 'الصلاحيات والمعلومات المهمة عن استخدام دوائي',
-        ),
-        const SizedBox(height: 9),
-        Card(
-          child: Column(
-            children: [
-              ListTile(
-                onTap: () => context.push('/notifications'),
-                leading: const _SettingsIcon(icon: Icons.inbox_outlined),
-                title: const Text('مركز الإشعارات'),
-                subtitle: const Text('عرض التنبيهات الواردة وحالتها'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/permissions'),
-                leading: const _SettingsIcon(
-                  icon: Icons.admin_panel_settings_outlined,
-                ),
-                title: const Text('صلاحيات الجهاز'),
-                subtitle: const Text('الموقع والكاميرا والملفات'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/privacy'),
-                leading: const _SettingsIcon(icon: Icons.shield_outlined),
-                title: const Text('الخصوصية'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/terms'),
-                leading: const _SettingsIcon(icon: Icons.description_outlined),
-                title: const Text('شروط الاستخدام'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/help'),
-                leading: const _SettingsIcon(icon: Icons.help_outline_rounded),
-                title: const Text('المساعدة'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-              const Divider(height: 1, indent: 20, endIndent: 20),
-              ListTile(
-                onTap: () => context.push('/settings/about'),
-                leading: const _SettingsIcon(icon: Icons.info_outline_rounded),
-                title: const Text('عن دوائي'),
-                subtitle: const Text('الإصدار 1.0.0'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 22),
-        OutlinedButton.icon(
-          onPressed: () => _confirmLogout(context, ref),
-          icon: const Icon(Icons.logout_rounded),
-          label: const Text('تسجيل الخروج'),
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size.fromHeight(54),
-            foregroundColor: context.appColors.danger,
-            side: const BorderSide(color: Color(0xFFE8CACA)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
@@ -266,38 +214,208 @@ class SettingsPage extends ConsumerWidget {
       await ref.read(authControllerProvider.notifier).logout();
     }
   }
-
-  String _roleLabel(AppRole role) => switch (role) {
-    AppRole.user => 'مستخدم',
-    AppRole.pharmacy => 'صيدلية',
-    AppRole.organization => 'منظمة',
-    AppRole.warehouse => 'مستودع أدوية',
-    AppRole.representative => 'مندوب مستودع',
-    AppRole.admin => 'إدارة المنصة',
-  };
 }
 
-class _SettingsSectionTitle extends StatelessWidget {
-  const _SettingsSectionTitle({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-  final IconData icon;
+String _roleLabel(AppRole role) => switch (role) {
+  AppRole.user => 'مستخدم',
+  AppRole.pharmacy => 'صيدلية',
+  AppRole.organization => 'منظمة',
+  AppRole.warehouse => 'مستودع أدوية',
+  AppRole.representative => 'مندوب مستودع',
+  AppRole.admin => 'إدارة المنصة',
+};
+
+class _ProfileHero extends StatelessWidget {
+  const _ProfileHero({required this.user});
+
+  final AuthUser user;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = user.hasProfileImage;
+
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            context.appColors.primaryDeep,
+            context.appColors.primary,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -30,
+            left: -25,
+            child: Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -40,
+            right: -15,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                color: context.appColors.secondary.withValues(alpha: 0.06),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    ProfileAvatar(user: user, radius: 34),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.fullName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            user.email,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.65),
+                                  fontSize: 13,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        hasImage
+                            ? Icons.verified_rounded
+                            : Icons.person_outline_rounded,
+                        color: context.appColors.secondary,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        _roleLabel(user.primaryRole),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: hasImage
+                              ? context.appColors.secondary
+                              : Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          hasImage ? 'حساب موثّق' : 'حساب غير موثّق',
+                          style: TextStyle(
+                            color: hasImage
+                                ? context.appColors.primaryDeep
+                                : Colors.white.withValues(alpha: 0.7),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.title, required this.subtitle});
+
   final String title, subtitle;
+
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(icon, color: context.appColors.primary, size: 21),
-      const SizedBox(width: 8),
+      Container(
+        width: 4,
+        height: 20,
+        decoration: BoxDecoration(
+          color: context.appColors.primary,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+      const SizedBox(width: 10),
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 15,
+                color: context.appColors.text,
+              ),
+            ),
+            const SizedBox(height: 2),
             Text(
               subtitle,
-              style: TextStyle(color: context.appColors.textMuted, fontSize: 10),
+              style: TextStyle(
+                color: context.appColors.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -306,19 +424,77 @@ class _SettingsSectionTitle extends StatelessWidget {
   );
 }
 
-class _SettingsIcon extends StatelessWidget {
-  const _SettingsIcon({required this.icon});
+class _AccentSettingsItem extends StatelessWidget {
+  const _AccentSettingsItem({
+    required this.accentColor,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
+  final Color accentColor;
   final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(
-      color: context.appColors.surfaceSoft,
-      borderRadius: BorderRadius.circular(13),
-    ),
-    child: Icon(icon, color: context.appColors.primary, size: 21),
-  );
+  Widget build(BuildContext context) {
+    return Material(
+      color: context.appColors.surface,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 52,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: const BorderRadius.horizontal(
+                  right: Radius.circular(18),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: Icon(icon, color: accentColor, size: 21),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: context.appColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

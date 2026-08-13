@@ -184,6 +184,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NotificationsPage(),
       ),
       GoRoute(
+        path: '/medicines/:medicineId',
+        name: 'medicine-details',
+        builder: (context, state) => MedicineDetailsPage(
+          medicineId: state.pathParameters['medicineId']!,
+        ),
+      ),
+      GoRoute(
         path: '/intelligence',
         name: 'intelligence',
         builder: (context, state) => const IntelligencePage(),
@@ -471,13 +478,6 @@ List<StatefulShellBranch> _shellBranches(Ref ref, AppRole role) {
                   ? null
                   : '/medicines',
               builder: (context, state) => const CreateMedicinePage(),
-            ),
-            GoRoute(
-              path: ':medicineId',
-              name: 'medicine-details',
-              builder: (context, state) => MedicineDetailsPage(
-                medicineId: state.pathParameters['medicineId']!,
-              ),
             ),
           ],
         ),

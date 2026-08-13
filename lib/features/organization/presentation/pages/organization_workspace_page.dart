@@ -754,7 +754,7 @@ class _OverviewSection extends StatelessWidget {
             child: _QuickAction(
               icon: Icons.upload_file_outlined,
               label: 'رفع وثيقة',
-              color: const Color(0xFF3977C4),
+              color: context.appColors.primaryLight,
               onTap: onUploadDocument,
             ),
           ),
@@ -763,7 +763,7 @@ class _OverviewSection extends StatelessWidget {
             child: _QuickAction(
               icon: Icons.edit_outlined,
               label: 'تعديل الملف',
-              color: const Color(0xFF8A5AC2),
+              color: context.appColors.primaryDark,
               onTap: onEditProfile,
             ),
           ),
@@ -820,7 +820,7 @@ class _OverviewSection extends StatelessWidget {
               label: 'طلبات مفتوحة',
               value: data.openAssistanceRequestsCount,
               icon: Icons.favorite_outline_rounded,
-              color: const Color(0xFFD14E62),
+              color: context.appColors.primaryDark,
             ),
           ],
         ),
@@ -1773,12 +1773,12 @@ class _AssistanceCard extends StatelessWidget {
                   width: 47,
                   height: 47,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD14E62).withValues(alpha: .08),
+                    color: context.appColors.primaryDark.withValues(alpha: .08),
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.favorite_outline_rounded,
-                    color: Color(0xFFD14E62),
+                    color: context.appColors.primaryDark,
                   ),
                 ),
                 const SizedBox(width: 11),

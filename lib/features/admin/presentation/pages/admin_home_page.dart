@@ -63,21 +63,21 @@ class AdminHomePage extends ConsumerWidget {
                     value: '${data.totalPharmacies}',
                     caption: '${data.pendingPharmacies} معلقة',
                     icon: Icons.local_pharmacy_rounded,
-                    color: const Color(0xFF3977C4),
+                    color: context.appColors.primaryLight,
                   ),
                   RoleMetricData(
                     label: 'المنظمات',
                     value: '${data.totalOrganizations}',
                     caption: '${data.pendingOrganizations} معلقة',
                     icon: Icons.apartment_rounded,
-                    color: const Color(0xFF8059A8),
+                    color: context.appColors.primaryDark,
                   ),
                   RoleMetricData(
                     label: 'المستودعات',
                     value: '${data.totalWarehouses}',
                     caption: '${data.approvedWarehouses} معتمد',
                     icon: Icons.warehouse_rounded,
-                    color: const Color(0xFFE08A3E),
+                    color: context.appColors.primaryLight,
                   ),
                 ],
               ),
@@ -107,7 +107,7 @@ class AdminHomePage extends ConsumerWidget {
                     title: 'الحسابات',
                     subtitle: 'متابعة الحالة والصلاحية',
                     icon: Icons.manage_accounts_rounded,
-                    color: const Color(0xFF3977C4),
+                    color: context.appColors.primaryLight,
                     onTap: () =>
                         context.go('/admin/workspace?section=accounts'),
                   ),
@@ -115,7 +115,7 @@ class AdminHomePage extends ConsumerWidget {
                     title: 'شريط المنصة',
                     subtitle: 'الإعلانات والصيدليات المناوبة',
                     icon: Icons.campaign_rounded,
-                    color: const Color(0xFFE08A3E),
+                    color: context.appColors.primaryDark,
                     onTap: () =>
                         context.go('/admin/workspace?section=ticker'),
                   ),
@@ -123,7 +123,7 @@ class AdminHomePage extends ConsumerWidget {
                     title: 'دليل الأدوية',
                     subtitle: 'مراجعة وإضافة بيانات الدواء',
                     icon: Icons.medication_rounded,
-                    color: const Color(0xFF8059A8),
+                    color: context.appColors.primaryLight,
                     onTap: () => context.go('/medicines'),
                   ),
                 ],
@@ -135,7 +135,7 @@ class AdminHomePage extends ConsumerWidget {
                     '${data.pendingMedicineRequests} طلب دواء معلق · ${data.openAssistanceRequests} طلب مساعدة مفتوح · ${data.totalDonationOffers} عروض تبرع',
                 icon: Icons.monitor_heart_outlined,
                 color: pendingApprovals > 0
-                    ? const Color(0xFFB7791F)
+                    ? context.appColors.primaryDark
                     : context.appColors.success,
                 onTap: () => context.go('/admin/workspace'),
               ),

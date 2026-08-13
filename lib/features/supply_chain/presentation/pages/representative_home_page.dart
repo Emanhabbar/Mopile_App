@@ -68,7 +68,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                     label: 'مهام نشطة',
                     value: '${active.length}',
                     icon: Icons.local_shipping_outlined,
-                    color: const Color(0xFF3977C4),
+                    color: context.appColors.primaryLight,
                   ),
                   RoleMetricData(
                     label: 'تم تسليمها',
@@ -100,7 +100,7 @@ class RepresentativeHomePage extends ConsumerWidget {
                     title: 'الإشعارات',
                     subtitle: 'التكليفات وآخر تحديثات المستودع',
                     icon: Icons.notifications_active_outlined,
-                    color: const Color(0xFF3977C4),
+                    color: context.appColors.primaryLight,
                     onTap: () => context.push('/notifications'),
                   ),
                 ],
@@ -194,6 +194,6 @@ IconData _shipmentIcon(String status) => switch (status) {
 Color _shipmentColor(AppColors colors, String status) => switch (status) {
   'Delivered' => colors.success,
   'Failed' || 'Returned' => colors.danger,
-  'OutForDelivery' || 'Arrived' => const Color(0xFF3977C4),
+  'OutForDelivery' || 'Arrived' => colors.primaryLight,
   _ => colors.primary,
 };

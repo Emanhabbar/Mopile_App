@@ -637,7 +637,7 @@ class _InventoryCard extends StatelessWidget {
                           if (item.dosageForm != null)
                             _Chip(
                               text: 'الشكل: ${item.dosageForm}',
-                              color: const Color(0xFF6D5AA8),
+                              color: context.appColors.primaryDark,
                             ),
                           _Chip(
                             text: item.isAvailable ? 'متاح للطلب' : 'غير متاح',

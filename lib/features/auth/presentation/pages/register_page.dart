@@ -16,7 +16,7 @@ class RegisterPage extends ConsumerStatefulWidget {
 
 class _RegisterPageState extends ConsumerState<RegisterPage> {
   static const String _logoPath =
-      'assets/brand/dawaai-icon-foreground.png';
+      'assets/brand/newlogo.png';
 
   final _accountFormKey = GlobalKey<FormState>();
   final _businessFormKey = GlobalKey<FormState>();

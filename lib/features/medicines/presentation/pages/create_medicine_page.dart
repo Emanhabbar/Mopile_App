@@ -289,6 +289,7 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
             ),
           );
       ref.invalidate(medicinesProvider);
+      ref.read(medicinesListProvider.notifier).refresh();
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,

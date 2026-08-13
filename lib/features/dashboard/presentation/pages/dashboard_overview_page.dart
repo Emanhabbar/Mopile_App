@@ -42,10 +42,13 @@ class DashboardOverviewPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
-                    colors: [Color(0xFF087F72), Color(0xFF075E56)],
+                    colors: [
+                      context.appColors.primary,
+                      context.appColors.primaryDark,
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(26),
                   boxShadow: [

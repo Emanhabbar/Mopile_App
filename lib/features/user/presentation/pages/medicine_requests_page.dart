@@ -86,11 +86,6 @@ class _MedicineRequestsPageState extends ConsumerState<MedicineRequestsPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/user/search'),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('طلب جديد'),
-      ),
     );
   }
 }

@@ -58,13 +58,13 @@ class OrganizationHomePage extends ConsumerWidget {
                   label: 'عروض بانتظارك',
                   value: '${data.pendingDonationOffersCount}',
                   icon: Icons.inventory_2_outlined,
-                  color: const Color(0xFFE08A3E),
+                  color: context.appColors.primaryLight,
                 ),
                 RoleMetricData(
                   label: 'طلبات مساعدة',
                   value: '${data.openAssistanceRequestsCount}',
                   icon: Icons.support_agent_rounded,
-                  color: const Color(0xFF3977C4),
+                  color: context.appColors.primaryDark,
                 ),
               ],
             ),
@@ -94,7 +94,7 @@ class OrganizationHomePage extends ConsumerWidget {
                       ? '${data.pendingDonationOffersCount}'
                       : null,
                   icon: Icons.volunteer_activism_outlined,
-                  color: const Color(0xFFE08A3E),
+                  color: context.appColors.primaryLight,
                   onTap: () =>
                       context.go('/organization/workspace?section=donations'),
                 ),
@@ -105,7 +105,7 @@ class OrganizationHomePage extends ConsumerWidget {
                       ? '${data.openAssistanceRequestsCount}'
                       : null,
                   icon: Icons.support_agent_rounded,
-                  color: const Color(0xFF3977C4),
+                  color: context.appColors.primaryDark,
                   onTap: () => context.push(
                     '/organization/workspace?section=assistance',
                   ),
@@ -114,7 +114,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   title: 'ملف المنظمة',
                   subtitle: 'البيانات ووثائق التحقق',
                   icon: Icons.verified_user_outlined,
-                  color: const Color(0xFF8059A8),
+                  color: context.appColors.primaryLight,
                   onTap: () =>
                       context.go('/organization/workspace?section=profile'),
                 ),
@@ -131,7 +131,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   : Icons.upload_file_outlined,
               color: data.isApproved
                   ? context.appColors.success
-                  : const Color(0xFFB7791F),
+                  : context.appColors.primaryDark,
               onTap: () =>
                   context.go('/organization/workspace?section=profile'),
             ),
@@ -160,7 +160,7 @@ class OrganizationHomePage extends ConsumerWidget {
                             ? Icons.priority_high_rounded
                             : Icons.campaign_outlined,
                         color: campaign.isUrgent
-                            ? const Color(0xFFD14E62)
+                            ? context.appColors.primaryDark
                             : context.appColors.primary,
                         onTap: () => context.push(
                           '/organization/workspace?section=campaigns',

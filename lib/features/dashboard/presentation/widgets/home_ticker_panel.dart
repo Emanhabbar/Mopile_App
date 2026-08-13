@@ -47,7 +47,7 @@ class _TickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = item.isDutyPharmacy
-        ? const Color(0xFF3977C4)
+        ? context.appColors.primaryLight
         : context.appColors.primary;
     return Material(
       color: color.withValues(alpha: 0.07),

@@ -286,10 +286,18 @@ class _DawaaiBottomBar extends StatelessWidget {
         height: 76,
         padding: const EdgeInsets.all(7),
         decoration: BoxDecoration(
-          color: context.appColors.surface.withValues(alpha: 0.75),
+          color: context.appColors.surface.withValues(
+            alpha: Theme.of(context).brightness == Brightness.light
+                ? 0.5
+                : 0.75,
+          ),
           borderRadius: BorderRadius.circular(26),
           border: Border.all(
-            color: context.appColors.border.withValues(alpha: 0.4),
+            color: context.appColors.border.withValues(
+              alpha: Theme.of(context).brightness == Brightness.light
+                  ? 0.7
+                  : 0.4,
+            ),
           ),
           boxShadow: [
             BoxShadow(

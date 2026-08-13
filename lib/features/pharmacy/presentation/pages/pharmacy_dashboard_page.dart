@@ -358,21 +358,21 @@ class _OperationsGrid extends StatelessWidget {
         'الطلبات',
         pendingRequests > 0 ? '$pendingRequests بانتظارك' : 'متابعة الردود',
         Icons.assignment_rounded,
-        const Color(0xFFB7791F),
+        context.appColors.warning,
         onRequests,
       ),
       (
         'ساعات العمل',
         'تنظيم الدوام',
         Icons.schedule_rounded,
-        const Color(0xFF6D5AA8),
+        context.appColors.primaryLight,
         onHours,
       ),
       (
         'ملف الصيدلية',
         'الموقع والبيانات',
         Icons.storefront_rounded,
-        const Color(0xFF177C70),
+        context.appColors.success,
         onProfile,
       ),
     ];
@@ -499,7 +499,7 @@ class _MetricsGrid extends StatelessWidget {
         'مخزون منخفض',
         data.lowStockCount,
         Icons.warning_amber_rounded,
-        const Color(0xFFB7791F),
+        context.appColors.warning,
       ),
       (
         'نافد',
@@ -633,9 +633,9 @@ class _ReadinessCard extends StatelessWidget {
                   color: context.appColors.surfaceWarm,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.fact_check_rounded,
-                  color: Color(0xFFB7791F),
+                  color: context.appColors.warning,
                 ),
               ),
               const SizedBox(width: 11),
@@ -749,7 +749,7 @@ class _InventoryAlertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expiring = alert.alertType.toLowerCase().contains('expir');
-    final color = expiring ? context.appColors.danger : const Color(0xFFB7791F);
+    final color = expiring ? context.appColors.danger : context.appColors.warning;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -824,15 +824,15 @@ class _HealthyInventoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: context.appColors.success.withValues(alpha: 0.14)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.task_alt_rounded, color: Color(0xFF167D5A)),
-          SizedBox(width: 10),
+          Icon(Icons.task_alt_rounded, color: context.appColors.success),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               'المخزون مستقر ولا توجد تنبيهات عاجلة',
               style: TextStyle(
-                color: Color(0xFF167D5A),
+                color: context.appColors.success,
                 fontWeight: FontWeight.w800,
               ),
             ),

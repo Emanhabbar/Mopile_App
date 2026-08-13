@@ -53,19 +53,19 @@ class WarehouseHomePage extends ConsumerWidget {
                   label: 'مخزون منخفض',
                   value: '${data.lowStockBatches}',
                   icon: Icons.warning_amber_rounded,
-                  color: const Color(0xFFE08A3E),
+                  color: context.appColors.primaryLight,
                 ),
                 RoleMetricData(
                   label: 'قريبة الانتهاء',
                   value: '${data.expiringBatches}',
                   icon: Icons.event_busy_outlined,
-                  color: const Color(0xFFD14E62),
+                  color: context.appColors.primaryDark,
                 ),
                 RoleMetricData(
                   label: 'شحنات نشطة',
                   value: '${data.activeDeliveries}',
                   icon: Icons.local_shipping_rounded,
-                  color: const Color(0xFF3977C4),
+                  color: context.appColors.primaryLight,
                 ),
               ],
             ),
@@ -75,7 +75,7 @@ class WarehouseHomePage extends ConsumerWidget {
               message:
                   '${_money(data.inventoryValue)} ل.س ضمن التشغيلات النشطة',
               icon: Icons.account_balance_wallet_outlined,
-              color: const Color(0xFF6D5AA8),
+              color: context.appColors.primary,
               onTap: () => context.go('/supply-chain'),
             ),
             const SizedBox(height: 24),
@@ -103,7 +103,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       ? '${data.pendingOrders}'
                       : null,
                   icon: Icons.receipt_long_rounded,
-                  color: const Color(0xFF3977C4),
+                  color: context.appColors.primaryLight,
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
@@ -113,14 +113,14 @@ class WarehouseHomePage extends ConsumerWidget {
                       ? '${data.activeDeliveries}'
                       : null,
                   icon: Icons.local_shipping_outlined,
-                  color: const Color(0xFFE08A3E),
+                  color: context.appColors.primaryDark,
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
                   title: 'تحليل المخزون',
                   subtitle: 'توقع النفاد ودعم قرار التوريد',
                   icon: Icons.auto_graph_rounded,
-                  color: const Color(0xFF6D5AA8),
+                  color: context.appColors.primaryLight,
                   onTap: () => context.push('/intelligence'),
                 ),
               ],
@@ -150,7 +150,7 @@ class WarehouseHomePage extends ConsumerWidget {
                             : Icons.inventory_2_outlined,
                         color: batch.sellableQuantity <= 0
                             ? context.appColors.danger
-                            : const Color(0xFFE08A3E),
+                            : context.appColors.primaryLight,
                         onTap: () => context.go('/supply-chain'),
                       ),
                     ),
@@ -206,6 +206,6 @@ String _orderStatus(String status) => switch (status) {
 Color _orderColor(AppColors colors, String status) => switch (status) {
   'Delivered' => colors.success,
   'Rejected' || 'Cancelled' => colors.danger,
-  'OutForDelivery' => const Color(0xFF3977C4),
+  'OutForDelivery' => colors.primaryLight,
   _ => colors.primary,
 };

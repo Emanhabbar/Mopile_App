@@ -10,6 +10,7 @@ import '../../../../core/widgets/async_states.dart';
 import '../../../pharmacy_discovery/data/repositories/pharmacy_discovery_repository.dart';
 import '../../data/models/admin_models.dart';
 import '../../data/repositories/admin_repository.dart';
+import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../controllers/admin_providers.dart';
 
 class AdminWorkspacePage extends ConsumerStatefulWidget {
@@ -669,7 +670,7 @@ class _DashboardTab extends ConsumerWidget {
           onRefresh: () => ref.refresh(adminDashboardProvider.future),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 112),
             children: [
               AppReveal(child: _AdminHero(data: data)),
               const SizedBox(height: 22),
@@ -680,24 +681,20 @@ class _DashboardTab extends ConsumerWidget {
                     'الأرقام الأساسية وحالات الاعتماد التي تتطلب المتابعة.',
               ),
               const SizedBox(height: 11),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: values.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.45,
-                ),
-                itemBuilder: (context, index) => _MetricCard(
-                  label: values[index].$1,
-                  value: values[index].$2,
-                  icon: values[index].$3,
-                  highlighted:
-                      values[index].$1.contains('معلقة') ||
-                      values[index].$1.contains('تحقق'),
-                ),
+              RoleMetricsGrid(
+                items: values
+                    .map(
+                      (v) => RoleMetricData(
+                        label: v.$1,
+                        value: '${v.$2}',
+                        icon: v.$3,
+                        color: v.$1.contains('معلقة') ||
+                                v.$1.contains('تحقق')
+                            ? context.appColors.secondary
+                            : context.appColors.primary,
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
@@ -893,73 +890,6 @@ class _AdminHeroMetric extends StatelessWidget {
   );
 }
 
-class _MetricCard extends StatelessWidget {
-  const _MetricCard({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.highlighted,
-  });
-  final String label;
-  final int value;
-  final IconData icon;
-  final bool highlighted;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: highlighted ? context.appColors.surfaceWarm : Colors.white,
-      borderRadius: BorderRadius.circular(19),
-      border: Border.all(
-        color: highlighted
-            ? context.appColors.secondary.withValues(alpha: .38)
-            : context.appColors.border,
-      ),
-    ),
-    child: Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: highlighted
-                ? context.appColors.secondary.withValues(alpha: .18)
-                : context.appColors.surfaceSoft,
-            borderRadius: BorderRadius.circular(13),
-          ),
-          child: Icon(
-            icon,
-            color: highlighted ? context.appColors.warning : context.appColors.primary,
-            size: 21,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '$value',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-              ),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
 class _ApprovalsTab extends ConsumerWidget {
   const _ApprovalsTab({
     required this.workingId,
@@ -991,7 +921,7 @@ class _ApprovalsTab extends ConsumerWidget {
       },
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 112),
         children: [
           const _AdminSectionHeading(
             eyebrow: 'قرارات الاعتماد',
@@ -1020,11 +950,11 @@ class _ApprovalsTab extends ConsumerWidget {
           _ApprovalGroup<AdminOrganization>(
             title: 'المنظمات',
             icon: Icons.apartment_outlined,
-            color: const Color(0xFF8A5AC2),
+            color: context.appColors.primaryDark,
             state: organizations,
             builder: (item) => _ApprovalCard(
               icon: Icons.apartment_outlined,
-              color: const Color(0xFF8A5AC2),
+              color: context.appColors.primaryDark,
               title: item.organizationName,
               subtitle:
                   '${item.ownerFullName} · ${item.verificationDocumentsCount} وثائق',
@@ -1038,11 +968,11 @@ class _ApprovalsTab extends ConsumerWidget {
           _ApprovalGroup<AdminWarehouse>(
             title: 'المستودعات',
             icon: Icons.warehouse_outlined,
-            color: const Color(0xFF3977C4),
+            color: context.appColors.primaryLight,
             state: warehouses,
             builder: (item) => _ApprovalCard(
               icon: Icons.warehouse_outlined,
-              color: const Color(0xFF3977C4),
+              color: context.appColors.primaryLight,
               title: item.warehouseName,
               subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
               location: '${item.city}، ${item.area}',
@@ -1283,7 +1213,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
               return RefreshIndicator(
                 onRefresh: () => ref.refresh(adminAccountsProvider.future),
                 child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 30),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 112),
                   itemCount: filtered.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 9),
                   itemBuilder: (context, index) {
@@ -1374,7 +1304,7 @@ class _TickerTab extends ConsumerWidget {
                 : RefreshIndicator(
                     onRefresh: () => ref.refresh(adminTickerProvider.future),
                     child: ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 112),
                       itemCount: items.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
@@ -1866,7 +1796,7 @@ class _TickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duty = item.type == 'DutyPharmacy';
-    final color = duty ? const Color(0xFF3977C4) : context.appColors.primary;
+    final color = duty ? context.appColors.primaryLight : context.appColors.primary;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(15),
@@ -1978,7 +1908,7 @@ class _AdminEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView(
     physics: const AlwaysScrollableScrollPhysics(),
-    padding: const EdgeInsets.fromLTRB(20, 70, 20, 30),
+    padding: const EdgeInsets.fromLTRB(20, 70, 20, 112),
     children: [
       Center(
         child: Container(
@@ -2026,10 +1956,10 @@ IconData _roleIcon(String role) => switch (role.toLowerCase()) {
   _ => Icons.person_outline_rounded,
 };
 Color _roleColor(String role) => switch (role.toLowerCase()) {
-  'admin' => const Color(0xFFD14E62),
-  'pharmacy' => Color(0xFF216474),
-  'organization' => const Color(0xFF8A5AC2),
-  'warehouse' => const Color(0xFF3977C4),
-  'representative' => Color(0xFFB7791F),
-  _ => const Color(0xFF4E6B8B),
+  'admin' => const Color(0xFF174B57),
+  'pharmacy' => const Color(0xFF216474),
+  'organization' => const Color(0xFF8BD0CB),
+  'warehouse' => const Color(0xFF8BD0CB),
+  'representative' => const Color(0xFF174B57),
+  _ => const Color(0xFF216474),
 };

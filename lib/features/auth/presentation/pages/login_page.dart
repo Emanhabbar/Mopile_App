@@ -38,7 +38,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
   static const Color _textSecondary = Color(0xFF7C9397);
 
   static const String _logoPath =
-      'assets/brand/dawaai-icon-foreground.png';
+      'assets/brand/newlogo.png';
 
   @override
   void initState() {

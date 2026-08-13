@@ -514,7 +514,7 @@ class _HealthCardView extends StatelessWidget {
         _InfoCollection(
           title: 'الحساسيات',
           icon: Icons.warning_amber_rounded,
-          color: const Color(0xFFD14E62),
+          color: context.appColors.primaryDark,
           values: card.allergies,
           emptyText: 'لا توجد حساسيات مسجلة',
         ),
@@ -522,7 +522,7 @@ class _HealthCardView extends StatelessWidget {
         _InfoCollection(
           title: 'الحالات المزمنة',
           icon: Icons.monitor_heart_rounded,
-          color: const Color(0xFF8A5AC2),
+          color: context.appColors.primaryLight,
           values: card.chronicConditions,
           emptyText: 'لا توجد حالات مزمنة مسجلة',
         ),
@@ -915,11 +915,14 @@ class _EmergencyCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.emergency_rounded, color: Color(0xFFD14E62)),
-                SizedBox(width: 8),
-                Text(
+                Icon(
+                  Icons.emergency_rounded,
+                  color: context.appColors.primaryDark,
+                ),
+                const SizedBox(width: 8),
+                const Text(
                   'جهة الاتصال عند الحاجة',
                   style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
                 ),

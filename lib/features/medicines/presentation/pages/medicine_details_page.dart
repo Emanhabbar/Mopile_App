@@ -35,10 +35,12 @@ class MedicineDetailsPage extends ConsumerWidget {
               ref.refresh(medicineDetailsProvider(medicineId).future),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
             children: [
               _MedicineHero(medicine: data),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
+              _QuickInfoStrip(medicine: data),
+              const SizedBox(height: 16),
               _Section(
                 title: 'المعلومات الدوائية',
                 icon: Icons.science_outlined,
@@ -59,7 +61,7 @@ class MedicineDetailsPage extends ConsumerWidget {
                   _InfoRow(label: 'حجم العبوة', value: data.packageSize),
                 ],
               ),
-              const SizedBox(height: 13),
+              const SizedBox(height: 12),
               _Section(
                 title: 'التصنيع والتوفر',
                 icon: Icons.factory_outlined,
@@ -81,7 +83,7 @@ class MedicineDetailsPage extends ConsumerWidget {
                 ],
               ),
               if (data.description case final description?) ...[
-                const SizedBox(height: 13),
+                const SizedBox(height: 12),
                 _Description(text: description),
               ],
               if (isAdmin) ...[
@@ -93,26 +95,7 @@ class MedicineDetailsPage extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF8E8),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFFF0D8A2)),
-                ),
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.info_outline_rounded, color: Color(0xFF9B681C)),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'هذه البيانات تعريفية. التزم بتوجيهات الطبيب أو الصيدلي ولا تغيّر علاجك دون استشارة مختص.',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _DisclaimerBanner(),
             ],
           ),
         ),
@@ -227,95 +210,75 @@ class _MedicineHero extends StatelessWidget {
   final Medicine medicine;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(22),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-        colors: [Color(0xFF174B57), Color(0xFF087F72)],
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [colors.primaryDark, colors.primary],
+        ),
+        borderRadius: BorderRadius.circular(26),
       ),
-      borderRadius: BorderRadius.circular(28),
-      boxShadow: [
-        BoxShadow(
-          color: context.appColors.primary.withValues(alpha: 0.18),
-          blurRadius: 27,
-          offset: const Offset(0, 12),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(17),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.medication_liquid_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
-              child: const Icon(
-                Icons.medication_liquid_rounded,
-                color: Colors.white,
-                size: 29,
+              const Spacer(),
+              _HeroTag(
+                icon: medicine.requiresPrescription
+                    ? Icons.receipt_long_outlined
+                    : Icons.health_and_safety_outlined,
+                text: medicine.requiresPrescription
+                    ? 'يتطلب وصفة'
+                    : ' بدون وصفة',
               ),
-            ),
-            const Spacer(),
-            if (medicine.requiresPrescription)
-              const _HeroTag(
-                icon: Icons.receipt_long_outlined,
-                text: 'يتطلب وصفة طبية',
-              )
-            else
-              const _HeroTag(
-                icon: Icons.health_and_safety_outlined,
-                text: 'لا يتطلب وصفة',
-              ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Text(
-          medicine.displayName,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: Colors.white,
-            fontSize: 27,
+            ],
           ),
-        ),
-        if (medicine.arabicName != null && medicine.name.trim().isNotEmpty) ...[
-          const SizedBox(height: 5),
+          const SizedBox(height: 18),
           Text(
-            medicine.name,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
-          ),
-        ],
-        if ((medicine.arabicScientificName ?? medicine.scientificName)
-            case final name?) ...[
-          const SizedBox(height: 6),
-          Text(
-            name,
-            style: const TextStyle(color: Colors.white70, fontSize: 15),
-          ),
-        ],
-        const SizedBox(height: 18),
-        Wrap(
-          spacing: 9,
-          runSpacing: 9,
-          children: [
-            _HeroTag(
-              icon: Icons.payments_outlined,
-              text: _currency(medicine.sellingPrice),
+            medicine.displayName,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontSize: 26,
+              height: 1.3,
             ),
-            if (medicine.dosageForm case final form?)
-              _HeroTag(icon: Icons.category_outlined, text: form),
-            if (medicine.capacity case final capacity?)
-              _HeroTag(icon: Icons.scale_outlined, text: capacity),
+          ),
+          if (medicine.arabicName != null && medicine.name.trim().isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              medicine.name,
+              style: const TextStyle(color: Colors.white60, fontSize: 13),
+            ),
           ],
-        ),
-      ],
-    ),
-  );
+          if ((medicine.arabicScientificName ?? medicine.scientificName)
+              case final name?) ...[
+            const SizedBox(height: 4),
+            Text(
+              name,
+              style: const TextStyle(color: Colors.white70, fontSize: 14.5),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
 class _HeroTag extends StatelessWidget {
@@ -326,27 +289,120 @@ class _HeroTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: 0.13),
-      borderRadius: BorderRadius.circular(22),
+      color: Colors.white.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white, size: 15),
-        const SizedBox(width: 5),
+        Icon(icon, color: Colors.white, size: 14),
+        const SizedBox(width: 4),
         Text(
           text,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
-            fontSize: 11.5,
+            fontSize: 11,
           ),
         ),
       ],
     ),
   );
+}
+
+class _QuickInfoStrip extends StatelessWidget {
+  const _QuickInfoStrip({required this.medicine});
+
+  final Medicine medicine;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final items = <_QuickInfo>[
+      _QuickInfo(
+        icon: Icons.payments_outlined,
+        label: 'سعر البيع',
+        value: _currency(medicine.sellingPrice),
+        color: colors.primary,
+      ),
+      if (medicine.dosageForm case final form?)
+        _QuickInfo(
+          icon: Icons.category_outlined,
+          label: 'الشكل',
+          value: form,
+          color: colors.primaryDark,
+        ),
+      _QuickInfo(
+        icon: Icons.inventory_2_outlined,
+        label: 'المخزون',
+        value: '${medicine.quantityInStock}',
+        color: colors.success,
+      ),
+    ];
+    return Row(
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(child: _QuickInfoCard(info: items[i])),
+        ],
+      ],
+    );
+  }
+}
+
+class _QuickInfo {
+  const _QuickInfo({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+}
+
+class _QuickInfoCard extends StatelessWidget {
+  const _QuickInfoCard({required this.info});
+
+  final _QuickInfo info;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: info.color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Icon(info.icon, color: info.color, size: 20),
+          const SizedBox(height: 6),
+          Text(
+            info.value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: info.color,
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            info.label,
+            style: TextStyle(color: colors.textMuted, fontSize: 10.5),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Section extends StatelessWidget {
@@ -362,27 +418,44 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final visible = children
         .where((child) => child is! _InfoRow || child.hasValue)
         .toList(growable: false);
     if (visible.isEmpty) return const SizedBox.shrink();
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: context.appColors.primary),
-                const SizedBox(width: 8),
-                Text(title, style: Theme.of(context).textTheme.titleMedium),
-              ],
-            ),
-            const SizedBox(height: 13),
-            ...visible,
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: colors.primary, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ...visible,
+        ],
       ),
     );
   }
@@ -397,24 +470,40 @@ class _InfoRow extends StatelessWidget {
   bool get hasValue => value?.trim().isNotEmpty == true;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 7),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 125,
-          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        ),
-        Expanded(
-          child: Text(
-            value ?? '',
-            style: const TextStyle(fontWeight: FontWeight.w700),
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 125,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: colors.textMuted,
+                fontSize: 13,
+              ),
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              value ?? '—',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13.5,
+                color: value?.trim().isNotEmpty == true
+                    ? colors.text
+                    : colors.textMuted,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Description extends StatelessWidget {
@@ -423,25 +512,90 @@ class _Description extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
       padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.notes_rounded, color: Color(0xFF216474)),
-              const SizedBox(width: 8),
-              Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.notes_rounded,
+                  color: colors.primary,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'الوصف',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 11),
-          Text(text, style: Theme.of(context).textTheme.bodyLarge),
+          const SizedBox(height: 12),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              height: 1.65,
+              color: colors.text,
+            ),
+          ),
         ],
       ),
-    ),
-  );
+    );
+  }
+}
+
+class _DisclaimerBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.warning.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.warning.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: colors.warning,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'هذه البيانات تعريفية. التزم بتوجيهات الطبيب أو الصيدلي ولا تغيّر علاجك دون استشارة مختص.',
+              style: TextStyle(
+                color: colors.text,
+                fontSize: 12.5,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 String _currency(double value) {

@@ -72,6 +72,8 @@ flutter:
 
   assets:
     - assets/brand/dawaai-icon-foreground.png
+    - assets/brand/newback.png
+    - assets/brand/newlogo.png
 
   fonts:
     - family: IBM Plex Sans Arabic

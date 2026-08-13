@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/theme/app_colors.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -59,14 +58,11 @@ class _SplashPageState extends ConsumerState<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.appColors.primaryDeep,
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
           final value = _controller.value;
-          final background = _phase(value, 0, 1, Curves.easeInOutCubic);
-          final halo = _phase(value, 0.02, 0.5, Curves.easeOutBack);
-          final assembly = _phase(value, 0.08, 0.5, Curves.easeOutBack);
+          final logo = _phase(value, 0.05, 0.55, Curves.easeOutBack);
           final title = _phase(value, 0.43, 0.72);
           final subtitle = _phase(value, 0.58, 0.82);
           final progress = _phase(value, 0.68, 0.96, Curves.easeInOut);
@@ -74,8 +70,11 @@ class _SplashPageState extends ConsumerState<SplashPage>
           return Stack(
             fit: StackFit.expand,
             children: [
-              const _SplashGradient(),
-              _AmbientShapes(progress: background),
+              Image.asset(
+                'assets/brand/newback.png',
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.high,
+              ),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 34, 24, 26),
@@ -92,7 +91,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       Semantics(
                         label: 'شعار تطبيق دوائي',
                         image: true,
-                        child: _AssemblingLogo(assembly: assembly, halo: halo),
+                        child: _LogoReveal(progress: logo),
                       ),
                       const SizedBox(height: 30),
                       Opacity(
@@ -101,7 +100,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
                           offset: Offset(0, 22 * (1 - title)),
                           child: Text(
                             'دوائي',
-                            style: Theme.of(context).textTheme.displaySmall
+                            style: Theme.of(context)
+                                .textTheme
+                                .displaySmall
                                 ?.copyWith(
                                   color: Colors.white,
                                   fontSize: 42,
@@ -119,7 +120,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
                           child: Text(
                             'دواؤك أقرب، ورعايتك أسهل',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleMedium
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
                                 ?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
@@ -135,7 +138,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
                         opacity: progress,
                         child: Text(
                           'نجهّز تجربتك',
-                          style: Theme.of(context).textTheme.bodySmall
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
                               ?.copyWith(
                                 color: Colors.white.withValues(alpha: 0.52),
                                 fontWeight: FontWeight.w700,
@@ -154,93 +159,6 @@ class _SplashPageState extends ConsumerState<SplashPage>
   }
 }
 
-class _SplashGradient extends StatelessWidget {
-  const _SplashGradient();
-
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF174B57), Color(0xFF102F37), Color(0xFF0B252C)],
-          stops: [0, 0.57, 1],
-        ),
-      ),
-    );
-  }
-}
-
-class _AmbientShapes extends StatelessWidget {
-  const _AmbientShapes({required this.progress});
-
-  final double progress;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Stack(
-        children: [
-          PositionedDirectional(
-            top: -98 + (progress * 20),
-            end: -84 + (progress * 16),
-            child: _Orb(
-              size: 260,
-              color: context.appColors.primary.withValues(alpha: 0.45),
-            ),
-          ),
-          PositionedDirectional(
-            top: 82 - (progress * 9),
-            start: -68 + (progress * 15),
-            child: _Orb(
-              size: 148,
-              color: context.appColors.primaryLight.withValues(alpha: 0.07),
-              borderColor: context.appColors.primaryLight.withValues(alpha: 0.08),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: -112 + (progress * 25),
-            start: -90 + (progress * 10),
-            child: _Orb(
-              size: 278,
-              color: context.appColors.primary.withValues(alpha: 0.2),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: 110 + (progress * 8),
-            end: -42 + (progress * 12),
-            child: _Orb(
-              size: 112,
-              color: context.appColors.secondary.withValues(alpha: 0.035),
-              borderColor: context.appColors.secondary.withValues(alpha: 0.08),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Orb extends StatelessWidget {
-  const _Orb({required this.size, required this.color, this.borderColor});
-
-  final double size;
-  final Color color;
-  final Color? borderColor;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: color,
-      border: borderColor == null ? null : Border.all(color: borderColor!),
-    ),
-  );
-}
-
 class _TopCaption extends StatelessWidget {
   const _TopCaption();
 
@@ -252,9 +170,9 @@ class _TopCaption extends StatelessWidget {
         Container(
           width: 7,
           height: 7,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: context.appColors.secondary,
+            color: Color(0xFFF5CB72),
           ),
         ),
         const SizedBox(width: 9),
@@ -270,116 +188,30 @@ class _TopCaption extends StatelessWidget {
   }
 }
 
-class _AssemblingLogo extends StatelessWidget {
-  const _AssemblingLogo({required this.assembly, required this.halo});
+class _LogoReveal extends StatelessWidget {
+  const _LogoReveal({required this.progress});
 
-  final double assembly;
-  final double halo;
-
-  static const _pieceOffsets = [
-    Offset(-50, -46),
-    Offset(50, -46),
-    Offset(-50, 46),
-    Offset(50, 46),
-  ];
+  final double progress;
 
   @override
   Widget build(BuildContext context) {
-    final pieceOpacity = ((assembly - 0.05) / 0.35).clamp(0.0, 1.0);
-    return SizedBox.square(
-      dimension: 176,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          Transform.scale(
-            scale: 0.72 + (halo * 0.28),
-            child: Opacity(
-              opacity: halo.clamp(0.0, 1.0),
-              child: Container(
-                width: 176,
-                height: 176,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: context.appColors.secondary.withValues(alpha: 0.08),
-                  border: Border.all(
-                    color: context.appColors.secondary.withValues(alpha: 0.16),
-                  ),
-                ),
-              ),
-            ),
+    return SizedBox(
+      width: 240,
+      height: 240,
+      child: Transform.scale(
+        scale: 0.6 + (progress * 0.4),
+        child: Opacity(
+          opacity: progress.clamp(0.0, 1.0),
+          child: Image.asset(
+            'assets/brand/newlogo.png',
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            cacheWidth: 480,
           ),
-          Transform.rotate(
-            angle: (1 - assembly) * -0.12,
-            child: Opacity(
-              opacity: pieceOpacity,
-              child: SizedBox.square(
-                dimension: 118,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: List.generate(4, (index) {
-                    final origin = _pieceOffsets[index];
-                    return Transform.translate(
-                      offset: origin * (1 - assembly),
-                      child: ClipPath(
-                        clipper: _LogoQuadrantClipper(index),
-                        child: Image.asset(
-                          'assets/brand/dawaai-icon-foreground.png',
-                          width: 118,
-                          height: 118,
-                          fit: BoxFit.contain,
-                          filterQuality: FilterQuality.high,
-                          cacheWidth: 280,
-                          excludeFromSemantics: true,
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ),
-          if (assembly > 0.72)
-            Opacity(
-              opacity: ((assembly - 0.72) / 0.28).clamp(0.0, 1.0),
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: context.appColors.secondary.withValues(alpha: 0.3),
-                  ),
-                ),
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
-}
-
-class _LogoQuadrantClipper extends CustomClipper<Path> {
-  const _LogoQuadrantClipper(this.index);
-
-  final int index;
-
-  @override
-  Path getClip(Size size) {
-    final halfWidth = size.width / 2;
-    final halfHeight = size.height / 2;
-    final rect = switch (index) {
-      0 => Rect.fromLTRB(0, 0, halfWidth, halfHeight),
-      1 => Rect.fromLTRB(halfWidth, 0, size.width, halfHeight),
-      2 => Rect.fromLTRB(0, halfHeight, halfWidth, size.height),
-      _ => Rect.fromLTRB(halfWidth, halfHeight, size.width, size.height),
-    };
-    return Path()..addRect(rect);
-  }
-
-  @override
-  bool shouldReclip(covariant _LogoQuadrantClipper oldClipper) =>
-      oldClipper.index != index;
 }
 
 class _LoadingTrack extends StatelessWidget {
@@ -412,13 +244,13 @@ class _LoadingTrack extends StatelessWidget {
                 child: Container(
                   width: 148,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [context.appColors.secondary, Color(0xFFFFE6A7)],
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFF5CB72), Color(0xFFFFE6A7)],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: context.appColors.secondary.withValues(alpha: 0.28),
+                        color: const Color(0xFFF5CB72).withValues(alpha: 0.28),
                         blurRadius: 9,
                       ),
                     ],

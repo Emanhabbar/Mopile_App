@@ -12,33 +12,15 @@ class AppBrand extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: compact ? 42 : 54,
-          height: compact ? 42 : 54,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [context.appColors.primary, context.appColors.primaryDark],
-            ),
-            borderRadius: BorderRadius.circular(compact ? 14 : 18),
-            boxShadow: [
-              BoxShadow(
-                color: context.appColors.shadow.withValues(alpha: 0.14),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Padding(
-            padding: EdgeInsets.all(compact ? 5 : 6),
-            child: Image.asset(
-              'assets/brand/dawaai-icon-foreground.png',
-              fit: BoxFit.contain,
-              filterQuality: FilterQuality.high,
-              cacheWidth: compact ? 96 : 128,
-            ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(compact ? 12 : 14),
+          child: Image.asset(
+            'assets/brand/newlogo.png',
+            width: compact ? 48 : 58,
+            height: compact ? 48 : 58,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            cacheWidth: compact ? 120 : 150,
           ),
         ),
         const SizedBox(width: 12),
