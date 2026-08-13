@@ -264,40 +264,42 @@ class _HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasLocation = data.profile.hasSavedLocation;
+    final accent = context.appColors.primary;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF1B5665), Color(0xFF103A45), Color(0xFF0B2E37)],
+        // تدرّج موحّد مع RoleDashboardHero لتتطابق كل الأدوار بصرياً.
+        gradient: LinearGradient(
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+          colors: [context.appColors.primaryDeep, accent],
         ),
         borderRadius: BorderRadius.circular(AppRadius.hero),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF174B57).withValues(alpha: 0.35),
-            blurRadius: 30,
-            spreadRadius: -4,
-            offset: const Offset(0, 14),
+            color: accent.withValues(alpha: 0.2),
+            blurRadius: 28,
+            offset: const Offset(0, 13),
           ),
         ],
       ),
       child: Stack(
         children: [
-          Positioned(
-            top: -40,
-            left: -30,
+          // أوربس بأحجام/مواضع مطابقة لـ RoleDashboardHero.
+          PositionedDirectional(
+            top: -55,
+            end: -40,
             child: _DecorativeOrb(
-              size: 130,
-              color: context.appColors.secondary.withValues(alpha: 0.08),
+              size: 145,
+              color: Colors.white.withValues(alpha: 0.07),
             ),
           ),
-          Positioned(
+          PositionedDirectional(
             bottom: -50,
-            right: -20,
+            start: -35,
             child: _DecorativeOrb(
-              size: 110,
-              color: context.appColors.primaryLight.withValues(alpha: 0.1),
+              size: 120,
+              color: accent.withValues(alpha: 0.18),
             ),
           ),
           Positioned(

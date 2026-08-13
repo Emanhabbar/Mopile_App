@@ -36,6 +36,23 @@ class _PharmacyWorkingHoursPageState
       appBar: AppBar(
         title: const Text('ساعات العمل'),
         actions: [
+          _saving
+              ? const Padding(
+                  padding: EdgeInsetsDirectional.only(end: 12),
+                  child: SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  onPressed: _save,
+                  tooltip: 'حفظ',
+                  icon: const Icon(Icons.save_rounded),
+                ),
+          const SizedBox(width: 4),
           IconButton(
             onPressed: () {
               _periods = null;
@@ -89,20 +106,6 @@ class _PharmacyWorkingHoursPageState
               ),
               const SizedBox(height: 15),
               ...List.generate(7, _dayEditor),
-              const SizedBox(height: 8),
-              FilledButton.icon(
-                onPressed: _saving ? null : _save,
-                icon: _saving
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.save_rounded),
-                label: Text(_saving ? 'جاري الحفظ...' : 'حفظ ساعات العمل'),
-              ),
             ],
           );
         },

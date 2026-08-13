@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../controllers/pharmacy_providers.dart';
 
@@ -45,34 +46,27 @@ class PharmacyDashboardPage extends ConsumerWidget {
                       openStatus: openStatus.valueOrNull,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const _SectionHeader(
+                  const SizedBox(height: 22),
+                  const RoleSectionHeader(
                     title: 'تشغيل الصيدلية',
                     subtitle: 'اختصارات لأهم مهامك اليومية',
                   ),
                   const SizedBox(height: 11),
                   AppReveal(
                     delay: const Duration(milliseconds: 70),
-                    child: _OperationsGrid(
-                      pendingRequests: data.pendingRequestsCount,
-                      lowStock: data.lowStockCount,
-                      onInventory: () => context.go('/pharmacy/inventory'),
-                      onRequests: () => context.go('/pharmacy/requests'),
-                      onHours: () => context.push('/pharmacy/working-hours'),
-                      onProfile: () => context.push('/pharmacy/profile'),
-                    ),
+                    child: _operations(context, data),
                   ),
-                  const SizedBox(height: 22),
-                  const _SectionHeader(
+                  const SizedBox(height: 24),
+                  const RoleSectionHeader(
                     title: 'نظرة سريعة',
                     subtitle: 'مؤشرات المخزون والطلبات الحالية',
                   ),
                   const SizedBox(height: 11),
                   AppReveal(
                     delay: const Duration(milliseconds: 120),
-                    child: _MetricsGrid(data: data),
+                    child: _metrics(context, data),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 24),
                   AppReveal(
                     delay: const Duration(milliseconds: 160),
                     child: _ReadinessCard(
@@ -83,7 +77,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _SectionHeader(
+                  RoleSectionHeader(
                     title: 'تنبيهات المخزون',
                     subtitle: 'الأصناف التي تحتاج تدخلك قريبًا',
                     action: TextButton.icon(
@@ -118,7 +112,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                             ),
                           ),
                         ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 24),
                   OutlinedButton.icon(
                     onPressed: () =>
                         context.push('/pharmacy/license-verification'),
@@ -159,8 +153,86 @@ class PharmacyDashboardPage extends ConsumerWidget {
       ),
     );
   }
+
+  /// اختصارات التشغيل السريع (تستخدم الويدجت المشتركة RoleActionsGrid
+  /// لتتطابق مع لغة تصميم بقية الأدوار).
+  Widget _operations(BuildContext context, PharmacyDashboard data) {
+    return RoleActionsGrid(
+      items: [
+        RoleActionData(
+          title: 'المخزون',
+          subtitle: 'إدارة الأصناف',
+          icon: Icons.inventory_2_rounded,
+          color: context.appColors.primary,
+          onTap: () => context.go('/pharmacy/inventory'),
+          badge: data.lowStockCount > 0
+              ? '${data.lowStockCount} منخفض'
+              : null,
+        ),
+        RoleActionData(
+          title: 'الطلبات',
+          subtitle: 'متابعة الردود',
+          icon: Icons.assignment_rounded,
+          color: context.appColors.primaryLight,
+          onTap: () => context.go('/pharmacy/requests'),
+          badge: data.pendingRequestsCount > 0
+              ? '${data.pendingRequestsCount} بانتظارك'
+              : null,
+        ),
+        RoleActionData(
+          title: 'ساعات العمل',
+          subtitle: 'تنظيم الدوام',
+          icon: Icons.schedule_rounded,
+          color: context.appColors.primaryDark,
+          onTap: () => context.push('/pharmacy/working-hours'),
+        ),
+        RoleActionData(
+          title: 'ملف الصيدلية',
+          subtitle: 'الموقع والبيانات',
+          icon: Icons.storefront_rounded,
+          color: context.appColors.primaryLight,
+          onTap: () => context.push('/pharmacy/profile'),
+        ),
+      ],
+    );
+  }
+
+  /// مؤشرات المخزون والطلبات (تستخدم الويدجت المشتركة RoleMetricsGrid).
+  Widget _metrics(BuildContext context, PharmacyDashboard data) {
+    return RoleMetricsGrid(
+      items: [
+        RoleMetricData(
+          label: 'أصناف المخزون',
+          value: '${data.inventoryItemsCount}',
+          icon: Icons.medication_rounded,
+          color: context.appColors.primary,
+        ),
+        RoleMetricData(
+          label: 'متوفر',
+          value: '${data.inStockCount}',
+          icon: Icons.check_circle_rounded,
+          color: context.appColors.primaryLight,
+        ),
+        RoleMetricData(
+          label: 'مخزون منخفض',
+          value: '${data.lowStockCount}',
+          icon: Icons.warning_amber_rounded,
+          color: context.appColors.primaryDark,
+        ),
+        RoleMetricData(
+          label: 'نافد',
+          value: '${data.outOfStockCount}',
+          icon: Icons.remove_circle_outline_rounded,
+          color: context.appColors.primaryLight,
+        ),
+      ],
+    );
+  }
 }
 
+/// Hero الصيدلية: بنوحد مظهرها مع RoleDashboardHero (التدرّج، الأوربس،
+/// الأيقونة، الظل) مع الحفاظ على المحتوى الحيوي الخاص بالصيدلي
+/// (الحالة، الموقع، نسبة الاكتمال، التقييم، الطلبات النشطة).
 class _PharmacyHero extends StatelessWidget {
   const _PharmacyHero({required this.data, this.openStatus});
 
@@ -181,20 +253,21 @@ class _PharmacyHero extends StatelessWidget {
       data.area,
       data.city,
     ].where((part) => part.trim().isNotEmpty).join('، ');
+    final accent = context.appColors.primary;
 
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF102F37), Color(0xFF174F5B)],
+        gradient: LinearGradient(
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+          colors: [context.appColors.primaryDeep, accent],
         ),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: context.appColors.shadow.withValues(alpha: 0.22),
-            blurRadius: 30,
-            offset: const Offset(0, 14),
+            color: accent.withValues(alpha: 0.2),
+            blurRadius: 28,
+            offset: const Offset(0, 13),
           ),
         ],
       ),
@@ -202,42 +275,42 @@ class _PharmacyHero extends StatelessWidget {
       child: Stack(
         children: [
           PositionedDirectional(
-            top: -70,
-            end: -55,
+            top: -55,
+            end: -40,
             child: _Orb(
-              size: 180,
-              color: context.appColors.primary.withValues(alpha: 0.42),
+              size: 145,
+              color: Colors.white.withValues(alpha: 0.07),
             ),
           ),
           PositionedDirectional(
-            bottom: -70,
-            start: -50,
+            bottom: -50,
+            start: -35,
             child: _Orb(
-              size: 150,
-              color: context.appColors.primaryLight.withValues(alpha: 0.07),
+              size: 120,
+              color: accent.withValues(alpha: 0.18),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(21),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      width: 54,
-                      height: 54,
+                      width: 62,
+                      height: 62,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(18),
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(21),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.12),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                       child: const Icon(
                         Icons.local_pharmacy_rounded,
                         color: Color(0xFFF5CB72),
-                        size: 28,
+                        size: 31,
                       ),
                     ),
                     const Spacer(),
@@ -246,7 +319,9 @@ class _PharmacyHero extends StatelessWidget {
                       icon: isOpen
                           ? Icons.circle_rounded
                           : Icons.schedule_rounded,
-                      color: isOpen ? context.appColors.primaryLight : Colors.white70,
+                      color: isOpen
+                          ? context.appColors.primaryLight
+                          : Colors.white70,
                     ),
                   ],
                 ),
@@ -259,7 +334,7 @@ class _PharmacyHero extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(color: Colors.white, fontSize: 25),
+                            ?.copyWith(color: Colors.white, fontSize: 22),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -327,249 +402,8 @@ class _PharmacyHero extends StatelessWidget {
   }
 }
 
-class _OperationsGrid extends StatelessWidget {
-  const _OperationsGrid({
-    required this.pendingRequests,
-    required this.lowStock,
-    required this.onInventory,
-    required this.onRequests,
-    required this.onHours,
-    required this.onProfile,
-  });
-
-  final int pendingRequests;
-  final int lowStock;
-  final VoidCallback onInventory;
-  final VoidCallback onRequests;
-  final VoidCallback onHours;
-  final VoidCallback onProfile;
-
-  @override
-  Widget build(BuildContext context) {
-    final operations = [
-      (
-        'المخزون',
-        lowStock > 0 ? '$lowStock منخفض' : 'إدارة الأصناف',
-        Icons.inventory_2_rounded,
-        context.appColors.primary,
-        onInventory,
-      ),
-      (
-        'الطلبات',
-        pendingRequests > 0 ? '$pendingRequests بانتظارك' : 'متابعة الردود',
-        Icons.assignment_rounded,
-        context.appColors.warning,
-        onRequests,
-      ),
-      (
-        'ساعات العمل',
-        'تنظيم الدوام',
-        Icons.schedule_rounded,
-        context.appColors.primaryLight,
-        onHours,
-      ),
-      (
-        'ملف الصيدلية',
-        'الموقع والبيانات',
-        Icons.storefront_rounded,
-        context.appColors.success,
-        onProfile,
-      ),
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: operations.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 11,
-        mainAxisSpacing: 11,
-        childAspectRatio: 1.68,
-      ),
-      itemBuilder: (context, index) {
-        final operation = operations[index];
-        return _OperationCard(
-          title: operation.$1,
-          subtitle: operation.$2,
-          icon: operation.$3,
-          color: operation.$4,
-          onTap: operation.$5,
-        );
-      },
-    );
-  }
-}
-
-class _OperationCard extends StatelessWidget {
-  const _OperationCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(21),
-        child: Ink(
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.075),
-            borderRadius: BorderRadius.circular(21),
-            border: Border.all(color: color.withValues(alpha: 0.14)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, color: color, size: 21),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleMedium?.copyWith(fontSize: 13.5),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(fontSize: 10.5),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MetricsGrid extends StatelessWidget {
-  const _MetricsGrid({required this.data});
-
-  final PharmacyDashboard data;
-
-  @override
-  Widget build(BuildContext context) {
-    final metrics = [
-      (
-        'أصناف المخزون',
-        data.inventoryItemsCount,
-        Icons.medication_rounded,
-        context.appColors.primary,
-      ),
-      (
-        'متوفر',
-        data.inStockCount,
-        Icons.check_circle_rounded,
-        context.appColors.success,
-      ),
-      (
-        'مخزون منخفض',
-        data.lowStockCount,
-        Icons.warning_amber_rounded,
-        context.appColors.warning,
-      ),
-      (
-        'نافد',
-        data.outOfStockCount,
-        Icons.remove_circle_outline_rounded,
-        context.appColors.danger,
-      ),
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: metrics.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.78,
-      ),
-      itemBuilder: (context, index) {
-        final metric = metrics[index];
-        return Container(
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            color: context.appColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: context.appColors.border),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: metric.$4.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(metric.$3, color: metric.$4, size: 20),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${metric.$2}',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge?.copyWith(fontSize: 21),
-                    ),
-                    Text(
-                      metric.$1,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(fontSize: 10.5),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
+/// بطاقة جاهزية الصيدلية (محتوى خاص قيّم) — حافظنا عليها بتصميم منسجم
+/// مع لغة الويدجتات المشتركة (radius 24 = AppRadius.card).
 class _ReadinessCard extends StatelessWidget {
   const _ReadinessCard({
     required this.data,
@@ -615,7 +449,7 @@ class _ReadinessCard extends StatelessWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.appColors.surface,
         borderRadius: BorderRadius.circular(24),
@@ -627,18 +461,18 @@ class _ReadinessCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 43,
-                height: 43,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
                   color: context.appColors.surfaceWarm,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   Icons.fact_check_rounded,
                   color: context.appColors.warning,
                 ),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -711,7 +545,9 @@ class _ReadinessStep extends StatelessWidget {
                 complete
                     ? Icons.check_circle_rounded
                     : Icons.radio_button_unchecked_rounded,
-                color: complete ? context.appColors.success : context.appColors.textMuted,
+                color: complete
+                    ? context.appColors.success
+                    : context.appColors.textMuted,
                 size: 22,
               ),
               const SizedBox(width: 10),
@@ -740,6 +576,8 @@ class _ReadinessStep extends StatelessWidget {
   }
 }
 
+/// تنبيه المخزون (محتوى خاص) — حافظنا عليها مع تنسيق منسجم: radius 21
+/// (= AppRadius.tile) وخلفية بتدرّج بدل اللون المسطّح.
 class _InventoryAlertCard extends StatelessWidget {
   const _InventoryAlertCard({required this.alert, required this.onTap});
 
@@ -749,37 +587,52 @@ class _InventoryAlertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expiring = alert.alertType.toLowerCase().contains('expir');
-    final color = expiring ? context.appColors.danger : context.appColors.warning;
+    final color =
+        expiring ? context.appColors.danger : context.appColors.warning;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(19),
+        borderRadius: BorderRadius.circular(21),
         child: Ink(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.055),
-            borderRadius: BorderRadius.circular(19),
-            border: Border.all(color: color.withValues(alpha: 0.13)),
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+              colors: [
+                color.withValues(alpha: 0.08),
+                color.withValues(alpha: 0.03),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(21),
+            border: Border.all(color: color.withValues(alpha: 0.12)),
           ),
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(13),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withValues(alpha: 0.18),
+                      color.withValues(alpha: 0.08),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   expiring
                       ? Icons.event_busy_rounded
                       : Icons.warning_amber_rounded,
                   color: color,
-                  size: 21,
+                  size: 22,
                 ),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -800,10 +653,7 @@ class _InventoryAlertCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.chevron_left_rounded,
-                color: Color(0xFF668087),
-              ),
+              Icon(Icons.chevron_left_rounded, color: color),
             ],
           ),
         ),
@@ -818,11 +668,13 @@ class _HealthyInventoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.appColors.success.withValues(alpha: 0.065),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.appColors.success.withValues(alpha: 0.14)),
+        borderRadius: BorderRadius.circular(21),
+        border: Border.all(
+          color: context.appColors.success.withValues(alpha: 0.14),
+        ),
       ),
       child: Row(
         children: [
@@ -839,37 +691,6 @@ class _HealthyInventoryCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-    this.action,
-  });
-
-  final String title;
-  final String subtitle;
-  final Widget? action;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 2),
-              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-            ],
-          ),
-        ),
-        ?action,
-      ],
     );
   }
 }

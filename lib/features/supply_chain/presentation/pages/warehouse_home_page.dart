@@ -69,7 +69,7 @@ class WarehouseHomePage extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 13),
+            const SizedBox(height: 24),
             RoleNoticeCard(
               title: 'قيمة المخزون الحالية',
               message:

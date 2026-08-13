@@ -86,6 +86,11 @@ class RepresentativeHomePage extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 24),
+              const RoleSectionHeader(
+                title: 'وصول سريع',
+                subtitle: 'اختصارات لمهام المندوب',
+              ),
+              const SizedBox(height: 11),
               RoleActionsGrid(
                 items: [
                   RoleActionData(
