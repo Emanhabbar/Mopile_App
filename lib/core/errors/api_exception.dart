@@ -54,6 +54,25 @@ class ApiException implements Exception {
     if (normalized.contains('latitude and longitude must be provided')) {
       return 'يجب إدخال خط العرض وخط الطول معًا.';
     }
+    if (normalized.contains('awaiting administration approval')) {
+      return 'حسابك بانتظار موافقة الإدارة.';
+    }
+    if (normalized.contains('already approved') ||
+        normalized.contains('has already been approved')) {
+      return 'تم الاعتماد مسبقاً.';
+    }
+    if (normalized.contains('already rejected') ||
+        normalized.contains('has already been rejected')) {
+      return 'تم رفض الطلب مسبقاً.';
+    }
+    if (normalized.contains('not found') ||
+        normalized.contains('does not exist')) {
+      return 'العنصر غير موجود.';
+    }
+    if (normalized.contains('already taken') ||
+        normalized.contains('already in use')) {
+      return 'القيمة مستخدمة مسبقاً.';
+    }
     return message;
   }
 

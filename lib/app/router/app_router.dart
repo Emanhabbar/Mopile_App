@@ -89,7 +89,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final splashCompleted = ref.read(splashCompletedProvider);
 
-      if (!splashCompleted || auth.isLoading) {
+      if (!splashCompleted) {
+        return location == '/splash' ? null : '/splash';
+      }
+
+      // أثناء تسجيل الدخول/إنشاء الحساب، الـ authControllerProvider بيصير
+      // AsyncLoading، ومنّا نريد أن الـ router يهدم الصفحة (وبالتالي يضيّع
+      // بيانات الفورم). فنبقى على صفحات الـ auth العامة وقت التحميل.
+      if (auth.isLoading) {
+        final isPublicAuthPage = location == '/login' ||
+            location == '/register' ||
+            location == '/forgot-password';
+        if (isPublicAuthPage) {
+          return null;
+        }
         return location == '/splash' ? null : '/splash';
       }
 

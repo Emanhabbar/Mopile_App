@@ -22,8 +22,12 @@ class AdminRemoteDataSource {
   );
   Future<List<AdminWarehouse>> getPendingWarehouses() async =>
       _getList(ApiEndpoints.adminPendingWarehouses, AdminWarehouse.fromJson);
-  Future<void> approvePharmacy(String id, bool approved) async =>
-      _put(ApiEndpoints.adminPharmacyApproval(id), {'isApproved': approved});
+  Future<void> approvePharmacy(String id, bool approved, {String? reason}) async =>
+      _put(ApiEndpoints.adminPharmacyApproval(id), {
+        'isApproved': approved,
+        'isManualDecision': true,
+        'reason': reason,
+      });
   Future<AdminPharmacyLicenseVerification> getPharmacyLicenseVerification(
     String id,
   ) async => AdminPharmacyLicenseVerification.fromJson(
@@ -56,8 +60,12 @@ class AdminRemoteDataSource {
     ApiEndpoints.adminOrganizationApproval(id),
     {'isApproved': approved},
   );
-  Future<void> approveWarehouse(String id, bool approved) async =>
-      _put(ApiEndpoints.adminWarehouseApproval(id), {'isApproved': approved});
+  Future<void> approveWarehouse(String id, bool approved, {String? reason}) async =>
+      _put(ApiEndpoints.adminWarehouseApproval(id), {
+        'isApproved': approved,
+        'isManualDecision': true,
+        'reason': reason,
+      });
   Future<void> reviewOrganization(
     String id, {
     required String status,

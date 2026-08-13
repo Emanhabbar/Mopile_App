@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -63,6 +64,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
         builder: (context, _) {
           final value = _controller.value;
           final logo = _phase(value, 0.05, 0.55, Curves.easeOutBack);
+          final divider = _phase(value, 0.35, 0.65, Curves.easeOutCubic);
           final title = _phase(value, 0.43, 0.72);
           final subtitle = _phase(value, 0.58, 0.82);
           final progress = _phase(value, 0.68, 0.96, Curves.easeInOut);
@@ -93,22 +95,13 @@ class _SplashPageState extends ConsumerState<SplashPage>
                         image: true,
                         child: _LogoReveal(progress: logo),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 12),
                       Opacity(
                         opacity: title,
                         child: Transform.translate(
                           offset: Offset(0, 22 * (1 - title)),
-                          child: Text(
-                            'دوائي',
-                            style: Theme.of(context)
-                                .textTheme
-                                .displaySmall
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 42,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: -1.4,
-                                ),
+                          child: _AnimatedBrandTitle(
+                            dividerProgress: divider,
                           ),
                         ),
                       ),
@@ -181,6 +174,80 @@ class _TopCaption extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Colors.white.withValues(alpha: 0.65),
             fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AnimatedBrandTitle extends StatelessWidget {
+  const _AnimatedBrandTitle({required this.dividerProgress});
+
+  final double dividerProgress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Right divider (animates from right to left)
+        Transform(
+          transform: Matrix4.translationValues(
+            40 * (1 - dividerProgress),
+            0,
+            0,
+          ),
+          child: Opacity(
+            opacity: dividerProgress,
+            child: Container(
+              width: 50 * dividerProgress,
+              height: 2,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFF5CB72).withValues(alpha: 0.0),
+                    const Color(0xFFF5CB72).withValues(alpha: 0.6),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Text(
+          'دوائي',
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+            color: context.appColors.primary,
+            fontSize: 42,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -1.4,
+          ),
+        ),
+        const SizedBox(width: 16),
+        // Left divider (animates from left to right)
+        Transform(
+          transform: Matrix4.translationValues(
+            -40 * (1 - dividerProgress),
+            0,
+            0,
+          ),
+          child: Opacity(
+            opacity: dividerProgress,
+            child: Container(
+              width: 50 * dividerProgress,
+              height: 2,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFF5CB72).withValues(alpha: 0.6),
+                    const Color(0xFFF5CB72).withValues(alpha: 0.0),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
           ),
         ),
       ],

@@ -9,6 +9,9 @@ final authControllerProvider =
 
 final registrationCompletedProvider = StateProvider<bool>((ref) => false);
 
+/// يُفعَّل عند انتهاء الجلسة (401) لإظهار SnackBar مرة واحدة.
+final sessionExpiredProvider = StateProvider<bool>((ref) => false);
+
 class AuthController extends AsyncNotifier<AuthSession?> {
   @override
   Future<AuthSession?> build() {

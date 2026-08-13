@@ -150,14 +150,14 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
     }
   }
 
-  Future<void> _approvePharmacy(String id, bool approved) => _run(id, () async {
-    await ref.read(adminRepositoryProvider).approvePharmacy(id, approved);
+  Future<void> _approvePharmacy(String id, bool approved, String? reason) => _run(id, () async {
+    await ref.read(adminRepositoryProvider).approvePharmacy(id, approved, reason: reason);
     _refreshApprovals();
   });
 
-  Future<void> _approveWarehouse(String id, bool approved) =>
+  Future<void> _approveWarehouse(String id, bool approved, String? reason) =>
       _run(id, () async {
-        await ref.read(adminRepositoryProvider).approveWarehouse(id, approved);
+        await ref.read(adminRepositoryProvider).approveWarehouse(id, approved, reason: reason);
         _refreshApprovals();
       });
 
@@ -247,6 +247,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
+      useRootNavigator: true,
       builder: (sheetContext) => StatefulBuilder(
         builder: (context, setSheetState) => Padding(
           padding: EdgeInsets.fromLTRB(
@@ -898,9 +899,9 @@ class _ApprovalsTab extends ConsumerWidget {
     required this.onWarehouse,
   });
   final String? workingId;
-  final Future<void> Function(String, bool) onPharmacy;
+  final Future<void> Function(String, bool, String?) onPharmacy;
   final Future<void> Function(AdminOrganization, bool) onOrganization;
-  final Future<void> Function(String, bool) onWarehouse;
+  final Future<void> Function(String, bool, String?) onWarehouse;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -941,9 +942,27 @@ class _ApprovalsTab extends ConsumerWidget {
               subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
               location: '${item.city}، ${item.area}',
               working: workingId == item.pharmacyId,
-              onApprove: () => onPharmacy(item.pharmacyId, true),
-              onReject: () => onPharmacy(item.pharmacyId, false),
+              onApprove: () => _showReasonSheet(
+                context,
+                title: 'اعتماد الصيدلية',
+                onConfirm: (reason) => onPharmacy(item.pharmacyId, true, reason),
+              ),
+              onReject: () => _showReasonSheet(
+                context,
+                title: 'رفض الصيدلية',
+                onConfirm: (reason) => onPharmacy(item.pharmacyId, false, reason),
+              ),
               onDetails: () => _showPharmacyLicense(context, ref, item),
+              expandedChild: _ApprovalDetails(
+                rows: [
+                  _DetailRow(label: 'المالك', value: item.ownerFullName),
+                  _DetailRow(label: 'البريد', value: item.ownerEmail),
+                  _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
+                  _DetailRow(label: 'المدينة', value: item.city),
+                  _DetailRow(label: 'المنطقة', value: item.area),
+                  _DetailRow(label: 'العنوان', value: item.address),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 18),
@@ -962,6 +981,17 @@ class _ApprovalsTab extends ConsumerWidget {
               working: workingId == item.organizationId,
               onApprove: () => onOrganization(item, true),
               onReject: () => onOrganization(item, false),
+              expandedChild: _ApprovalDetails(
+                rows: [
+                  _DetailRow(label: 'المالك', value: item.ownerFullName),
+                  _DetailRow(label: 'البريد', value: item.ownerEmail),
+                  _DetailRow(label: 'رقم السجل', value: item.registrationNumber),
+                  _DetailRow(label: 'المدينة', value: item.city),
+                  _DetailRow(label: 'المنطقة', value: item.area),
+                  _DetailRow(label: 'حالة التحقق', value: item.verificationStatus),
+                  _DetailRow(label: 'الوثائق', value: '${item.verificationDocumentsCount}'),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 18),
@@ -977,13 +1007,52 @@ class _ApprovalsTab extends ConsumerWidget {
               subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
               location: '${item.city}، ${item.area}',
               working: workingId == item.warehouseId,
-              onApprove: () => onWarehouse(item.warehouseId, true),
-              onReject: () => onWarehouse(item.warehouseId, false),
+              onApprove: () => _showReasonSheet(
+                context,
+                title: 'اعتماد المستودع',
+                onConfirm: (reason) => onWarehouse(item.warehouseId, true, reason),
+              ),
+              onReject: () => _showReasonSheet(
+                context,
+                title: 'رفض المستودع',
+                onConfirm: (reason) => onWarehouse(item.warehouseId, false, reason),
+              ),
+              expandedChild: _ApprovalDetails(
+                rows: [
+                  _DetailRow(label: 'المالك', value: item.ownerFullName),
+                  _DetailRow(label: 'البريد', value: item.ownerEmail),
+                  _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
+                  _DetailRow(label: 'المدينة', value: item.city),
+                  _DetailRow(label: 'المنطقة', value: item.area),
+                  _DetailRow(label: 'العنوان', value: item.address),
+                  _DetailRow(label: 'حد الطلب الأدنى', value: '${item.minimumOrderAmount} ر.س'),
+                  _DetailRow(label: 'رسوم التوصيل', value: '${item.deliveryFee} ر.س'),
+                  _DetailRow(label: 'دفعات الأدوية', value: '${item.medicineBatchesCount}'),
+                  _DetailRow(label: 'المندوبين', value: '${item.representativesCount}'),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _showReasonSheet(
+    BuildContext context, {
+    required String title,
+    required Future<void> Function(String reason) onConfirm,
+  }) async {
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      useRootNavigator: true,
+      builder: (_) => _ReasonSheetBody(title: title),
+    );
+    if (result != null && result.length >= 10) {
+      await onConfirm(result);
+    }
   }
 
   Future<void> _showPharmacyLicense(
@@ -1244,6 +1313,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
         context: context,
         isScrollControlled: true,
         useSafeArea: true,
+        useRootNavigator: true,
         builder: (context) =>
             _AccountDetailsSheet(account: account, details: details),
       );
@@ -1448,7 +1518,7 @@ class _ApprovalGroup<T> extends StatelessWidget {
   );
 }
 
-class _ApprovalCard extends StatelessWidget {
+class _ApprovalCard extends StatefulWidget {
   const _ApprovalCard({
     required this.icon,
     required this.color,
@@ -1459,6 +1529,7 @@ class _ApprovalCard extends StatelessWidget {
     required this.onApprove,
     required this.onReject,
     this.onDetails,
+    this.expandedChild,
   });
   final IconData icon;
   final Color color;
@@ -1469,90 +1540,351 @@ class _ApprovalCard extends StatelessWidget {
   final VoidCallback onApprove;
   final VoidCallback onReject;
   final VoidCallback? onDetails;
+  final Widget? expandedChild;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: .08),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(icon, color: color),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleMedium),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              if (working)
-                const SizedBox.square(
-                  dimension: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-            ],
+  State<_ApprovalCard> createState() => _ApprovalCardState();
+}
+
+class _ApprovalCardState extends State<_ApprovalCard>
+    with SingleTickerProviderStateMixin {
+  bool _expanded = false;
+  late final AnimationController _animCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animCtrl.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    setState(() => _expanded = !_expanded);
+    if (_expanded) {
+      _animCtrl.forward();
+    } else {
+      _animCtrl.reverse();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: widget.expandedChild != null ? _toggle : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: _expanded ? colors.primary : colors.border,
+            width: _expanded ? 1.5 : 1,
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Icon(
-                Icons.location_on_outlined,
-                size: 17,
-                color: Color(0xFF668087),
-              ),
-              const SizedBox(width: 5),
-              Text(location, style: Theme.of(context).textTheme.bodySmall),
-            ],
-          ),
-          const Divider(height: 23),
-          if (onDetails != null) ...[
-            SizedBox(
-              width: double.infinity,
-              child: TextButton.icon(
-                onPressed: working ? null : onDetails,
-                icon: const Icon(Icons.badge_outlined),
-                label: const Text('مراجعة الترخيص والوثيقة'),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: widget.color.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: Icon(widget.icon, color: widget.color, size: 22),
+                      ),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              widget.subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (widget.working)
+                        const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      else if (widget.expandedChild != null)
+                        AnimatedRotation(
+                          turns: _expanded ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 250),
+                          child: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: colors.textMuted,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 15,
+                        color: colors.textMuted,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          widget.location,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.textMuted,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
+            if (widget.onDetails != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: widget.working ? null : widget.onDetails,
+                    icon: const Icon(Icons.badge_outlined, size: 18),
+                    label: const Text('مراجعة الترخيص'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: _expanded && widget.expandedChild != null
+                  ? Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          child: Divider(
+                            height: 1,
+                            color: colors.border,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                          child: widget.expandedChild,
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: widget.working ? null : widget.onApprove,
+                      icon: const Icon(Icons.check_rounded, size: 18),
+                      label: const Text('اعتماد'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: widget.working ? null : widget.onReject,
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      label: const Text('رفض'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colors.primaryDark,
+                        side: BorderSide(color: colors.border),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton(
-                  onPressed: working ? null : onApprove,
-                  child: const Text('اعتماد الجهة'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: working ? null : onReject,
-                  child: const Text('رفض'),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
-    ),
-  );
+    );
+  }
+}
+
+class _ApprovalDetails extends StatelessWidget {
+  const _ApprovalDetails({required this.rows});
+  final List<_DetailRow> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: rows
+          .map(
+            (row) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: Text(
+                      row.label,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.textMuted,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      row.value,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.text,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _ReasonSheetBody extends StatefulWidget {
+  const _ReasonSheetBody({required this.title});
+  final String title;
+
+  @override
+  State<_ReasonSheetBody> createState() => _ReasonSheetBodyState();
+}
+
+class _ReasonSheetBodyState extends State<_ReasonSheetBody> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        0,
+        20,
+        MediaQuery.of(context).viewPadding.bottom + 24,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 6),
+            Text(
+              'اكتب سبب القرار (10 أحرف على الأقل)',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colors.textMuted,
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _controller,
+              maxLines: 3,
+              minLines: 2,
+              textInputAction: TextInputAction.newline,
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                hintText: 'مثال: تمت مراجعة البيانات والوثائق والاعتماد مطابق للمعايير المطلوبة.',
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('إلغاء'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _controller.text.trim().length >= 10
+                        ? () => Navigator.of(context).pop(_controller.text.trim())
+                        : null,
+                    child: const Text('تأكيد'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailRow {
+  const _DetailRow({required this.label, required this.value});
+  final String label;
+  final String value;
 }
 
 class _RoleFilter extends StatelessWidget {
@@ -1704,12 +2036,14 @@ class _AccountDetailsSheet extends StatelessWidget {
           icon: Icons.verified_outlined,
         ),
     ];
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      padding: EdgeInsets.fromLTRB(20, 0, 20, bottomPadding + 24),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Row(
             children: [
               Container(
@@ -1776,6 +2110,7 @@ class _AccountDetailsSheet extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../config/app_config.dart';
 import '../storage/secure_session_storage.dart';
 
@@ -28,7 +29,19 @@ final dioProvider = Provider<Dio>((ref) {
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
-          await sessionStorage.clear();
+          // مسار الطلب النسبي بدون شرطة مائلة بادئة، عشان الفحص يشتغل
+          // سواء كان dio ضمّ baseUrl ولا لأ.
+          final path = error.requestOptions.path;
+          final isAuthEndpoint =
+              path.contains('Auth/login') ||
+              path.contains('Auth/register') ||
+              path.contains('Auth/password/forgot') ||
+              path.contains('Auth/password/reset');
+          if (!isAuthEndpoint) {
+            await sessionStorage.clear();
+            ref.read(authControllerProvider.notifier).logout();
+            ref.read(sessionExpiredProvider.notifier).state = true;
+          }
         }
         handler.next(error);
       },
