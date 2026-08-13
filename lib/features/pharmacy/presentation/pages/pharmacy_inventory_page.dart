@@ -10,6 +10,10 @@ import '../controllers/pharmacy_providers.dart';
 import '../widgets/batch_inventory_editor.dart';
 import 'pharmacy_barcode_scanner_page.dart';
 
+/// المساحة المحجوزة لشريط التنقل السفلي المخصص (76px ارتفاع + ~12px SafeArea).
+/// تُستخدم كـ padding سفلي للـ Bottom Sheets حتى تظهر أزرارها فوق الشريط.
+const double kPharmacyBottomNavReserved = 88;
+
 class PharmacyInventoryPage extends ConsumerStatefulWidget {
   const PharmacyInventoryPage({super.key});
   @override
@@ -147,6 +151,9 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
       isScrollControlled: true,
       useSafeArea: false,
       builder: (context) => const _AddMedicineOptions(),
+      // نستخدم rootNavigator عشان الـ BottomSheet يطلع فوق الـ
+      // BottomNavigationBar المخصص (76px + SafeArea).
+      routeSettings: const RouteSettings(name: '/add-medicine-options'),
     );
     if (!mounted || action == null) return;
     if (action == _AddMedicineAction.manual) {
@@ -710,56 +717,61 @@ class _AddMedicineOptions extends StatelessWidget {
   const _AddMedicineOptions();
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(
-          child: Container(
-            width: 44,
-            height: 4,
-            decoration: BoxDecoration(
-              color: context.appColors.border,
-              borderRadius: BorderRadius.circular(20),
+  Widget build(BuildContext context) {
+    // الـ BottomNav المخصص بارتفاع 76px + SafeArea ~12px.
+    // نضيف padding سفلية كافية عشان محتوى الـ Sheet يبان فوقه.
+    final bottomPadding = MediaQuery.of(context).padding.bottom + kPharmacyBottomNavReserved;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPadding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              decoration: BoxDecoration(
+                color: context.appColors.border,
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 18),
-        Text(
-          'إضافة إلى المخزون',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'اختر الطريقة الأنسب لإدخال الدواء.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 16),
-        _AddOptionTile(
-          icon: Icons.library_add_outlined,
-          title: 'اختيار من دليل الأدوية',
-          subtitle: 'اختر دواءً واحدًا أو عدة أدوية دفعة واحدة',
-          onTap: () => Navigator.pop(context, _AddMedicineAction.catalog),
-        ),
-        const SizedBox(height: 10),
-        _AddOptionTile(
-          icon: Icons.qr_code_scanner_rounded,
-          title: 'مسح باركود العبوة',
-          subtitle: 'اعثر على الدواء مباشرة بالكاميرا',
-          onTap: () => Navigator.pop(context, _AddMedicineAction.barcode),
-        ),
-        const SizedBox(height: 10),
-        _AddOptionTile(
-          icon: Icons.edit_note_rounded,
-          title: 'إضافة دواء يدويًا',
-          subtitle: 'استخدمها عندما لا تجد الدواء في الدليل',
-          onTap: () => Navigator.pop(context, _AddMedicineAction.manual),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 18),
+          Text(
+            'إضافة إلى المخزون',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'اختر الطريقة الأنسب لإدخال الدواء.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          _AddOptionTile(
+            icon: Icons.library_add_outlined,
+            title: 'اختيار من دليل الأدوية',
+            subtitle: 'اختر دواءً واحدًا أو عدة أدوية دفعة واحدة',
+            onTap: () => Navigator.pop(context, _AddMedicineAction.catalog),
+          ),
+          const SizedBox(height: 10),
+          _AddOptionTile(
+            icon: Icons.qr_code_scanner_rounded,
+            title: 'مسح باركود العبوة',
+            subtitle: 'اعثر على الدواء مباشرة بالكاميرا',
+            onTap: () => Navigator.pop(context, _AddMedicineAction.barcode),
+          ),
+          const SizedBox(height: 10),
+          _AddOptionTile(
+            icon: Icons.edit_note_rounded,
+            title: 'إضافة دواء يدويًا',
+            subtitle: 'استخدمها عندما لا تجد الدواء في الدليل',
+            onTap: () => Navigator.pop(context, _AddMedicineAction.manual),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AddOptionTile extends StatelessWidget {
@@ -860,7 +872,10 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
       20,
       16,
       20,
-      MediaQuery.viewInsetsOf(context).bottom + 24,
+      (MediaQuery.viewInsetsOf(context).bottom > 0
+          ? MediaQuery.viewInsetsOf(context).bottom
+          : kPharmacyBottomNavReserved) +
+          16,
     ),
     child: SingleChildScrollView(
       child: Column(
@@ -1346,7 +1361,12 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
           ),
           SafeArea(
             top: false,
-            minimum: const EdgeInsets.fromLTRB(20, 8, 20, 14),
+            minimum: EdgeInsets.fromLTRB(
+              20,
+              8,
+              20,
+              kPharmacyBottomNavReserved + 14,
+            ),
             child: SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
@@ -1542,7 +1562,10 @@ class _InventoryEditorState extends State<_InventoryEditor> {
       20,
       20,
       20,
-      MediaQuery.viewInsetsOf(context).bottom + 24,
+      (MediaQuery.viewInsetsOf(context).bottom > 0
+          ? MediaQuery.viewInsetsOf(context).bottom
+          : kPharmacyBottomNavReserved) +
+          16,
     ),
     child: SingleChildScrollView(
       child: Column(

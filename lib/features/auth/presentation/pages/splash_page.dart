@@ -95,16 +95,6 @@ class _SplashPageState extends ConsumerState<SplashPage>
                         image: true,
                         child: _LogoReveal(progress: logo),
                       ),
-                      const SizedBox(height: 12),
-                      Opacity(
-                        opacity: title,
-                        child: Transform.translate(
-                          offset: Offset(0, 22 * (1 - title)),
-                          child: _AnimatedBrandTitle(
-                            dividerProgress: divider,
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 8),
                       Opacity(
                         opacity: subtitle,
@@ -270,7 +260,7 @@ class _LogoReveal extends StatelessWidget {
         child: Opacity(
           opacity: progress.clamp(0.0, 1.0),
           child: Image.asset(
-            'assets/brand/newlogo.png',
+            'assets/brand/logo_splash.png',
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
             cacheWidth: 480,
