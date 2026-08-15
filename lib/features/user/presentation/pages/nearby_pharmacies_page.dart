@@ -253,14 +253,28 @@ class _LocationHeader extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: context.appColors.primaryDeep,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: context.appColors.primary.withValues(alpha: 0.15),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.near_me_rounded, color: context.appColors.secondary, size: 29),
-          const SizedBox(height: 12),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              Icons.near_me_rounded,
+              color: context.appColors.secondary,
+              size: 26,
+            ),
+          ),
+          const SizedBox(height: 14),
           Text(
             hasLocation ? 'اكتشف الأقرب إليك' : 'حدد موقعك أولًا',
             style: Theme.of(
@@ -272,37 +286,57 @@ class _LocationHeader extends StatelessWidget {
             'اعرض أقرب ثلاث صيدليات والطريق إلى الخيار الأقرب.',
             style: Theme.of(
               context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+            ).textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.7),
+            ),
           ),
           const SizedBox(height: 17),
           Row(
             children: [
               Expanded(
-                child: FilledButton.icon(
-                  onPressed: isUpdating ? null : onAutomatic,
-                  icon: isUpdating
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(Icons.my_location_rounded),
-                  label: Text(isUpdating ? 'جاري التحديد...' : 'موقعي الحالي'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: context.appColors.primary,
+                child: SizedBox(
+                  height: 48,
+                  child: FilledButton.icon(
+                    onPressed: isUpdating ? null : onAutomatic,
+                    icon: isUpdating
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Icon(Icons.my_location_rounded),
+                    label: Text(
+                      isUpdating ? 'جاري التحديد...' : 'موقعي الحالي',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 9),
-              OutlinedButton.icon(
-                onPressed: isUpdating ? null : onManual,
-                icon: const Icon(Icons.edit_location_alt_outlined),
-                label: const Text('يدوي'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+              const SizedBox(width: 10),
+              SizedBox(
+                height: 48,
+                child: OutlinedButton.icon(
+                  onPressed: isUpdating ? null : onManual,
+                  icon: const Icon(Icons.edit_location_alt_outlined, size: 20),
+                  label: const Text(
+                    'يدوي',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.25),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -431,92 +465,128 @@ class _MapCardState extends ConsumerState<_MapCard> {
       curve: Curves.easeOutCubic,
       height: _expanded ? expandedHeight : 472,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: context.appColors.border, width: 1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: context.appColors.border,
+          width: 1,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
           Positioned.fill(
             child: RepaintBoundary(
-              child: FlutterMap(
-                mapController: _mapController,
-                options: MapOptions(
-                  initialCenter: center,
-                  initialZoom: 13.5,
-                  minZoom: 4,
-                  maxZoom: 18,
-                  interactionOptions: const InteractionOptions(
-                    flags:
-                        InteractiveFlag.drag |
-                        InteractiveFlag.pinchZoom |
-                        InteractiveFlag.doubleTapZoom,
-                  ),
-                  onMapReady: () {
-                    _mapReady = true;
-                    WidgetsBinding.instance.addPostFrameCallback(
-                      (_) => _fitAll(),
-                    );
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.pharmacy_app',
-                    tileBuilder: _softMapTileBuilder,
-                  ),
-                  if (routePoints.length > 1)
-                    PolylineLayer(
-                      polylines: [
-                        Polyline(
-                          points: routePoints,
-                          strokeWidth: 6,
-                          borderStrokeWidth: 5,
-                          borderColor: Colors.white.withValues(alpha: 0.92),
-                          gradientColors: [
-                            context.appColors.primary,
-                            context.appColors.primaryDark,
-                            context.appColors.secondary,
+              child: Builder(
+                builder: (context) {
+                  try {
+                    return FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: center,
+                        initialZoom: 13.5,
+                        minZoom: 4,
+                        maxZoom: 18,
+                        interactionOptions: const InteractionOptions(
+                          flags:
+                              InteractiveFlag.drag |
+                              InteractiveFlag.pinchZoom |
+                              InteractiveFlag.doubleTapZoom,
+                        ),
+                        onMapReady: () {
+                          _mapReady = true;
+                          WidgetsBinding.instance.addPostFrameCallback(
+                            (_) => _fitAll(),
+                          );
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.example.pharmacy_app',
+                          tileBuilder: _softMapTileBuilder,
+                        ),
+                        if (routePoints.length > 1)
+                          PolylineLayer(
+                            polylines: [
+                              Polyline(
+                                points: routePoints,
+                                strokeWidth: 6,
+                                borderStrokeWidth: 5,
+                                borderColor: Colors.white.withValues(alpha: 0.92),
+                                gradientColors: [
+                                  context.appColors.primary,
+                                  context.appColors.primaryDark,
+                                  context.appColors.secondary,
+                                ],
+                              ),
+                            ],
+                          ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: center,
+                              width: 58,
+                              height: 58,
+                              child: const _UserMarker(),
+                            ),
+                            ..._markers.asMap().entries.map(
+                              (entry) => Marker(
+                                point: LatLng(
+                                  entry.value.latitude,
+                                  entry.value.longitude,
+                                ),
+                                width: 68,
+                                height: 76,
+                                child: _PharmacyMarker(
+                                  key: ValueKey(
+                                    'pharmacy-map-marker-${entry.value.markerId}',
+                                  ),
+                                  number: entry.key + 1,
+                                  nearest: entry.key == 0,
+                                  selected: entry.key == _selectedIndex,
+                                  pharmacyName: entry.value.name,
+                                  onTap: () => _selectMarker(entry.key),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
+                        const RichAttributionWidget(
+                          alignment: AttributionAlignment.bottomLeft,
+                          attributions: [TextSourceAttribution('OpenStreetMap')],
+                        ),
                       ],
-                    ),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: center,
-                        width: 58,
-                        height: 58,
-                        child: const _UserMarker(),
-                      ),
-                      ..._markers.asMap().entries.map(
-                        (entry) => Marker(
-                          point: LatLng(
-                            entry.value.latitude,
-                            entry.value.longitude,
-                          ),
-                          width: 68,
-                          height: 76,
-                          child: _PharmacyMarker(
-                            key: ValueKey(
-                              'pharmacy-map-marker-${entry.value.markerId}',
+                    );
+                  } catch (_) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.map_outlined,
+                              color: context.appColors.textMuted,
+                              size: 40,
                             ),
-                            number: entry.key + 1,
-                            nearest: entry.key == 0,
-                            selected: entry.key == _selectedIndex,
-                            pharmacyName: entry.value.name,
-                            onTap: () => _selectMarker(entry.key),
-                          ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'تعذر تحميل الخريطة',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'تأكد من اتصالك بالإنترنت ثم حاول مجددًا.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                  const RichAttributionWidget(
-                    alignment: AttributionAlignment.bottomLeft,
-                    attributions: [TextSourceAttribution('OpenStreetMap')],
-                  ),
-                ],
+                    );
+                  }
+                },
               ),
             ),
           ),
@@ -587,7 +657,9 @@ class _MapCardState extends ConsumerState<_MapCard> {
     final zoom = _mapController.camera.zoom < 14.5
         ? 14.5
         : _mapController.camera.zoom;
-    _mapController.move(LatLng(pharmacy.latitude, pharmacy.longitude), zoom);
+    try {
+      _mapController.move(LatLng(pharmacy.latitude, pharmacy.longitude), zoom);
+    } catch (_) {}
     if (index > 0 && pharmacy.pharmacyId != null) {
       _loadSelectedRoute(pharmacy.pharmacyId!);
     }
@@ -614,7 +686,9 @@ class _MapCardState extends ConsumerState<_MapCard> {
 
   void _centerOnUser() {
     if (!_mapReady) return;
-    _mapController.move(LatLng(data.latitude, data.longitude), 15);
+    try {
+      _mapController.move(LatLng(data.latitude, data.longitude), 15);
+    } catch (_) {}
   }
 
   void _fitAll() {
@@ -624,18 +698,20 @@ class _MapCardState extends ConsumerState<_MapCard> {
       ..._markers.map((item) => LatLng(item.latitude, item.longitude)),
       ...?route?.path.map((point) => LatLng(point.latitude, point.longitude)),
     ];
-    if (points.length == 1) {
-      _mapController.move(points.first, 14.5);
-      return;
-    }
-    _mapController.fitCamera(
-      CameraFit.coordinates(
-        coordinates: points,
-        padding: const EdgeInsets.fromLTRB(48, 88, 48, 145),
-        minZoom: 9,
-        maxZoom: 15.5,
-      ),
-    );
+    try {
+      if (points.length == 1) {
+        _mapController.move(points.first, 14.5);
+        return;
+      }
+      _mapController.fitCamera(
+        CameraFit.coordinates(
+          coordinates: points,
+          padding: const EdgeInsets.fromLTRB(48, 88, 48, 145),
+          minZoom: 9,
+          maxZoom: 15.5,
+        ),
+      );
+    } catch (_) {}
   }
 
   void _openPharmacy(UserMapPharmacy pharmacy) {
@@ -657,7 +733,15 @@ class _MapCardState extends ConsumerState<_MapCard> {
         : pharmacy.googleMapsUrl;
     final uri = raw == null ? null : Uri.tryParse(raw);
     if (uri != null) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تعذر فتح تطبيق الخرائط.')),
+          );
+        }
+      }
     }
   }
 }
@@ -708,8 +792,10 @@ class _RouteOverview extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: context.appColors.primaryDeep,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: context.appColors.primary.withValues(alpha: 0.15),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
@@ -820,14 +906,16 @@ class _MapPharmacyPreview extends StatelessWidget {
         child: InkWell(
           onTap: onOpen,
           child: Padding(
-          padding: const EdgeInsets.all(13),
-          child: Row(
-            children: [
+            padding: const EdgeInsets.all(13),
+            child: Row(
+              children: [
               Container(
                 width: 47,
                 height: 47,
                 decoration: BoxDecoration(
-                  color: number == 1 ? context.appColors.secondary : context.appColors.primary,
+                  color: number == 1
+                      ? context.appColors.secondary
+                      : context.appColors.primary,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 alignment: Alignment.center,
@@ -890,8 +978,8 @@ class _MapPharmacyPreview extends StatelessWidget {
           ),
         ),
       ),
-    ),
-  );
+      ),
+    );
   }
 }
 
@@ -1190,7 +1278,11 @@ class _NearbyItem extends StatelessWidget {
     if (raw == null || raw.isEmpty) return;
     final uri = Uri.tryParse(raw);
     if (uri != null) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        // Silently fail — the user can try again or use another app.
+      }
     }
   }
 }
