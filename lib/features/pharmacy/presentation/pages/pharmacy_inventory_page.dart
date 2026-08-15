@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
@@ -77,37 +78,26 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
               children: [
                 _InventoryOverview(items: snapshot, onAdd: _openAddOptions),
                 const SizedBox(height: 13),
-                TextField(
+                AppTextField(
+                  label: 'ابحث باسم الدواء أو الاسم العلمي',
                   controller: _search,
-                  onSubmitted: (value) => setState(() => _query = value.trim()),
-                  decoration: InputDecoration(
-                    hintText: 'ابحث باسم الدواء أو الاسم العلمي',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: IconButton(
-                      onPressed: () =>
-                          setState(() => _query = _search.text.trim()),
-                      icon: const Icon(Icons.arrow_forward_rounded),
-                    ),
+                  icon: Icons.search_rounded,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (value) =>
+                      setState(() => _query = _search.text.trim()),
+                  suffixIcon: IconButton(
+                    onPressed: () =>
+                        setState(() => _query = _search.text.trim()),
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    tooltip: 'بحث',
                   ),
                 ),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'All', label: Text('الكل')),
-                      ButtonSegment(value: 'InStock', label: Text('متوفر')),
-                      ButtonSegment(value: 'LowStock', label: Text('منخفض')),
-                      ButtonSegment(value: 'OutOfStock', label: Text('نافد')),
-                    ],
-                    selected: {_stockStatus ?? 'All'},
-                    onSelectionChanged: (values) => setState(() {
-                      _stockStatus = values.first == 'All'
-                          ? null
-                          : values.first;
-                    }),
-                    showSelectedIcon: false,
-                  ),
+                _StockStatusSelector(
+                  selectedStatus: _stockStatus,
+                  onStatusSelected: (status) => setState(() {
+                    _stockStatus = status == 'All' ? null : status;
+                  }),
                 ),
               ],
             ),
@@ -377,10 +367,10 @@ class _InventoryOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFF102F37), Color(0xFF185866)],
+          colors: [context.appColors.primaryDeep, context.appColors.primary],
         ),
         borderRadius: BorderRadius.circular(24),
       ),
@@ -438,19 +428,19 @@ class _InventoryOverview extends StatelessWidget {
               _OverviewFact(
                 label: 'متوفر',
                 value: available,
-                color: context.appColors.primaryLight,
+                color: Colors.white.withValues(alpha: 0.95),
               ),
               const SizedBox(width: 8),
               _OverviewFact(
                 label: 'منخفض',
                 value: low,
-                color: context.appColors.secondary,
+                color: Colors.white.withValues(alpha: 0.85),
               ),
               const SizedBox(width: 8),
               _OverviewFact(
                 label: 'نافد',
                 value: out,
-                color: const Color(0xFFFFA0A0),
+                color: Colors.white.withValues(alpha: 0.75),
               ),
             ],
           ),
@@ -513,7 +503,7 @@ class _InventoryCard extends StatelessWidget {
   final VoidCallback onDelete;
   @override
   Widget build(BuildContext context) {
-    final statusColor = _stockColor(item.stockStatus);
+    final statusColor = _stockColor(context, item.stockStatus);
     final details = [
       if (showArabicName) item.arabicMedicineName,
       item.scientificName,
@@ -650,13 +640,13 @@ class _InventoryCard extends StatelessWidget {
                           _Chip(
                             text: item.isAvailable ? 'متاح للطلب' : 'غير متاح',
                             color: item.isAvailable
-                                ? context.appColors.success
+                                ? context.appColors.primary
                                 : context.appColors.textMuted,
                           ),
                           if (item.requiresPrescription)
-                            const _Chip(
+                            _Chip(
                               text: 'يتطلب وصفة',
-                              color: Color(0xFFB47618),
+                              color: context.appColors.primaryDark,
                             ),
                           if (expiry != null)
                             _Chip(
@@ -699,8 +689,8 @@ class _InventoryFact extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF142E35),
+            style: TextStyle(
+              color: context.appColors.text,
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
             ),
@@ -820,7 +810,7 @@ class _AddOptionTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_left_rounded, color: Color(0xFF216474)),
+            Icon(Icons.chevron_left_rounded, color: context.appColors.primary),
           ],
         ),
       ),
@@ -902,17 +892,19 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
-          _TextField(
+          AppTextField(
             label: 'اسم الدواء بالإنكليزية *',
             controller: _name,
             icon: Icons.medication_outlined,
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'اسم الدواء بالعربية',
             controller: _arabicName,
             icon: Icons.translate_rounded,
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'الباركود',
             controller: _barcode,
             icon: Icons.qr_code_rounded,
@@ -926,88 +918,142 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
               icon: const Icon(Icons.qr_code_scanner_rounded),
             ),
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'الاسم العلمي بالإنكليزية',
             controller: _scientificName,
             icon: Icons.science_outlined,
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'الاسم العلمي بالعربية',
             controller: _arabicScientificName,
             icon: Icons.science_rounded,
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'الشركة المصنعة',
             controller: _manufacturer,
             icon: Icons.factory_outlined,
           ),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: _TextField(
+                child: AppTextField(
                   label: 'الشكل الدوائي',
                   controller: _dosageForm,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _TextField(
+                child: AppTextField(
                   label: 'التركيز أو السعة',
                   controller: _capacity,
                 ),
               ),
             ],
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'حجم العبوة',
             controller: _packageSize,
             icon: Icons.inventory_2_outlined,
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'التركيب الدوائي',
             controller: _composition,
             icon: Icons.biotech_outlined,
-            lines: 2,
+            maxLines: 2,
           ),
-          _TextField(
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'وصف إضافي',
             controller: _description,
             icon: Icons.notes_rounded,
-            lines: 3,
+            maxLines: 3,
           ),
+          const SizedBox(height: 16),
           Container(
             margin: const EdgeInsets.only(bottom: 13),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: context.appColors.surfaceSoft,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: SwitchListTile(
-              value: _requiresPrescription,
-              onChanged: (value) =>
-                  setState(() => _requiresPrescription = value),
-              secondary: const Icon(
-                Icons.description_outlined,
-                color: Color(0xFF216474),
-              ),
-              title: const Text('يتطلب وصفة طبية'),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.description_outlined,
+                  color: context.appColors.primary,
+                  size: 21,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'يتطلب وصفة طبية',
+                    style: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Switch(
+                  value: _requiresPrescription,
+                  onChanged: (value) =>
+                      setState(() => _requiresPrescription = value),
+                ),
+              ],
             ),
           ),
           if (_error != null) ...[
-            Text(
-              _error!,
-              style: const TextStyle(
-                color: Color(0xFFB33A3A),
-                fontWeight: FontWeight.w700,
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.appColors.danger.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: context.appColors.danger.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    color: context.appColors.danger,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _error!,
+                      style: TextStyle(
+                        color: context.appColors.danger,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
           ],
           SizedBox(
             width: double.infinity,
+            height: 52,
             child: FilledButton.icon(
               onPressed: _submit,
               icon: const Icon(Icons.arrow_back_rounded),
               label: const Text('متابعة إلى بيانات المخزون'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
             ),
           ),
         ],
@@ -1038,40 +1084,6 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
       ),
     );
   }
-}
-
-class _TextField extends StatelessWidget {
-  const _TextField({
-    required this.label,
-    required this.controller,
-    this.icon,
-    this.lines = 1,
-    this.suffixIcon,
-    this.keyboardType,
-  });
-  final String label;
-  final TextEditingController controller;
-  final IconData? icon;
-  final int lines;
-  final Widget? suffixIcon;
-  final TextInputType? keyboardType;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 12),
-    child: TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      minLines: lines,
-      maxLines: lines,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: icon == null ? null : Icon(icon),
-        suffixIcon: suffixIcon,
-        alignLabelWithHint: lines > 1,
-      ),
-    ),
-  );
 }
 
 class _ManualMedicineInfo {
@@ -1212,27 +1224,25 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                   ),
                 ],
                 const SizedBox(height: 14),
-                TextField(
+                AppTextField(
+                  label: 'اسم الدواء أو الاسم العلمي',
                   controller: _search,
+                  icon: Icons.search_rounded,
                   textInputAction: TextInputAction.search,
                   onSubmitted: _startSearch,
-                  decoration: InputDecoration(
-                    hintText: 'اسم الدواء أو الاسم العلمي',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: _scanCatalogBarcode,
-                          tooltip: 'مسح باركود',
-                          icon: const Icon(Icons.qr_code_scanner_rounded),
-                        ),
-                        IconButton(
-                          onPressed: () => _startSearch(_search.text),
-                          icon: const Icon(Icons.arrow_forward_rounded),
-                        ),
-                      ],
-                    ),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: _scanCatalogBarcode,
+                        tooltip: 'مسح باركود',
+                        icon: const Icon(Icons.qr_code_scanner_rounded),
+                      ),
+                      IconButton(
+                        onPressed: () => _startSearch(_search.text),
+                        icon: const Icon(Icons.arrow_forward_rounded),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -1520,7 +1530,7 @@ class _CatalogIdentityChip extends StatelessWidget {
 }
 
 Future<String?> _scanBarcode(BuildContext context) =>
-    Navigator.of(context).push(
+    Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute<String>(
         fullscreenDialog: true,
         builder: (_) => const PharmacyBarcodeScannerPage(),
@@ -1588,32 +1598,92 @@ class _InventoryEditorState extends State<_InventoryEditor> {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
-          _NumberField(label: 'الكمية', controller: _quantity),
-          _NumberField(
+          AppTextField(
+            label: 'الكمية',
+            controller: _quantity,
+            icon: Icons.inventory_2_outlined,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
             label: 'السعر بالليرة السورية',
             controller: _price,
-            decimal: true,
+            icon: Icons.payments_outlined,
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
           ),
-          _NumberField(label: 'حد المخزون المنخفض', controller: _threshold),
-          SwitchListTile(
-            value: _available,
-            onChanged: (v) => setState(() => _available = v),
-            title: const Text('متاح للطلب'),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: 'حد المخزون المنخفض',
+            controller: _threshold,
+            icon: Icons.notification_important_outlined,
+            keyboardType: TextInputType.number,
           ),
-          SwitchListTile(
-            value: _visible,
-            onChanged: (v) => setState(() => _visible = v),
-            title: const Text('إظهار السعر للمستخدم'),
-          ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('تاريخ الانتهاء'),
-            subtitle: Text(
-              _expiry == null
-                  ? 'غير محدد'
-                  : '${_expiry!.year}/${_expiry!.month}/${_expiry!.day}',
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: context.appColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(14),
             ),
-            trailing: const Icon(Icons.calendar_today_rounded),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.check_circle_outline_rounded,
+                  color: context.appColors.primary,
+                  size: 21,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'متاح للطلب',
+                    style: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Switch(
+                  value: _available,
+                  onChanged: (v) => setState(() => _available = v),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: context.appColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.visibility_outlined,
+                  color: context.appColors.primary,
+                  size: 21,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'إظهار السعر للمستخدم',
+                    style: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Switch(
+                  value: _visible,
+                  onChanged: (v) => setState(() => _visible = v),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          InkWell(
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
@@ -1622,6 +1692,54 @@ class _InventoryEditorState extends State<_InventoryEditor> {
               );
               if (picked != null) setState(() => _expiry = picked);
             },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: context.appColors.surfaceSoft,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    color: context.appColors.primary,
+                    size: 21,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'تاريخ الانتهاء',
+                          style: TextStyle(
+                            color: context.appColors.text,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _expiry == null
+                              ? 'غير محدد'
+                              : '${_expiry!.year}/${_expiry!.month}/${_expiry!.day}',
+                          style: TextStyle(
+                            color: context.appColors.textMuted,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: context.appColors.textMuted,
+                    size: 16,
+                  ),
+                ],
+              ),
+            ),
           ),
           if (_validationError != null) ...[
             Container(
@@ -1679,26 +1797,6 @@ class _InventoryEditorState extends State<_InventoryEditor> {
           ),
         ],
       ),
-    ),
-  );
-}
-
-class _NumberField extends StatelessWidget {
-  const _NumberField({
-    required this.label,
-    required this.controller,
-    this.decimal = false,
-  });
-  final String label;
-  final TextEditingController controller;
-  final bool decimal;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 11),
-    child: TextField(
-      controller: controller,
-      keyboardType: TextInputType.numberWithOptions(decimal: decimal),
-      decoration: InputDecoration(labelText: label),
     ),
   );
 }
@@ -1784,8 +1882,120 @@ String _stock(String value) => switch (value.toLowerCase()) {
   'outofstock' => 'نافد',
   _ => value,
 };
-Color _stockColor(String value) => switch (value.toLowerCase()) {
-  'instock' => Color(0xFF167D5A),
-  'lowstock' => const Color(0xFFB47618),
-  _ => Color(0xFFB33A3A),
+Color _stockColor(BuildContext context, String value) => switch (value.toLowerCase()) {
+  'instock' => context.appColors.primary,
+  'lowstock' => context.appColors.primaryDark,
+  _ => context.appColors.danger,
 };
+
+class _StockStatusSelector extends StatelessWidget {
+  const _StockStatusSelector({
+    required this.selectedStatus,
+    required this.onStatusSelected,
+  });
+
+  final String? selectedStatus;
+  final Function(String) onStatusSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Row(
+      children: [
+        Expanded(
+          child: _StockButton(
+            label: 'الكل',
+            icon: Icons.apps_rounded,
+            color: colors.text,
+            isSelected: selectedStatus == null,
+            onTap: () => onStatusSelected('All'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _StockButton(
+            label: 'متوفر',
+            icon: Icons.check_circle_rounded,
+            color: colors.primary,
+            isSelected: selectedStatus == 'InStock',
+            onTap: () => onStatusSelected('InStock'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _StockButton(
+            label: 'منخفض',
+            icon: Icons.warning_amber_rounded,
+            color: colors.primaryDark,
+            isSelected: selectedStatus == 'LowStock',
+            onTap: () => onStatusSelected('LowStock'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _StockButton(
+            label: 'نافد',
+            icon: Icons.remove_circle_rounded,
+            color: colors.primaryDark,
+            isSelected: selectedStatus == 'OutOfStock',
+            onTap: () => onStatusSelected('OutOfStock'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StockButton extends StatelessWidget {
+  const _StockButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? color : colors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? color : colors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : color,
+              size: 22,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : color,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

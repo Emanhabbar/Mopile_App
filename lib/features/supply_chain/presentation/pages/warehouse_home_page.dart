@@ -53,7 +53,7 @@ class WarehouseHomePage extends ConsumerWidget {
                   label: 'مخزون منخفض',
                   value: '${data.lowStockBatches}',
                   icon: Icons.warning_amber_rounded,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primaryDeep,
                 ),
                 RoleMetricData(
                   label: 'قريبة الانتهاء',
@@ -65,7 +65,7 @@ class WarehouseHomePage extends ConsumerWidget {
                   label: 'شحنات نشطة',
                   value: '${data.activeDeliveries}',
                   icon: Icons.local_shipping_rounded,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primary,
                 ),
               ],
             ),
@@ -103,7 +103,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       ? '${data.pendingOrders}'
                       : null,
                   icon: Icons.receipt_long_rounded,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primaryDeep,
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
@@ -120,7 +120,7 @@ class WarehouseHomePage extends ConsumerWidget {
                   title: 'تحليل المخزون',
                   subtitle: 'توقع النفاد ودعم قرار التوريد',
                   icon: Icons.auto_graph_rounded,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primary,
                   onTap: () => context.push('/intelligence'),
                 ),
               ],
@@ -149,8 +149,8 @@ class WarehouseHomePage extends ConsumerWidget {
                             ? Icons.remove_circle_outline_rounded
                             : Icons.inventory_2_outlined,
                         color: batch.sellableQuantity <= 0
-                            ? context.appColors.danger
-                            : context.appColors.primaryLight,
+                            ? context.appColors.primaryDark
+                            : context.appColors.primary,
                         onTap: () => context.go('/supply-chain'),
                       ),
                     ),
@@ -204,8 +204,8 @@ String _orderStatus(String status) => switch (status) {
 };
 
 Color _orderColor(AppColors colors, String status) => switch (status) {
-  'Delivered' => colors.success,
-  'Rejected' || 'Cancelled' => colors.danger,
-  'OutForDelivery' => colors.primaryLight,
+  'Delivered' => colors.primary,
+  'Rejected' || 'Cancelled' => colors.primaryDark,
+  'OutForDelivery' => colors.primaryDeep,
   _ => colors.primary,
 };

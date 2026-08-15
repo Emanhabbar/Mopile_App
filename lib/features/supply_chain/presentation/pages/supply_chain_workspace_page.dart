@@ -139,82 +139,105 @@ class _WarehouseNavigation extends StatelessWidget {
   final int pendingOrders;
   final ValueChanged<int> onSelected;
 
-  static const sections = <(String, IconData)>[
-    ('الملخص', Icons.dashboard_rounded),
-    ('التشغيلات', Icons.inventory_2_outlined),
-    ('الطلبات', Icons.receipt_long_outlined),
-    ('المندوبون', Icons.delivery_dining_outlined),
-    ('المالية', Icons.account_balance_wallet_outlined),
+  static const sections = <({String label, IconData icon, int? count})>[
+    (label: 'الملخص', icon: Icons.dashboard_rounded, count: null),
+    (label: 'التشغيلات', icon: Icons.inventory_2_outlined, count: null),
+    (label: 'الطلبات', icon: Icons.receipt_long_outlined, count: null),
+    (label: 'المندوبون', icon: Icons.delivery_dining_outlined, count: null),
+    (label: 'المالية', icon: Icons.account_balance_wallet_outlined, count: null),
   ];
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 78,
-    child: ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  Widget build(BuildContext context) {
+    final itemsWithCounts = sections.map((item) {
+      if (item.label == 'الطلبات') {
+        return (label: item.label, icon: item.icon, count: pendingOrders);
+      }
+      return item;
+    }).toList();
+
+    return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      itemCount: sections.length,
-      separatorBuilder: (_, _) => const SizedBox(width: 8),
-      itemBuilder: (_, index) {
-        final active = selected == index;
-        final item = sections[index];
-        return InkWell(
-          borderRadius: BorderRadius.circular(17),
-          onTap: () => onSelected(index),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              color: active ? context.appColors.primaryDeep : context.appColors.surfaceSoft,
-              borderRadius: BorderRadius.circular(17),
-              border: Border.all(
-                color: active ? context.appColors.primaryDeep : context.appColors.border,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  item.$2,
-                  size: 19,
-                  color: active ? context.appColors.secondary : context.appColors.primary,
-                ),
-                const SizedBox(width: 7),
-                Text(
-                  item.$1,
-                  style: TextStyle(
-                    color: active ? Colors.white : context.appColors.text,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: itemsWithCounts
+            .asMap()
+            .entries
+            .map((entry) {
+              final selected = this.selected == entry.key;
+              final item = entry.value;
+              return Padding(
+                padding: const EdgeInsetsDirectional.only(end: 8),
+                child: Material(
+                  color: selected ? context.appColors.primaryDeep : context.appColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(17),
+                    side: BorderSide(
+                      color: selected
+                          ? context.appColors.primaryDeep
+                          : context.appColors.border,
+                    ),
                   ),
-                ),
-                if (index == 2 && pendingOrders > 0) ...[
-                  const SizedBox(width: 7),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: active ? context.appColors.secondary : context.appColors.danger,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$pendingOrders',
-                      style: TextStyle(
-                        color: active ? context.appColors.primaryDeep : Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
+                  child: InkWell(
+                    onTap: () => onSelected(entry.key),
+                    borderRadius: BorderRadius.circular(17),
+                    child: AnimatedPadding(
+                      duration: const Duration(milliseconds: 220),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: selected ? 17 : 14,
+                        vertical: 11,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item.icon,
+                            size: 19,
+                            color: selected ? Colors.white : context.appColors.primary,
+                          ),
+                          const SizedBox(width: 7),
+                          Text(
+                            item.label,
+                            style: TextStyle(
+                              color: selected ? Colors.white : context.appColors.text,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if ((item.count ?? 0) > 0) ...[
+                            const SizedBox(width: 7),
+                            Container(
+                              constraints: const BoxConstraints(minWidth: 20),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? context.appColors.secondary.withValues(alpha: .3)
+                                    : context.appColors.primary.withValues(alpha: .1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${item.count}',
+                                style: TextStyle(
+                                  color: selected ? Colors.white : context.appColors.primary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
-    ),
-  );
+                ),
+              );
+            })
+            .toList(growable: false),
+      ),
+    );
+  }
 }
 
 class _WarehouseDashboard extends ConsumerWidget {
@@ -270,7 +293,7 @@ class _WarehouseDashboard extends ConsumerWidget {
                       'مخزون منخفض',
                       data.lowStockBatches,
                       Icons.trending_down_rounded,
-                      context.appColors.warning,
+                      context.appColors.primaryDeep,
                     ),
                   ),
                   AppReveal(
@@ -279,7 +302,7 @@ class _WarehouseDashboard extends ConsumerWidget {
                       'قرب الانتهاء',
                       data.expiringBatches,
                       Icons.event_busy_outlined,
-                      context.appColors.danger,
+                      context.appColors.primaryDark,
                     ),
                   ),
                   AppReveal(
@@ -288,7 +311,7 @@ class _WarehouseDashboard extends ConsumerWidget {
                       'شحنات نشطة',
                       data.activeDeliveries,
                       Icons.local_shipping_outlined,
-                      context.appColors.success,
+                      context.appColors.primary,
                     ),
                   ),
                 ],
@@ -566,14 +589,60 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
   bool _isDone(SupplyOrder order) =>
       const {'Delivered', 'Rejected', 'Cancelled'}.contains(order.status);
 
-  Widget _filterChip(String value, String label, int count) => Padding(
-    padding: const EdgeInsetsDirectional.only(end: 8),
-    child: ChoiceChip(
-      selected: filter == value,
-      onSelected: (_) => setState(() => filter = value),
-      label: Text('$label  $count'),
-    ),
-  );
+  Widget _filterChip(String value, String label, int count) {
+    final colors = context.appColors;
+    final selected = filter == value;
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: 8),
+      child: InkWell(
+        onTap: () => setState(() => filter = value),
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? colors.primaryDeep : colors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: selected ? colors.primaryDeep : colors.border,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected ? Colors.white : colors.text,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? colors.secondary.withValues(alpha: .3)
+                      : colors.primary.withValues(alpha: .1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$count',
+                  style: TextStyle(
+                    color: selected ? Colors.white : colors.primary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _OrderCard extends ConsumerWidget {
@@ -957,14 +1026,14 @@ class _RepresentativeCard extends ConsumerWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: r.isAvailable
-                        ? context.appColors.success.withValues(alpha: .1)
+                        ? context.appColors.primary.withValues(alpha: .1)
                         : context.appColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     Icons.delivery_dining_rounded,
                     color: r.isAvailable
-                        ? context.appColors.success
+                        ? context.appColors.primary
                         : context.appColors.textMuted,
                   ),
                 ),
@@ -989,7 +1058,7 @@ class _RepresentativeCard extends ConsumerWidget {
                 ),
                 _Badge(
                   r.isOnShift ? 'ضمن الوردية' : 'خارج الوردية',
-                  r.isOnShift ? context.appColors.success : context.appColors.textMuted,
+                  r.isOnShift ? context.appColors.primary : context.appColors.textMuted,
                 ),
               ],
             ),
@@ -1166,8 +1235,13 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
                       decoration: BoxDecoration(
                         color: active
                             ? context.appColors.primaryDeep
-                            : context.appColors.surfaceSoft,
+                            : context.appColors.surface,
                         borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: active
+                              ? context.appColors.primaryDeep
+                              : context.appColors.border,
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -1175,7 +1249,7 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
                             items[index].$2,
                             size: 19,
                             color: active
-                                ? context.appColors.secondary
+                                ? Colors.white
                                 : context.appColors.primary,
                           ),
                           const SizedBox(height: 4),
@@ -1207,34 +1281,137 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
   }
 }
 
-class _PharmacySupplyWorkspace extends StatelessWidget {
+class _PharmacySupplyWorkspace extends ConsumerStatefulWidget {
   const _PharmacySupplyWorkspace();
 
   @override
+  ConsumerState<_PharmacySupplyWorkspace> createState() =>
+      _PharmacySupplyWorkspaceState();
+}
+
+class _PharmacySupplyWorkspaceState
+    extends ConsumerState<_PharmacySupplyWorkspace> {
+  int _selectedSection = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('توريد الصيدلية'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'المستودعات'),
-              Tab(text: 'طلباتي'),
-              Tab(text: 'احتياج المخزون'),
-            ],
+    final pages = <Widget>[
+      const _MarketplaceTab(),
+      const _OrdersTab(warehouse: false),
+      const _SuggestionsTab(),
+    ];
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('توريد الصيدلية'),
+        actions: [
+          IconButton(
+            tooltip: 'تحديث البيانات',
+            onPressed: _refresh,
+            icon: const Icon(Icons.refresh_rounded),
           ),
-        ),
-        body: const TabBarView(
-          children: [
-            _MarketplaceTab(),
-            _OrdersTab(warehouse: false),
-            _SuggestionsTab(),
-          ],
-        ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Column(
+        children: [
+          _PharmacySupplyNavigation(
+            selected: _selectedSection,
+            onSelected: (value) => setState(() => _selectedSection = value),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 280),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              child: KeyedSubtree(
+                key: ValueKey(_selectedSection),
+                child: pages[_selectedSection],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  void _refresh() {
+    switch (_selectedSection) {
+      case 0:
+        ref.invalidate(supplyMarketplaceProvider);
+        return;
+      case 1:
+        ref.invalidate(supplyOrdersProvider);
+        return;
+      case 2:
+        ref.invalidate(supplySuggestionsProvider);
+        return;
+    }
+  }
+}
+
+class _PharmacySupplyNavigation extends StatelessWidget {
+  const _PharmacySupplyNavigation({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final int selected;
+  final ValueChanged<int> onSelected;
+
+  static const sections = <(String, IconData)>[
+    ('المستودعات', Icons.store_mall_directory_outlined),
+    ('طلباتي', Icons.receipt_long_outlined),
+    ('احتياج المخزون', Icons.inventory_2_outlined),
+  ];
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 78,
+    child: ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      scrollDirection: Axis.horizontal,
+      itemCount: sections.length,
+      separatorBuilder: (_, _) => const SizedBox(width: 8),
+      itemBuilder: (_, index) {
+        final active = selected == index;
+        final item = sections[index];
+        return InkWell(
+          borderRadius: BorderRadius.circular(17),
+          onTap: () => onSelected(index),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: active ? context.appColors.primaryDeep : context.appColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(
+                color: active ? context.appColors.primaryDeep : context.appColors.border,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  item.$2,
+                  size: 19,
+                  color: active ? context.appColors.secondary : context.appColors.primary,
+                ),
+                const SizedBox(width: 7),
+                Text(
+                  item.$1,
+                  style: TextStyle(
+                    color: active ? Colors.white : context.appColors.text,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ),
+  );
 }
 
 class _MarketplaceTab extends ConsumerWidget {
@@ -1250,45 +1427,148 @@ class _MarketplaceTab extends ConsumerWidget {
             error: error,
             onRetry: () => ref.invalidate(supplyMarketplaceProvider),
           ),
-          data: (items) => items.isEmpty
-              ? const _Empty(
-                  icon: Icons.store_mall_directory_outlined,
-                  text: 'لا توجد مستودعات متاحة.',
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(20),
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final warehouse = items[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(14),
-                        leading: Icon(
-                          Icons.warehouse_outlined,
-                          color: context.appColors.primary,
-                        ),
-                        title: Text(warehouse.name),
-                        subtitle: Text(
-                          '${warehouse.city} · ${warehouse.area}\n'
-                          '${warehouse.availableMedicines} دواء · توصيل '
-                          '${_money(warehouse.deliveryFee)} ل.س',
-                        ),
-                        isThreeLine: true,
-                        trailing: const Icon(Icons.chevron_left),
-                        onTap: () => showModalBottomSheet<void>(
-                          context: context,
-                          isScrollControlled: true,
-                          useSafeArea: true,
-                          builder: (_) =>
-                              _CatalogOrderSheet(warehouse: warehouse),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+          data: (items) => RefreshIndicator(
+            onRefresh: () => ref.refresh(supplyMarketplaceProvider.future),
+            child: items.isEmpty
+                ? const _Empty(
+                    icon: Icons.store_mall_directory_outlined,
+                    text: 'لا توجد مستودعات متاحة.',
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                    itemCount: items.length + 1,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) => index == 0
+                        ? _CollectionHeader(
+                            icon: Icons.store_mall_directory_outlined,
+                            title: 'المستودعات المتاحة',
+                            subtitle: 'تصفح المستودعات واطلب الأدوية المطلوبة',
+                            count: items.length,
+                          )
+                        : _WarehouseCard(warehouse: items[index - 1]),
+                  ),
+          ),
         );
   }
+}
+
+class _WarehouseCard extends StatelessWidget {
+  const _WarehouseCard({required this.warehouse});
+  final WarehouseMarketplace warehouse;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          builder: (_) => _CatalogOrderSheet(warehouse: warehouse),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: context.appColors.primary.withValues(alpha: .08),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  Icons.warehouse_outlined,
+                  color: context.appColors.primary,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      warehouse.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: context.appColors.text,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: context.appColors.textMuted,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${warehouse.city} · ${warehouse.area}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.appColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _WarehouseStat(
+                          icon: Icons.medication_outlined,
+                          label: '${warehouse.availableMedicines} دواء',
+                        ),
+                        const SizedBox(width: 12),
+                        _WarehouseStat(
+                          icon: Icons.local_shipping_outlined,
+                          label: 'توصيل ${_money(warehouse.deliveryFee)} ل.س',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_back_rounded,
+                color: context.appColors.primary,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WarehouseStat extends StatelessWidget {
+  const _WarehouseStat({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(
+        icon,
+        size: 13,
+        color: context.appColors.textMuted,
+      ),
+      const SizedBox(width: 4),
+      Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: context.appColors.textMuted,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ],
+  );
 }
 
 class _CatalogOrderSheet extends ConsumerStatefulWidget {
@@ -1427,33 +1707,137 @@ class _SuggestionsTab extends ConsumerWidget {
           error: e,
           onRetry: () => ref.invalidate(supplySuggestionsProvider),
         ),
-        data: (items) => items.isEmpty
-            ? const _Empty(
-                icon: Icons.task_alt,
-                text: 'المخزون ضمن الحدود المناسبة.',
-              )
-            : ListView.separated(
-                padding: const EdgeInsets.all(20),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 9),
-                itemBuilder: (_, i) {
-                  final x = items[i];
-                  return Card(
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.auto_graph,
-                        color: context.appColors.warning,
-                      ),
-                      title: Text(x.medicineName),
-                      subtitle: Text(
-                        'الحالي ${x.currentQuantity} · المقترح ${x.suggestedQuantity}\n${x.recommendedWarehouseName ?? 'لا يوجد مستودع مقترح'}',
-                      ),
-                      isThreeLine: true,
-                    ),
-                  );
-                },
-              ),
+        data: (items) => RefreshIndicator(
+          onRefresh: () => ref.refresh(supplySuggestionsProvider.future),
+          child: items.isEmpty
+              ? const _Empty(
+                  icon: Icons.task_alt,
+                  text: 'المخزون ضمن الحدود المناسبة.',
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                  itemCount: items.length + 1,
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) => i == 0
+                      ? _CollectionHeader(
+                          icon: Icons.inventory_2_outlined,
+                          title: 'احتياج المخزون',
+                          subtitle: 'الأدوية التي تحتاج إلى إعادة توريد',
+                          count: items.length,
+                        )
+                      : _SuggestionCard(suggestion: items[i - 1]),
+                ),
+        ),
       );
+}
+
+class _SuggestionCard extends StatelessWidget {
+  const _SuggestionCard({required this.suggestion});
+  final RestockSuggestion suggestion;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: colors.primaryDark.withValues(alpha: .08),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                Icons.auto_graph,
+                color: colors.primaryDark,
+                size: 26,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    suggestion.medicineName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: colors.text,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      _SuggestionStat(
+                        icon: Icons.inventory_2_outlined,
+                        label: 'الحالي ${suggestion.currentQuantity}',
+                      ),
+                      const SizedBox(width: 12),
+                      _SuggestionStat(
+                        icon: Icons.trending_up_rounded,
+                        label: 'المقترح ${suggestion.suggestedQuantity}',
+                      ),
+                    ],
+                  ),
+                  if (suggestion.recommendedWarehouseName != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.store_mall_directory_outlined,
+                          size: 13,
+                          color: colors.textMuted,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          suggestion.recommendedWarehouseName!,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: colors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SuggestionStat extends StatelessWidget {
+  const _SuggestionStat({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(
+        icon,
+        size: 13,
+        color: context.appColors.textMuted,
+      ),
+      const SizedBox(width: 4),
+      Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          color: context.appColors.textMuted,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ],
+  );
 }
 
 class _RepresentativeWorkspace extends ConsumerWidget {
@@ -2308,7 +2692,7 @@ class _BatchCard extends StatelessWidget {
                 width: 45,
                 height: 45,
                 decoration: BoxDecoration(
-                  color: context.appColors.surfaceSoft,
+                  color: context.appColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(Icons.medication, color: context.appColors.primary),
@@ -2399,18 +2783,6 @@ class _Hero extends StatelessWidget {
     ),
     child: Stack(
       children: [
-        PositionedDirectional(
-          end: -35,
-          top: -42,
-          child: Container(
-            width: 145,
-            height: 145,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: .06),
-            ),
-          ),
-        ),
         PositionedDirectional(
           end: 35,
           bottom: -50,
@@ -2571,7 +2943,7 @@ class _CollectionHeader extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: context.appColors.surfaceSoft,
+          color: context.appColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Icon(icon, color: context.appColors.primary, size: 21),
@@ -2598,7 +2970,7 @@ class _CollectionHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: context.appColors.surfaceSoft,
+            color: context.appColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Text(
@@ -2712,9 +3084,9 @@ String _health(String s) => switch (s.toLowerCase()) {
   _ => s,
 };
 Color _healthColor(AppColors colors, String s) => switch (s.toLowerCase()) {
-  'healthy' => colors.success,
-  'expired' => colors.danger,
-  _ => colors.warning,
+  'healthy' => colors.primary,
+  'expired' => colors.primaryDark,
+  _ => colors.primaryDeep,
 };
 String _status(String s) => switch (s.toLowerCase()) {
   'submitted' => 'مرسل',
@@ -2736,9 +3108,9 @@ String _status(String s) => switch (s.toLowerCase()) {
   _ => s,
 };
 Color _statusColor(AppColors colors, String s) => switch (s.toLowerCase()) {
-  'delivered' || 'paid' || 'approved' => colors.success,
-  'rejected' || 'failed' || 'overdue' => colors.danger,
-  'submitted' || 'requested' || 'unpaid' => colors.warning,
+  'delivered' || 'paid' || 'approved' => colors.primary,
+  'rejected' || 'failed' || 'overdue' => colors.primaryDark,
+  'submitted' || 'requested' || 'unpaid' => colors.primaryDeep,
   _ => colors.primary,
 };
 String _nextLabel(String s) => switch (s) {

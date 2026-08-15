@@ -251,8 +251,8 @@ class _MedicineHero extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: medicine.requiresPrescription
-                      ? colors.warning.withValues(alpha: 0.2)
-                      : colors.success.withValues(alpha: 0.2),
+                      ? colors.primaryDark.withValues(alpha: 0.2)
+                      : colors.primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.15),
@@ -341,13 +341,13 @@ class _QuickInfoStrip extends StatelessWidget {
           icon: Icons.category_outlined,
           label: 'الشكل',
           value: form,
-          color: colors.primaryDark,
+          color: colors.primaryDeep,
         ),
       _QuickInfo(
         icon: Icons.inventory_2_outlined,
         label: 'المخزون',
         value: '${medicine.quantityInStock}',
-        color: colors.success,
+        color: colors.primaryDark,
       ),
     ];
     return Row(
@@ -598,9 +598,9 @@ class _DisclaimerBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: colors.warning.withValues(alpha: 0.08),
+        color: colors.primaryDark.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.warning.withValues(alpha: 0.2)),
+        border: Border.all(color: colors.primaryDark.withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,12 +609,12 @@ class _DisclaimerBanner extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: colors.warning.withValues(alpha: 0.12),
+              color: colors.primaryDark.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.info_outline_rounded,
-              color: colors.warning,
+              color: colors.primaryDark,
               size: 20,
             ),
           ),

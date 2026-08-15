@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../donations/data/models/donation_models.dart';
 import '../../../donations/presentation/pages/donations_page.dart';
 import '../../data/models/organization_models.dart';
@@ -58,7 +59,7 @@ class _OrganizationWorkspacePageState
               'المبادرات والتبرعات والمستفيدون',
               style: TextStyle(
                 color: context.appColors.textMuted,
-                fontSize: 10.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -103,7 +104,7 @@ class _OrganizationWorkspacePageState
         onRefresh: _refresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
           children: [
             AppReveal(
               child: dashboard.when(
@@ -235,7 +236,7 @@ class _OrganizationWorkspacePageState
                           Text(
                             'حملة جديدة',
                             style: TextStyle(
-                              fontSize: 19,
+                              fontSize: 18,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
@@ -243,7 +244,7 @@ class _OrganizationWorkspacePageState
                             'أضف معلومات واضحة تساعد المتبرعين.',
                             style: TextStyle(
                               color: context.appColors.textMuted,
-                              fontSize: 11.5,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -346,6 +347,7 @@ class _OrganizationWorkspacePageState
                     label: const Text('إنشاء الحملة'),
                   ),
                 ),
+                const SizedBox(height: 80),
               ],
             ),
           ),
@@ -374,9 +376,13 @@ class _OrganizationWorkspacePageState
           ..invalidate(organizationDashboardProvider);
       });
     }
-    for (final controller in [title, description, medicines, city, area]) {
-      controller.dispose();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      title.dispose();
+      description.dispose();
+      medicines.dispose();
+      city.dispose();
+      area.dispose();
+    });
   }
 
   Future<DateTime?> _pickCampaignDate(
@@ -671,7 +677,7 @@ class _SectionNavigation extends StatelessWidget {
                             style: TextStyle(
                               color: selected ? Colors.white : context.appColors.text,
                               fontWeight: FontWeight.w800,
-                              fontSize: 12.5,
+                              fontSize: 13,
                             ),
                           ),
                           if ((item.count ?? 0) > 0) ...[
@@ -693,7 +699,7 @@ class _SectionNavigation extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: context.appColors.primaryDeep,
-                                  fontSize: 9,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
@@ -745,7 +751,6 @@ class _OverviewSection extends StatelessWidget {
             child: _QuickAction(
               icon: Icons.add_rounded,
               label: 'حملة جديدة',
-              color: context.appColors.primary,
               onTap: onCreateCampaign,
             ),
           ),
@@ -754,7 +759,6 @@ class _OverviewSection extends StatelessWidget {
             child: _QuickAction(
               icon: Icons.upload_file_outlined,
               label: 'رفع وثيقة',
-              color: context.appColors.primaryLight,
               onTap: onUploadDocument,
             ),
           ),
@@ -763,7 +767,6 @@ class _OverviewSection extends StatelessWidget {
             child: _QuickAction(
               icon: Icons.edit_outlined,
               label: 'تعديل الملف',
-              color: context.appColors.primaryDark,
               onTap: onEditProfile,
             ),
           ),
@@ -780,7 +783,7 @@ class _OverviewSection extends StatelessWidget {
           onUpload: onUploadDocument,
         ),
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 16),
       const _SectionHeading(
         eyebrow: 'الأثر الحالي',
         title: 'ملخص العمل',
@@ -808,13 +811,13 @@ class _OverviewSection extends StatelessWidget {
               label: 'الحملات النشطة',
               value: data.activeCampaignsCount,
               icon: Icons.bolt_rounded,
-              color: context.appColors.success,
+              color: context.appColors.primary,
             ),
             _ImpactMetric(
               label: 'عروض تنتظر',
               value: data.pendingDonationOffersCount,
               icon: Icons.volunteer_activism_outlined,
-              color: context.appColors.warning,
+              color: context.appColors.primaryDeep,
             ),
             _ImpactMetric(
               label: 'طلبات مفتوحة',
@@ -825,7 +828,7 @@ class _OverviewSection extends StatelessWidget {
           ],
         ),
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 2),
       const _SectionHeading(
         eyebrow: 'آخر التحديثات',
         title: 'الحملات الأخيرة',
@@ -1095,6 +1098,10 @@ class _OrganizationHero extends StatelessWidget {
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(27),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: .08),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: context.appColors.primaryDeep.withValues(alpha: .14),
@@ -1104,37 +1111,11 @@ class _OrganizationHero extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          PositionedDirectional(
-            top: -62,
-            end: -38,
-            child: Container(
-              width: 170,
-              height: 170,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: .055),
-              ),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: -74,
-            start: -46,
-            child: Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: context.appColors.secondary.withValues(alpha: .075),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
                 Row(
                   children: [
                     Container(
@@ -1260,8 +1241,6 @@ class _OrganizationHero extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ],
       ),
     );
   }
@@ -1278,8 +1257,12 @@ class _HeroCount extends StatelessWidget {
       margin: const EdgeInsetsDirectional.only(end: 7),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .08),
+        color: context.appColors.primary.withValues(alpha: .08),
         borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: .08),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
@@ -1287,14 +1270,17 @@ class _HeroCount extends StatelessWidget {
             '$value',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 19,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
             ),
           ),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white60, fontSize: 9),
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 11,
+            ),
           ),
         ],
       ),
@@ -1339,7 +1325,7 @@ class _SectionHeading extends StatelessWidget {
               eyebrow,
               style: TextStyle(
                 color: context.appColors.primary,
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: FontWeight.w900,
                 letterSpacing: .3,
               ),
@@ -1360,20 +1346,18 @@ class _QuickAction extends StatelessWidget {
   const _QuickAction({
     required this.icon,
     required this.label,
-    required this.color,
     required this.onTap,
   });
   final IconData icon;
   final String label;
-  final Color color;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => Material(
-    color: color.withValues(alpha: .075),
+    color: context.appColors.surfaceSoft,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
-      side: BorderSide(color: color.withValues(alpha: .12)),
+      side: BorderSide(color: context.appColors.border),
     ),
     child: InkWell(
       onTap: onTap,
@@ -1386,23 +1370,23 @@ class _QuickAction extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.appColors.surface,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withValues(alpha: .09),
+                    color: context.appColors.primary.withValues(alpha: .09),
                     blurRadius: 12,
                     offset: const Offset(0, 5),
                   ),
                 ],
               ),
-              child: Icon(icon, color: color, size: 21),
+              child: Icon(icon, color: context.appColors.primary, size: 21),
             ),
             const SizedBox(height: 9),
             Text(
               label,
               maxLines: 1,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -1427,7 +1411,7 @@ class _ImpactMetric extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: context.appColors.surface,
+      color: context.appColors.surfaceSoft,
       borderRadius: BorderRadius.circular(21),
       border: Border.all(color: context.appColors.border),
     ),
@@ -1437,7 +1421,7 @@ class _ImpactMetric extends StatelessWidget {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: .085),
+            color: context.appColors.surface,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(icon, color: color, size: 21),
@@ -1451,8 +1435,8 @@ class _ImpactMetric extends StatelessWidget {
               Text(
                 '$value',
                 style: TextStyle(
-                  color: context.appColors.text,
-                  fontSize: 20,
+                  color: color,
+                  fontSize: 18,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -1460,7 +1444,10 @@ class _ImpactMetric extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: TextStyle(
+                  color: context.appColors.textMuted,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -1556,7 +1543,7 @@ class _CampaignCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: item.isUrgent
-                        ? const [Color(0xFFE96A78), Color(0xFFC94256)]
+                        ? [context.appColors.primaryDark, context.appColors.primaryDark.withValues(alpha: 0.8)]
                         : [context.appColors.primary, context.appColors.primaryDeep],
                   ),
                   borderRadius: BorderRadius.circular(15),
@@ -1610,11 +1597,11 @@ class _CampaignCard extends StatelessWidget {
             color: _campaignColor(context.appColors, item.status),
               ),
               if (item.isUrgent)
-                _StatusPill(label: 'عاجلة', color: context.appColors.danger),
+                _StatusPill(label: 'عاجلة', color: context.appColors.primaryDark),
               if (item.acceptsPublicDonations)
                 _StatusPill(
                   label: 'تستقبل التبرعات',
-                  color: context.appColors.success,
+                  color: context.appColors.primary,
                 ),
             ],
           ),
@@ -2027,7 +2014,7 @@ class _StatusPill extends StatelessWidget {
       label,
       style: TextStyle(
         color: color,
-        fontSize: 9.5,
+        fontSize: 11,
         fontWeight: FontWeight.w900,
       ),
     ),
@@ -2042,11 +2029,11 @@ class _Field extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
-    child: TextField(
+    child: AppTextField(
       controller: controller,
+      label: label,
       minLines: lines,
       maxLines: lines,
-      decoration: InputDecoration(labelText: label),
     ),
   );
 }
@@ -2089,13 +2076,13 @@ class _DateSelector extends StatelessWidget {
                     label,
                     style: TextStyle(
                       color: context.appColors.textMuted,
-                      fontSize: 9.5,
+                      fontSize: 11,
                     ),
                   ),
                   Text(
                     value == null ? 'اختياري' : _shortDate(value!),
                     style: const TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -2125,18 +2112,15 @@ class _VerificationCard extends StatelessWidget {
     final verified =
         status.toLowerCase() == 'verified' ||
         status.toLowerCase() == 'approved';
-    final rejected = status.toLowerCase() == 'rejected';
     final color = verified
-        ? context.appColors.success
-        : rejected
-        ? context.appColors.danger
-        : context.appColors.warning;
+        ? context.appColors.primary
+        : context.appColors.primaryDeep;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: .07),
+        color: context.appColors.surfaceSoft,
         borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: color.withValues(alpha: .14)),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
@@ -2144,7 +2128,7 @@ class _VerificationCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appColors.surface,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -2236,10 +2220,10 @@ String _campaignStatus(String status) => switch (status.toLowerCase()) {
 };
 Color _campaignColor(AppColors colors, String status) => switch (status
     .toLowerCase()) {
-  'active' => colors.success,
+  'active' => colors.primary,
   'closed' => colors.textMuted,
-  'cancelled' => colors.danger,
-  _ => colors.warning,
+  'cancelled' => colors.primaryDark,
+  _ => colors.primaryDeep,
 };
 String _shortDate(DateTime value) =>
     '${value.year}/${value.month.toString().padLeft(2, '0')}/${value.day.toString().padLeft(2, '0')}';

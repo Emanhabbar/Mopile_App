@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../data/models/prescription_models.dart';
 import '../../data/repositories/prescriptions_repository.dart';
 import '../controllers/prescriptions_providers.dart';
@@ -91,14 +93,12 @@ class _PharmacyPrescriptionOrdersPageState
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('تأكيد تسليم الوصفة'),
-        content: TextField(
+        content: AppTextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          maxLength: 8,
-          decoration: const InputDecoration(
-            labelText: 'رمز الاستلام',
-            prefixIcon: Icon(Icons.pin_outlined),
-          ),
+          label: 'رمز الاستلام',
+          hint: 'أدخل رمز الاستلام المكون من 8 أرقام',
+          icon: Icons.pin_outlined,
         ),
         actions: [
           TextButton(

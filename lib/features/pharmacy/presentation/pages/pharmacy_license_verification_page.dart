@@ -128,10 +128,10 @@ class _Header extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFF102F37), Color(0xFF174F5B)],
+          colors: [context.appColors.primaryDeep, context.appColors.primary],
         ),
         borderRadius: BorderRadius.circular(28),
       ),
@@ -141,7 +141,7 @@ class _Header extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .1),
+              color: Colors.white.withValues(alpha: .12),
               borderRadius: BorderRadius.circular(21),
             ),
             child: Icon(presentation.$2, color: context.appColors.secondary, size: 32),
@@ -189,8 +189,8 @@ class _Instructions extends StatelessWidget {
             const Divider(height: 24),
             Text(
               verification!.rejectionReason ?? verification!.failureReason!,
-              style: const TextStyle(
-                color: Color(0xFFB33A3A),
+              style: TextStyle(
+                color: context.appColors.danger,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -209,9 +209,9 @@ class _Tip extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 9),
     child: Row(
       children: [
-        const Icon(
+        Icon(
           Icons.check_circle_rounded,
-          color: Color(0xFF167D5A),
+          color: context.appColors.primary,
           size: 18,
         ),
         const SizedBox(width: 8),
@@ -237,22 +237,22 @@ class _VerificationDetails extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          _row('الاسم المسجل', verification.registeredName),
+          _row(context, 'الاسم المسجل', verification.registeredName),
           if (verification.extractedName != null)
-            _row('الاسم في الترخيص', verification.extractedName!),
+            _row(context, 'الاسم في الترخيص', verification.extractedName!),
           if (verification.registryNumber != null)
-            _row('رقم السجل', verification.registryNumber!),
+            _row(context, 'رقم السجل', verification.registryNumber!),
           if (verification.documentSerialNumber != null)
-            _row('رقم الوثيقة', verification.documentSerialNumber!),
-          _row('عدد مرات الإرسال', '${verification.attemptCount}'),
+            _row(context, 'رقم الوثيقة', verification.documentSerialNumber!),
+          _row(context, 'عدد مرات الإرسال', '${verification.attemptCount}'),
           if (verification.manualReviewNote != null)
-            _row('ملاحظة المراجعة', verification.manualReviewNote!),
+            _row(context, 'ملاحظة المراجعة', verification.manualReviewNote!),
         ],
       ),
     ),
   );
 
-  Widget _row(String label, String value) => Padding(
+  Widget _row(BuildContext context, String label, String value) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +261,7 @@ class _VerificationDetails extends StatelessWidget {
           width: 115,
           child: Text(
             label,
-            style: const TextStyle(color: Color(0xFF668087)),
+            style: TextStyle(color: context.appColors.textMuted),
           ),
         ),
         Expanded(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/errors/api_exception.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/intelligence_models.dart';
 import '../../data/repositories/intelligence_repository.dart';
@@ -63,12 +64,11 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
           const SizedBox(height: 18),
           Text('البحث عن بدائل', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 10),
-          TextField(
+          AppTextField(
             controller: _medicine,
-            decoration: const InputDecoration(
-              labelText: 'اسم الدواء',
-              prefixIcon: Icon(Icons.medication_outlined),
-            ),
+            label: 'اسم الدواء',
+            hint: 'أدخل اسم الدواء للبحث عن بدائل',
+            icon: Icons.medication_outlined,
           ),
           const SizedBox(height: 10),
           FilledButton.icon(
@@ -222,10 +222,10 @@ class _NumberField extends StatelessWidget {
   final String label;
   final bool decimal;
   @override
-  Widget build(BuildContext context) => TextField(
+  Widget build(BuildContext context) => AppTextField(
     controller: controller,
     keyboardType: TextInputType.numberWithOptions(decimal: decimal),
-    decoration: InputDecoration(labelText: label),
+    label: label,
   );
 }
 

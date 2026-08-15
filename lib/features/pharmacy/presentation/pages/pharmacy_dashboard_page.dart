@@ -173,7 +173,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
           title: 'الطلبات',
           subtitle: 'متابعة الردود',
           icon: Icons.assignment_rounded,
-          color: context.appColors.primaryLight,
+          color: context.appColors.primaryDeep,
           onTap: () => context.go('/pharmacy/requests'),
           badge: data.pendingRequestsCount > 0
               ? '${data.pendingRequestsCount} بانتظارك'
@@ -190,7 +190,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
           title: 'ملف الصيدلية',
           subtitle: 'الموقع والبيانات',
           icon: Icons.storefront_rounded,
-          color: context.appColors.primaryLight,
+          color: context.appColors.primary,
           onTap: () => context.push('/pharmacy/profile'),
         ),
       ],
@@ -211,19 +211,19 @@ class PharmacyDashboardPage extends ConsumerWidget {
           label: 'متوفر',
           value: '${data.inStockCount}',
           icon: Icons.check_circle_rounded,
-          color: context.appColors.primaryLight,
+          color: context.appColors.primary,
         ),
         RoleMetricData(
           label: 'مخزون منخفض',
           value: '${data.lowStockCount}',
           icon: Icons.warning_amber_rounded,
-          color: context.appColors.primaryDark,
+          color: context.appColors.primaryDeep,
         ),
         RoleMetricData(
           label: 'نافد',
           value: '${data.outOfStockCount}',
           icon: Icons.remove_circle_outline_rounded,
-          color: context.appColors.primaryLight,
+          color: context.appColors.primaryDark,
         ),
       ],
     );
@@ -303,7 +303,7 @@ class _PharmacyHero extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.headlineSmall
-                        ?.copyWith(color: Colors.white, fontSize: 22),
+                        ?.copyWith(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -312,21 +312,21 @@ class _PharmacyHero extends StatelessWidget {
                       ? Icons.verified_rounded
                       : Icons.hourglass_top_rounded,
                   color: context.appColors.secondary,
-                  size: 23,
+                  size: 26,
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Icon(
                   data.hasLocation
                       ? Icons.location_on_rounded
                       : Icons.location_off_rounded,
-                  color: Colors.white.withValues(alpha: 0.62),
-                  size: 17,
+                  color: Colors.white.withValues(alpha: 0.7),
+                  size: 19,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     data.hasLocation && location.isNotEmpty
@@ -335,8 +335,9 @@ class _PharmacyHero extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -431,12 +432,12 @@ class _ReadinessCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: context.appColors.surfaceWarm,
+                  color: context.appColors.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   Icons.fact_check_rounded,
-                  color: context.appColors.warning,
+                  color: context.appColors.secondary,
                 ),
               ),
               const SizedBox(width: 12),
@@ -464,9 +465,7 @@ class _ReadinessCard extends StatelessWidget {
               value: data.profileCompletionPercentage.clamp(0, 100) / 100,
               minHeight: 7,
               backgroundColor: context.appColors.surfaceSoft,
-              color: data.profileCompletionPercentage >= 100
-                  ? context.appColors.success
-                  : context.appColors.secondary,
+              color: context.appColors.secondary,
             ),
           ),
           const SizedBox(height: 14),
@@ -513,7 +512,7 @@ class _ReadinessStep extends StatelessWidget {
                     ? Icons.check_circle_rounded
                     : Icons.radio_button_unchecked_rounded,
                 color: complete
-                    ? context.appColors.success
+                    ? context.appColors.primary
                     : context.appColors.textMuted,
                 size: 22,
               ),
@@ -622,21 +621,21 @@ class _HealthyInventoryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: context.appColors.success.withValues(alpha: 0.065),
+        color: context.appColors.primary.withValues(alpha: 0.065),
         borderRadius: BorderRadius.circular(21),
         border: Border.all(
-          color: context.appColors.success.withValues(alpha: 0.14),
+          color: context.appColors.primary.withValues(alpha: 0.14),
         ),
       ),
       child: Row(
         children: [
-          Icon(Icons.task_alt_rounded, color: context.appColors.success),
+          Icon(Icons.task_alt_rounded, color: context.appColors.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'المخزون مستقر ولا توجد تنبيهات عاجلة',
               style: TextStyle(
-                color: context.appColors.success,
+                color: context.appColors.primary,
                 fontWeight: FontWeight.w800,
               ),
             ),

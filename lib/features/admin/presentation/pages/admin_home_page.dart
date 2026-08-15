@@ -63,7 +63,7 @@ class AdminHomePage extends ConsumerWidget {
                     value: '${data.totalPharmacies}',
                     caption: '${data.pendingPharmacies} معلقة',
                     icon: Icons.local_pharmacy_rounded,
-                    color: context.appColors.primaryLight,
+                    color: context.appColors.primaryDeep,
                   ),
                   RoleMetricData(
                     label: 'المنظمات',
@@ -77,7 +77,7 @@ class AdminHomePage extends ConsumerWidget {
                     value: '${data.totalWarehouses}',
                     caption: '${data.approvedWarehouses} معتمد',
                     icon: Icons.warehouse_rounded,
-                    color: context.appColors.primaryLight,
+                    color: context.appColors.primary,
                   ),
                 ],
               ),
@@ -107,7 +107,7 @@ class AdminHomePage extends ConsumerWidget {
                     title: 'الحسابات',
                     subtitle: 'متابعة الحالة والصلاحية',
                     icon: Icons.manage_accounts_rounded,
-                    color: context.appColors.primaryLight,
+                    color: context.appColors.primaryDeep,
                     onTap: () =>
                         context.go('/admin/workspace?section=accounts'),
                   ),
@@ -123,7 +123,7 @@ class AdminHomePage extends ConsumerWidget {
                     title: 'دليل الأدوية',
                     subtitle: 'مراجعة وإضافة بيانات الدواء',
                     icon: Icons.medication_rounded,
-                    color: context.appColors.primaryLight,
+                    color: context.appColors.primary,
                     onTap: () => context.go('/medicines'),
                   ),
                 ],
@@ -209,7 +209,7 @@ class _AiServicesCard extends StatelessWidget {
       children: [
         Icon(
           status.available ? Icons.check_circle_rounded : Icons.error_rounded,
-          color: status.available ? context.appColors.success : context.appColors.danger,
+          color: status.available ? context.appColors.primary : context.appColors.primaryDark,
           size: 18,
         ),
         const SizedBox(width: 8),
@@ -217,7 +217,7 @@ class _AiServicesCard extends StatelessWidget {
         Text(
           status.available ? 'يعمل' : 'غير متاح',
           style: TextStyle(
-            color: status.available ? context.appColors.success : context.appColors.danger,
+            color: status.available ? context.appColors.primary : context.appColors.primaryDark,
             fontSize: 11,
             fontWeight: FontWeight.w800,
           ),

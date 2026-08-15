@@ -151,6 +151,39 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
   }
 
   Future<void> _approvePharmacy(String id, bool approved, String? reason) => _run(id, () async {
+    if (approved) {
+      // التحقق من حالة الترخيص قبل الموافقة
+      try {
+        final verification = await ref
+            .read(adminRepositoryProvider)
+            .getPharmacyLicenseVerification(id);
+        
+        if (verification.status != 'approved' && verification.status != 'verified') {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'لا يمكن الموافقة على الصيدلية. حالة الترخيص: ${verification.status}. يجب أن يكون الترخيص موثقاً أولاً.',
+                ),
+                backgroundColor: context.appColors.danger,
+              ),
+            );
+          }
+          return;
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('تعذر التحقق من حالة الترخيص: ${e.toString()}'),
+              backgroundColor: context.appColors.danger,
+            ),
+          );
+        }
+        return;
+      }
+    }
+    
     await ref.read(adminRepositoryProvider).approvePharmacy(id, approved, reason: reason);
     _refreshApprovals();
   });
@@ -860,12 +893,12 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: _active ? colors.success.withValues(alpha: .12) : colors.textMuted.withValues(alpha: .08),
+                      color: _active ? colors.primary.withValues(alpha: .12) : colors.textMuted.withValues(alpha: .08),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       _active ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      color: _active ? colors.success : colors.textMuted,
+                      color: _active ? colors.primary : colors.textMuted,
                       size: 22,
                     ),
                   ),
@@ -1244,6 +1277,18 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
           .read(adminRepositoryProvider)
           .getPharmacyLicenseVerification(pharmacy.pharmacyId);
       if (!context.mounted) return;
+      
+      final needsManualReview = verification.status == 'manual_review' || 
+                                  verification.status == 'manualreview' ||
+                                  verification.status == 'failed';
+      final isApproved = verification.status == 'approved' || 
+                         verification.status == 'verified';
+      final statusMessage = isApproved 
+          ? 'الترخيص موثق، يمكنك الموافقة على الصيدلية'
+          : needsManualReview 
+              ? 'الترخيص يحتاج إلى مراجعة يدوية. يجب أن يكون الترخيص موثقاً أولاً قبل الموافقة على الصيدلية.'
+              : 'الترخيص قيد المعالجة.';
+      
       await showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
@@ -1273,6 +1318,58 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                     'ملاحظة المراجعة',
                     verification.manualReviewNote!,
                   ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isApproved 
+                        ? context.appColors.success.withValues(alpha: .1)
+                        : needsManualReview
+                            ? context.appColors.warning.withValues(alpha: .1)
+                            : context.appColors.primary.withValues(alpha: .1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isApproved 
+                          ? context.appColors.success
+                          : needsManualReview
+                              ? context.appColors.warning
+                              : context.appColors.primary,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isApproved 
+                            ? Icons.check_circle_rounded
+                            : needsManualReview
+                                ? Icons.warning_rounded
+                                : Icons.info_rounded,
+                        color: isApproved 
+                            ? context.appColors.success
+                            : needsManualReview
+                                ? context.appColors.warning
+                                : context.appColors.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          statusMessage,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isApproved 
+                                ? context.appColors.success
+                                : needsManualReview
+                                    ? context.appColors.warning
+                                    : context.appColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -2623,8 +2720,8 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _roleColor(account.role);
     final colors = context.appColors;
+    final color = _roleColor(colors, account.role);
     return Container(
       decoration: BoxDecoration(
         color: colors.surface,
@@ -2699,8 +2796,8 @@ class _AccountCard extends StatelessWidget {
                         _AdminPill(
                           label: account.isActive ? 'نشط' : 'موقوف',
                           color: account.isActive
-                              ? colors.success
-                              : colors.danger,
+                              ? colors.primary
+                              : colors.primaryDark,
                         ),
                       ],
                     ),
@@ -2826,8 +2923,8 @@ class _AccountDetailsSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: account.isActive
-                              ? colors.success.withValues(alpha: .15)
-                              : colors.danger.withValues(alpha: .15),
+                              ? colors.primary.withValues(alpha: .15)
+                              : colors.primaryDark.withValues(alpha: .15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -2836,13 +2933,13 @@ class _AccountDetailsSheet extends StatelessWidget {
                             Icon(
                               account.isActive ? Icons.check_circle_outline : Icons.block_outlined,
                               size: 16,
-                              color: account.isActive ? colors.success : colors.danger,
+                              color: account.isActive ? colors.primary : colors.primaryDark,
                             ),
                             const SizedBox(width: 6),
                             Text(
                               account.isActive ? 'حساب نشط' : 'حساب موقوف',
                               style: TextStyle(
-                                color: account.isActive ? colors.success : colors.danger,
+                                color: account.isActive ? colors.primary : colors.primaryDark,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 13,
                               ),
@@ -3091,7 +3188,7 @@ class _TickerCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: item.isActive
-                                  ? colors.success.withValues(alpha: .12)
+                                  ? colors.primary.withValues(alpha: .12)
                                   : colors.textMuted.withValues(alpha: .08),
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -3101,13 +3198,13 @@ class _TickerCard extends StatelessWidget {
                                 Icon(
                                   item.isActive ? Icons.check_circle_outline : Icons.block_outlined,
                                   size: 12,
-                                  color: item.isActive ? colors.success : colors.textMuted,
+                                  color: item.isActive ? colors.primary : colors.textMuted,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   item.isActive ? 'منشور' : 'متوقف',
                                   style: TextStyle(
-                                    color: item.isActive ? colors.success : colors.textMuted,
+                                    color: item.isActive ? colors.primary : colors.textMuted,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -3265,11 +3362,11 @@ IconData _roleIcon(String role) => switch (role.toLowerCase()) {
   'representative' => Icons.delivery_dining_outlined,
   _ => Icons.person_outline_rounded,
 };
-Color _roleColor(String role) => switch (role.toLowerCase()) {
-  'admin' => const Color(0xFF174B57),
-  'pharmacy' => const Color(0xFF216474),
-  'organization' => const Color(0xFF8BD0CB),
-  'warehouse' => const Color(0xFF8BD0CB),
-  'representative' => const Color(0xFF174B57),
-  _ => const Color(0xFF216474),
+Color _roleColor(AppColors colors, String role) => switch (role.toLowerCase()) {
+  'admin' => colors.primaryDark,
+  'pharmacy' => colors.primaryDeep,
+  'organization' => colors.primary,
+  'warehouse' => colors.primaryDeep,
+  'representative' => colors.primaryDark,
+  _ => colors.primary,
 };

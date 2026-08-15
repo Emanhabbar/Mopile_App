@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -52,44 +53,23 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
               children: [
                 _RequestsOverview(items: snapshot),
                 const SizedBox(height: 13),
-                TextField(
+                AppTextField(
+                  label: 'ابحث بالدواء أو اسم المستخدم أو الهاتف',
                   controller: _search,
+                  icon: Icons.search_rounded,
                   textInputAction: TextInputAction.search,
                   onSubmitted: (value) => setState(() => _query = value.trim()),
-                  decoration: InputDecoration(
-                    hintText: 'ابحث بالدواء أو اسم المستخدم أو الهاتف',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _search.text.isEmpty
-                        ? null
-                        : IconButton(
-                            tooltip: 'مسح البحث',
-                            onPressed: () {
-                              _search.clear();
-                              setState(() => _query = '');
-                            },
-                            icon: const Icon(Icons.close_rounded),
-                          ),
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() => _query = _search.text.trim()),
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    tooltip: 'بحث',
                   ),
                 ),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'All', label: Text('الكل')),
-                      ButtonSegment(value: 'Pending', label: Text('بانتظارك')),
-                      ButtonSegment(value: 'Available', label: Text('متوفر')),
-                      ButtonSegment(
-                        value: 'Unavailable',
-                        label: Text('غير متوفر'),
-                      ),
-                    ],
-                    selected: {_status ?? 'All'},
-                    onSelectionChanged: (values) => setState(
-                      () =>
-                          _status = values.first == 'All' ? null : values.first,
-                    ),
-                    showSelectedIcon: false,
+                _RequestStatusSelector(
+                  selectedStatus: _status,
+                  onStatusSelected: (status) => setState(
+                    () => _status = status == 'All' ? null : status,
                   ),
                 ),
               ],
@@ -452,8 +432,120 @@ String _statusLabel(String value) => switch (value.toLowerCase()) {
 
 Color _statusColor(AppColors colors, String value) => switch (value
     .toLowerCase()) {
-  'available' => colors.success,
+  'available' => colors.primary,
   'unavailable' => colors.danger,
   'cancelled' => colors.textMuted,
-  _ => colors.warning,
+  _ => colors.primaryDark,
 };
+
+class _RequestStatusSelector extends StatelessWidget {
+  const _RequestStatusSelector({
+    required this.selectedStatus,
+    required this.onStatusSelected,
+  });
+
+  final String? selectedStatus;
+  final Function(String) onStatusSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Row(
+      children: [
+        Expanded(
+          child: _RequestStatusButton(
+            label: 'الكل',
+            icon: Icons.apps_rounded,
+            color: colors.text,
+            isSelected: selectedStatus == null,
+            onTap: () => onStatusSelected('All'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _RequestStatusButton(
+            label: 'بانتظارك',
+            icon: Icons.hourglass_top_rounded,
+            color: colors.primaryDark,
+            isSelected: selectedStatus == 'Pending',
+            onTap: () => onStatusSelected('Pending'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _RequestStatusButton(
+            label: 'متوفر',
+            icon: Icons.check_circle_rounded,
+            color: colors.primary,
+            isSelected: selectedStatus == 'Available',
+            onTap: () => onStatusSelected('Available'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _RequestStatusButton(
+            label: 'غير متوفر',
+            icon: Icons.cancel_rounded,
+            color: colors.primaryDark,
+            isSelected: selectedStatus == 'Unavailable',
+            onTap: () => onStatusSelected('Unavailable'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RequestStatusButton extends StatelessWidget {
+  const _RequestStatusButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? color : colors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? color : colors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : color,
+              size: 22,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : color,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

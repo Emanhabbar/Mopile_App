@@ -473,6 +473,7 @@ class _BatchMedicineCard extends StatelessWidget {
               },
               title: const Text('متاح للطلب'),
             ),
+            const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               dense: true,

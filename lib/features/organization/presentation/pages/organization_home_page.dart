@@ -52,13 +52,13 @@ class OrganizationHomePage extends ConsumerWidget {
                   label: 'حملات نشطة',
                   value: '${data.activeCampaignsCount}',
                   icon: Icons.track_changes_rounded,
-                  color: context.appColors.success,
+                  color: context.appColors.primary,
                 ),
                 RoleMetricData(
                   label: 'عروض بانتظارك',
                   value: '${data.pendingDonationOffersCount}',
                   icon: Icons.inventory_2_outlined,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primaryDeep,
                 ),
                 RoleMetricData(
                   label: 'طلبات مساعدة',
@@ -94,7 +94,7 @@ class OrganizationHomePage extends ConsumerWidget {
                       ? '${data.pendingDonationOffersCount}'
                       : null,
                   icon: Icons.volunteer_activism_outlined,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primaryDeep,
                   onTap: () =>
                       context.go('/organization/workspace?section=donations'),
                 ),
@@ -114,7 +114,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   title: 'ملف المنظمة',
                   subtitle: 'البيانات ووثائق التحقق',
                   icon: Icons.verified_user_outlined,
-                  color: context.appColors.primaryLight,
+                  color: context.appColors.primary,
                   onTap: () =>
                       context.go('/organization/workspace?section=profile'),
                 ),
@@ -130,7 +130,7 @@ class OrganizationHomePage extends ConsumerWidget {
                   ? Icons.verified_outlined
                   : Icons.upload_file_outlined,
               color: data.isApproved
-                  ? context.appColors.success
+                  ? context.appColors.primary
                   : context.appColors.primaryDark,
               onTap: () =>
                   context.go('/organization/workspace?section=profile'),

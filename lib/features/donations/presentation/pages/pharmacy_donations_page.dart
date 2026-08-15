@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../data/models/donation_models.dart';
 import '../../data/repositories/donations_repository.dart';
 import '../controllers/donations_providers.dart';
@@ -92,15 +93,12 @@ class PharmacyDonationsPage extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(_actionLabel(status)),
-        content: TextField(
+        content: AppTextField(
           controller: note,
-          minLines: 2,
+          label: 'ملاحظة الفحص (اختياري)',
+          hint: 'أضف ملاحظات حول فحص التبرع',
           maxLines: 4,
-          maxLength: 1000,
-          decoration: const InputDecoration(
-            labelText: 'ملاحظة الفحص (اختياري)',
-            alignLabelWithHint: true,
-          ),
+          minLines: 2,
         ),
         actions: [
           TextButton(
