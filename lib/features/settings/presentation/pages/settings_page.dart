@@ -73,7 +73,7 @@ class SettingsPage extends ConsumerWidget {
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
-          accentColor: context.appColors.primaryLight,
+          accentColor: context.appColors.primary,
           icon: Icons.palette_outlined,
           title: 'المظهر',
           subtitle: 'فاتح أو داكن أو حسب إعداد الجهاز',
@@ -149,9 +149,12 @@ class SettingsPage extends ConsumerWidget {
           onTap: () => context.push('/settings/about'),
         ),
         const SizedBox(height: 28),
-        Material(
-          color: context.appColors.danger.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(18),
+        Container(
+          decoration: BoxDecoration(
+            color: context.appColors.danger.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: context.appColors.danger.withValues(alpha: 0.12)),
+          ),
           child: InkWell(
             onTap: () => _confirmLogout(context, ref),
             borderRadius: BorderRadius.circular(18),
@@ -196,6 +199,7 @@ class SettingsPage extends ConsumerWidget {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: context.appColors.surface,
         title: const Text('تسجيل الخروج'),
         content: const Text('هل تريد تسجيل الخروج من حسابك؟'),
         actions: [
@@ -237,42 +241,12 @@ class _ProfileHero extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [
-            context.appColors.primaryDeep,
-            context.appColors.primary,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(30),
+        color: context.appColors.primaryDeep,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
       ),
       child: Stack(
         children: [
-          Positioned(
-            top: -30,
-            left: -25,
-            child: Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -40,
-            right: -15,
-            child: Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                color: context.appColors.secondary.withValues(alpha: 0.06),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(22),
             child: Column(
@@ -320,7 +294,7 @@ class _ProfileHero extends StatelessWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: context.appColors.surface.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.08),
@@ -345,28 +319,29 @@ class _ProfileHero extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: hasImage
-                              ? context.appColors.secondary
-                              : Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          hasImage ? 'حساب موثّق' : 'حساب غير موثّق',
-                          style: TextStyle(
+                      if (user.primaryRole != AppRole.admin)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
                             color: hasImage
-                                ? context.appColors.primaryDeep
-                                : Colors.white.withValues(alpha: 0.7),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
+                                ? context.appColors.secondary
+                                : context.appColors.surface.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            hasImage ? 'حساب موثّق' : 'حساب غير موثّق',
+                            style: TextStyle(
+                              color: hasImage
+                                  ? context.appColors.primaryDeep
+                                  : Colors.white.withValues(alpha: 0.6),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -403,8 +378,8 @@ class _SectionLabel extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
                 color: context.appColors.text,
               ),
             ),
@@ -413,7 +388,7 @@ class _SectionLabel extends StatelessWidget {
               subtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -441,58 +416,55 @@ class _AccentSettingsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: context.appColors.surface,
-      borderRadius: BorderRadius.circular(18),
+    return Container(
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: context.appColors.border),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 52,
-              decoration: BoxDecoration(
-                color: accentColor,
-                borderRadius: const BorderRadius.horizontal(
-                  right: Radius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: context.appColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(icon, color: accentColor, size: 21),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: context.appColors.text,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: context.appColors.textMuted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: 14),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(13),
-              ),
-              child: Icon(icon, color: accentColor, size: 21),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14.5,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: context.appColors.textMuted,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

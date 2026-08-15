@@ -252,17 +252,14 @@ class _LocationHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF174B57), Color(0xFF0B3540)],
-        ),
+        color: context.appColors.primaryDeep,
         borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.near_me_rounded, color: Color(0xFFF5CB72), size: 29),
+          Icon(Icons.near_me_rounded, color: context.appColors.secondary, size: 29),
           const SizedBox(height: 12),
           Text(
             hasLocation ? 'اكتشف الأقرب إليك' : 'حدد موقعك أولًا',
@@ -435,14 +432,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
       height: _expanded ? expandedHeight : 472,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: context.appColors.shadow.withValues(alpha: 0.16),
-            blurRadius: 34,
-            offset: const Offset(0, 16),
-          ),
-        ],
+        border: Border.all(color: context.appColors.border, width: 1),
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -486,7 +476,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
                           borderColor: Colors.white.withValues(alpha: 0.92),
                           gradientColors: [
                             context.appColors.primary,
-                            Color(0xFF0E7482),
+                            context.appColors.primaryDark,
                             context.appColors.secondary,
                           ],
                         ),
@@ -717,16 +707,9 @@ class _RouteOverview extends StatelessWidget {
     final routeReady = route?.routeAvailable == true && route!.path.length > 1;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep.withValues(alpha: 0.93),
+        color: context.appColors.primaryDeep,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-        boxShadow: [
-          BoxShadow(
-            color: context.appColors.shadow.withValues(alpha: 0.2),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
@@ -783,11 +766,12 @@ class _MapControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(15),
-        elevation: 3,
-        shadowColor: context.appColors.shadow.withValues(alpha: 0.25),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.appColors.surface,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: context.appColors.border),
+        ),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(15),
@@ -825,15 +809,17 @@ class _MapPharmacyPreview extends StatelessWidget {
     final canNavigate =
         route?.directionsUrl.isNotEmpty == true ||
         pharmacy.googleMapsUrl?.isNotEmpty == true;
-    return Material(
-      color: Colors.white.withValues(alpha: 0.97),
-      borderRadius: BorderRadius.circular(23),
-      elevation: 8,
-      shadowColor: context.appColors.shadow.withValues(alpha: 0.24),
-      child: InkWell(
-        onTap: onOpen,
-        borderRadius: BorderRadius.circular(23),
-        child: Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: context.appColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: context.appColors.border),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          onTap: onOpen,
+          child: Padding(
           padding: const EdgeInsets.all(13),
           child: Row(
             children: [
@@ -841,13 +827,7 @@ class _MapPharmacyPreview extends StatelessWidget {
                 width: 47,
                 height: 47,
                 decoration: BoxDecoration(
-                  gradient: number == 1
-                      ? LinearGradient(
-                          colors: [context.appColors.secondary, Color(0xFFE7AE45)],
-                        )
-                      : LinearGradient(
-                          colors: [context.appColors.primary, context.appColors.primaryDark],
-                        ),
+                  color: number == 1 ? context.appColors.secondary : context.appColors.primary,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 alignment: Alignment.center,
@@ -910,7 +890,8 @@ class _MapPharmacyPreview extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
@@ -939,12 +920,6 @@ class _UserMarker extends StatelessWidget {
               color: context.appColors.primary,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 4),
-              boxShadow: [
-                BoxShadow(
-                  color: context.appColors.shadow.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                ),
-              ],
             ),
           ),
           const Icon(Icons.person_rounded, color: Colors.white, size: 13),
@@ -972,7 +947,7 @@ class _PharmacyMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = nearest ? const Color(0xFFE3A940) : context.appColors.primaryDark;
+    final color = nearest ? context.appColors.secondary : context.appColors.primaryDark;
     return Semantics(
       button: true,
       selected: selected,
@@ -992,15 +967,6 @@ class _PharmacyMarker extends StatelessWidget {
                 color: color,
                 borderRadius: BorderRadius.circular(selected ? 19 : 17),
                 border: Border.all(color: Colors.white, width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: context.appColors.shadow.withValues(
-                      alpha: selected ? 0.34 : 0.22,
-                    ),
-                    blurRadius: selected ? 17 : 10,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -1242,7 +1208,7 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = highlighted ? const Color(0xFFB47618) : context.appColors.textMuted;
+    final color = highlighted ? context.appColors.secondary : context.appColors.textMuted;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(

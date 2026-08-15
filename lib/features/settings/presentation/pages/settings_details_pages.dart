@@ -22,7 +22,12 @@ class AppearanceSettingsPage extends ConsumerWidget {
             subtitle: 'اختر مظهر التطبيق أو اجعله يتبع إعداد جهازك.',
           ),
           const SizedBox(height: 18),
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: context.appColors.border),
+            ),
             child: Column(
               children: ThemeMode.values.map((value) {
                 final data = switch (value) {
@@ -86,7 +91,12 @@ class NotificationPreferencesPage extends ConsumerWidget {
                 'تحكم بأنواع التنبيهات التي يعرضها التطبيق لك. صلاحية الإشعارات تُدار من إعدادات الهاتف.',
           ),
           const SizedBox(height: 18),
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: context.appColors.border),
+            ),
             child: Column(
               children: [
                 SwitchListTile(
@@ -183,7 +193,12 @@ class _PermissionsSettingsPageState extends State<PermissionsSettingsPage> {
                 'يطلب دوائي الصلاحية عند الحاجة فقط، ويمكنك تعديلها من إعدادات هاتفك.',
           ),
           const SizedBox(height: 18),
-          Card(
+          Container(
+            decoration: BoxDecoration(
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: context.appColors.border),
+            ),
             child: Column(
               children: [
                 ListTile(
@@ -339,7 +354,12 @@ class InformationPage extends StatelessWidget {
               .map(
                 (section) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Card(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: context.appColors.surface,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: context.appColors.border),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(18),
                       child: Column(
@@ -378,10 +398,9 @@ class _IntroCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primary, context.appColors.primaryDark],
-      ),
-      borderRadius: BorderRadius.circular(22),
+      color: context.appColors.surfaceSoft,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: context.appColors.border),
     ),
     child: Row(
       children: [
@@ -389,10 +408,10 @@ class _IntroCard extends StatelessWidget {
           width: 52,
           height: 52,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(17),
+            color: context.appColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(18),
           ),
-          child: Icon(icon, color: context.appColors.secondary),
+          child: Icon(icon, color: context.appColors.primary),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -401,16 +420,16 @@ class _IntroCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.appColors.textMuted,
+                ),
               ),
             ],
           ),

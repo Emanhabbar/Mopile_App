@@ -261,9 +261,9 @@ class _WarningsCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: const Color(0xFFFFF8E8),
+      color: context.appColors.surfaceWarm,
       borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: const Color(0xFFF0D9A7)),
+      border: Border.all(color: context.appColors.secondary.withValues(alpha: 0.3)),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

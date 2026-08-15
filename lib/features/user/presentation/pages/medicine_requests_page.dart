@@ -100,12 +100,11 @@ class _RequestsIntro extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF174B57), Color(0xFF216474)],
+        color: context.appColors.primaryDeep,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: context.appColors.primary.withValues(alpha: 0.15),
         ),
-        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         children: [
@@ -113,12 +112,12 @@ class _RequestsIntro extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.receipt_long_rounded,
-              color: Color(0xFFF5CB72),
+              color: context.appColors.secondary,
             ),
           ),
           const SizedBox(width: 13),
@@ -146,7 +145,7 @@ class _RequestsIntro extends StatelessWidget {
             onPressed: onNewRequest,
             tooltip: 'طلب جديد',
             style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFFF5CB72),
+              backgroundColor: context.appColors.secondary,
               foregroundColor: context.appColors.primaryDark,
             ),
             icon: const Icon(Icons.add_rounded),
@@ -306,9 +305,9 @@ class _EmptyRequests extends StatelessWidget {
       padding: const EdgeInsets.all(32),
       children: [
         const SizedBox(height: 80),
-        const Icon(
+        Icon(
           Icons.inventory_2_outlined,
-          color: Color(0xFF668087),
+          color: context.appColors.textMuted,
           size: 48,
         ),
         const SizedBox(height: 14),
@@ -344,8 +343,8 @@ class _Fact extends StatelessWidget {
           value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Color(0xFF142E35),
+          style: TextStyle(
+            color: context.appColors.text,
             fontWeight: FontWeight.w800,
             fontSize: 12,
           ),

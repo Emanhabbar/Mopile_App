@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/theme/app_colors.dart';
 
@@ -16,6 +17,8 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.onSubmitted,
     this.autofillHints,
+    this.focusNode,
+    this.inputFormatters,
     this.maxLines = 1,
     this.minLines,
   });
@@ -31,52 +34,113 @@ class AppTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final ValueChanged<String>? onSubmitted;
   final Iterable<String>? autofillHints;
+  final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
   final int maxLines;
   final int? minLines;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: TextStyle(
+            color: colors.text,
             fontSize: 14,
-            color: context.appColors.text,
+            fontWeight: FontWeight.w600,
+            height: 1.3,
           ),
         ),
-        const SizedBox(height: 9),
+        const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          focusNode: focusNode,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
           obscureText: obscureText,
           maxLines: obscureText ? 1 : maxLines,
           minLines: obscureText ? 1 : minLines,
+          inputFormatters: inputFormatters,
           validator: validator,
           onFieldSubmitted: onSubmitted,
           autofillHints: autofillHints,
+          cursorColor: colors.primary,
+          cursorWidth: 1.4,
+          style: TextStyle(
+            color: colors.text,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            prefixIconConstraints: icon == null
-                ? null
-                : const BoxConstraints(minWidth: 58, minHeight: 48),
-            prefixIcon: icon == null
-                ? null
-                : Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 8, end: 8),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: context.appColors.surfaceSoft,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(icon, size: 21),
+            hintStyle: TextStyle(
+              color: colors.textMuted.withValues(alpha: 0.6),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+            filled: true,
+            fillColor: colors.surfaceSoft,
+            prefixIcon: icon != null
+                ? Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      start: 14,
+                      end: 10,
                     ),
-                  ),
+                    child: Icon(
+                      icon,
+                      size: 21,
+                      color: colors.primary,
+                    ),
+                  )
+                : null,
+            prefixIconConstraints: icon != null
+                ? const BoxConstraints(minWidth: 46, minHeight: 52)
+                : null,
             suffixIcon: suffixIcon,
+            suffixIconConstraints:
+                const BoxConstraints(minWidth: 48, minHeight: 52),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 15,
+            ),
+            errorStyle: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: colors.danger,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: colors.primary.withValues(alpha: 0.4),
+                width: 1.2,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: colors.danger.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: colors.danger.withValues(alpha: 0.7),
+                width: 1.2,
+              ),
+            ),
           ),
         ),
       ],

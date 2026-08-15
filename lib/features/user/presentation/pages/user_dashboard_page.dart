@@ -228,10 +228,8 @@ class _DashboardContent extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: context.appColors.surface,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                      color: context.appColors.border.withValues(alpha: 0.7),
-                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: context.appColors.border),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(6),
@@ -264,256 +262,198 @@ class _HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasLocation = data.profile.hasSavedLocation;
-    final accent = context.appColors.primary;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        // تدرّج موحّد مع RoleDashboardHero لتتطابق كل الأدوار بصرياً.
-        gradient: LinearGradient(
-          begin: AlignmentDirectional.topStart,
-          end: AlignmentDirectional.bottomEnd,
-          colors: [context.appColors.primaryDeep, accent],
+        color: context.appColors.primaryDeep,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: context.appColors.primary.withValues(alpha: 0.15),
         ),
-        borderRadius: BorderRadius.circular(AppRadius.hero),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withValues(alpha: 0.2),
-            blurRadius: 28,
-            offset: const Offset(0, 13),
-          ),
-        ],
       ),
-      child: Stack(
-        children: [
-          // أوربس بأحجام/مواضع مطابقة لـ RoleDashboardHero.
-          PositionedDirectional(
-            top: -55,
-            end: -40,
-            child: _DecorativeOrb(
-              size: 145,
-              color: Colors.white.withValues(alpha: 0.07),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: -50,
-            start: -35,
-            child: _DecorativeOrb(
-              size: 120,
-              color: accent.withValues(alpha: 0.18),
-            ),
-          ),
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.medical_services_rounded,
-                    color: Color(0xFF8BD0CB),
-                    size: 14,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    'مساحتك الصحية',
-                    style: TextStyle(
-                      color: context.appColors.primaryLight,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: 16,
-            left: 16,
-            child: _HealthProfileButton(
-              onPressed: () => context.push('/user/health'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(22, 58, 22, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(
-                  'أهلًا $firstName',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontSize: 26,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'ابحث عن دوائك، تابع طلباتك واحتفظ\nبمعلوماتك الصحية في مكان واحد.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 13.5,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => context.go('/user/search'),
-                    borderRadius: BorderRadius.circular(18),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.13),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search_rounded,
-                            color: context.appColors.secondary,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'ابحث عن دواء...',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.5),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: context.appColors.secondary,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Text(
-                              'بحث',
-                              style: TextStyle(
-                                color: Color(0xFF173D46),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.07),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        hasLocation
-                            ? Icons.location_on_rounded
-                            : Icons.add_location_alt_rounded,
-                        color: hasLocation
-                            ? context.appColors.secondary
-                            : Colors.white.withValues(alpha: 0.6),
-                        size: 17,
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          hasLocation
-                              ? 'موقعك محفوظ — النتائج الأقرب لك'
-                              : 'أضف موقعك لعرض الصيدليات القريبة',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.65),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
                         ),
-                      ),
-                      Icon(
-                        Icons.chevron_left_rounded,
-                        color: Colors.white.withValues(alpha: 0.4),
-                        size: 18,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.medical_services_rounded,
+                              color: Color(0xFF8BD0CB),
+                              size: 14,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              'مساحتك الصحية',
+                              style: TextStyle(
+                                color: context.appColors.primaryLight,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
+                GestureDetector(
+                  onTap: () => context.push('/user/health'),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.favorite_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Text(
+              'أهلًا $firstName',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: Colors.white,
+                fontSize: 26,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'ابحث عن دوائك، تابع طلباتك واحتفظ\nبمعلوماتك الصحية في مكان واحد.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 13.5,
+                height: 1.6,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => context.go('/user/search'),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 13,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search_rounded,
+                        color: context.appColors.secondary,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'ابحث عن دواء...',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.appColors.secondary,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text(
+                          'بحث',
+                          style: TextStyle(
+                            color: Color(0xFF173D46),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    hasLocation
+                        ? Icons.location_on_rounded
+                        : Icons.add_location_alt_rounded,
+                    color: hasLocation
+                        ? context.appColors.secondary
+                        : Colors.white.withValues(alpha: 0.6),
+                    size: 17,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      hasLocation
+                          ? 'موقعك محفوظ — النتائج الأقرب لك'
+                          : 'أضف موقعك لعرض الصيدليات القريبة',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.65),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withValues(alpha: 0.4),
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-}
-
-class _HealthProfileButton extends StatelessWidget {
-  const _HealthProfileButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        tooltip: 'ملفي الصحي',
-        icon: const Icon(Icons.favorite_rounded, color: Colors.white, size: 20),
-        padding: EdgeInsets.zero,
-      ),
-    );
-  }
-}
-
-class _DecorativeOrb extends StatelessWidget {
-  const _DecorativeOrb({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
@@ -536,50 +476,24 @@ class _LocationSummary extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         child: Ink(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.topStart,
-              end: AlignmentDirectional.bottomEnd,
-              colors: hasLocation
-                  ? [
-                      context.appColors.primary.withValues(alpha: 0.08),
-                      context.appColors.surface,
-                    ]
-                  : [
-                      const Color(0xFFFFF9EC),
-                      context.appColors.surface,
-                    ],
-            ),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: hasLocation
-                  ? context.appColors.primary.withValues(alpha: 0.18)
-                  : const Color(0xFFF1DDAF),
-            ),
+            color: context.appColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: hasLocation
-                        ? [
-                            context.appColors.primary.withValues(alpha: 0.18),
-                            context.appColors.primary.withValues(alpha: 0.08),
-                          ]
-                        : [
-                            const Color(0xFFF5CB72).withValues(alpha: 0.3),
-                            const Color(0xFFF5CB72).withValues(alpha: 0.1),
-                          ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
+                  color: hasLocation
+                      ? context.appColors.primary.withValues(alpha: 0.1)
+                      : context.appColors.secondary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   hasLocation
@@ -587,7 +501,7 @@ class _LocationSummary extends StatelessWidget {
                       : Icons.add_location_alt_rounded,
                   color: hasLocation
                       ? context.appColors.primary
-                      : const Color(0xFFB57920),
+                      : context.appColors.secondary,
                   size: 22,
                 ),
               ),
@@ -619,15 +533,15 @@ class _LocationSummary extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: hasLocation
-                      ? context.appColors.primary.withValues(alpha: 0.1)
-                      : context.appColors.warning.withValues(alpha: 0.12),
+                      ? context.appColors.primary.withValues(alpha: 0.08)
+                      : context.appColors.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   Icons.chevron_left_rounded,
                   color: hasLocation
                       ? context.appColors.primary
-                      : context.appColors.warning,
+                      : context.appColors.secondary,
                   size: 20,
                 ),
               ),
@@ -651,7 +565,7 @@ class _NearbyPharmacyCard extends StatelessWidget {
       width: 255,
       child: Card(
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: InkWell(
           onTap: onTap,
           child: Padding(
@@ -662,23 +576,16 @@ class _NearbyPharmacyCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            context.appColors.primary.withValues(alpha: 0.18),
-                            context.appColors.primary.withValues(alpha: 0.08),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
+                        color: context.appColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         Icons.local_pharmacy_rounded,
                         color: context.appColors.primary,
-                        size: 22,
+                        size: 21,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -746,7 +653,7 @@ class _RequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -754,23 +661,16 @@ class _RequestCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      context.appColors.primary.withValues(alpha: 0.18),
-                      context.appColors.primary.withValues(alpha: 0.08),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(15),
+                  color: context.appColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   Icons.medication_rounded,
                   color: context.appColors.primary,
-                  size: 24,
+                  size: 23,
                 ),
               ),
               const SizedBox(width: 14),
@@ -800,15 +700,15 @@ class _RequestCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF5DE),
-                  borderRadius: BorderRadius.circular(12),
+                  color: context.appColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   request.statusDisplayText.isEmpty
                       ? request.status
                       : request.statusDisplayText,
-                  style: const TextStyle(
-                    color: Color(0xFF9B681C),
+                  style: TextStyle(
+                    color: context.appColors.primary,
                     fontWeight: FontWeight.w700,
                     fontSize: 11.5,
                   ),
@@ -832,7 +732,7 @@ class _SearchActivity extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
         child: Row(
@@ -909,21 +809,19 @@ class _EmptyActivity extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
       decoration: BoxDecoration(
         color: context.appColors.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: context.appColors.border.withValues(alpha: 0.7),
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
               color: context.appColors.surfaceSoft,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: context.appColors.textMuted, size: 24),
+            child: Icon(icon, color: context.appColors.textMuted, size: 23),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -945,26 +843,27 @@ class _SmallPill extends StatelessWidget {
   const _SmallPill({
     required this.icon,
     required this.text,
-    this.color = const Color(0xFF216474),
+    this.color,
   });
 
   final IconData icon;
   final String text;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final pillColor = color ?? context.appColors.primary;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
+          color: pillColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 12),
+            Icon(icon, color: pillColor, size: 12),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
@@ -972,7 +871,7 @@ class _SmallPill extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: color,
+                  color: pillColor,
                   fontWeight: FontWeight.w700,
                   fontSize: 10.5,
                 ),

@@ -67,9 +67,36 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                 TextFormField(
                   controller: _currentController,
                   obscureText: _obscureCurrent,
+                  cursorColor: context.appColors.primary,
+                  cursorWidth: 1.4,
+                  style: TextStyle(
+                    color: context.appColors.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                   decoration: InputDecoration(
                     labelText: 'كلمة المرور الحالية',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    labelStyle: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        start: 14,
+                        end: 10,
+                      ),
+                      child: Icon(
+                        Icons.lock_outline_rounded,
+                        size: 21,
+                        color: context.appColors.primary,
+                      ),
+                    ),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 46,
+                      minHeight: 52,
+                    ),
                     suffixIcon: IconButton(
                       onPressed: () =>
                           setState(() => _obscureCurrent = !_obscureCurrent),
@@ -77,6 +104,33 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                         _obscureCurrent
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
+                        color: context.appColors.textMuted,
+                        size: 21,
+                      ),
+                    ),
+                    suffixIconConstraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 52,
+                    ),
+                    filled: true,
+                    fillColor: context.appColors.surfaceSoft,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 15,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                        color: context.appColors.primary.withValues(alpha: 0.4),
+                        width: 1.2,
                       ),
                     ),
                   ),
@@ -88,9 +142,36 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                 TextFormField(
                   controller: _newController,
                   obscureText: _obscureNew,
+                  cursorColor: context.appColors.primary,
+                  cursorWidth: 1.4,
+                  style: TextStyle(
+                    color: context.appColors.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                   decoration: InputDecoration(
                     labelText: 'كلمة المرور الجديدة',
-                    prefixIcon: const Icon(Icons.password_rounded),
+                    labelStyle: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        start: 14,
+                        end: 10,
+                      ),
+                      child: Icon(
+                        Icons.password_rounded,
+                        size: 21,
+                        color: context.appColors.primary,
+                      ),
+                    ),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 46,
+                      minHeight: 52,
+                    ),
                     suffixIcon: IconButton(
                       onPressed: () =>
                           setState(() => _obscureNew = !_obscureNew),
@@ -98,6 +179,33 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                         _obscureNew
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
+                        color: context.appColors.textMuted,
+                        size: 21,
+                      ),
+                    ),
+                    suffixIconConstraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 52,
+                    ),
+                    filled: true,
+                    fillColor: context.appColors.surfaceSoft,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 15,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                        color: context.appColors.primary.withValues(alpha: 0.4),
+                        width: 1.2,
                       ),
                     ),
                   ),
@@ -112,9 +220,57 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
                 TextFormField(
                   controller: _confirmController,
                   obscureText: _obscureNew,
-                  decoration: const InputDecoration(
+                  cursorColor: context.appColors.primary,
+                  cursorWidth: 1.4,
+                  style: TextStyle(
+                    color: context.appColors.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
                     labelText: 'تأكيد كلمة المرور الجديدة',
-                    prefixIcon: Icon(Icons.verified_user_outlined),
+                    labelStyle: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        start: 14,
+                        end: 10,
+                      ),
+                      child: Icon(
+                        Icons.verified_user_outlined,
+                        size: 21,
+                        color: context.appColors.primary,
+                      ),
+                    ),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 46,
+                      minHeight: 52,
+                    ),
+                    filled: true,
+                    fillColor: context.appColors.surfaceSoft,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 15,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                        color: context.appColors.primary.withValues(alpha: 0.4),
+                        width: 1.2,
+                      ),
+                    ),
                   ),
                   validator: (value) => value != _newController.text
                       ? 'كلمتا المرور غير متطابقتين'
@@ -185,10 +341,9 @@ class _PasswordHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
-      borderRadius: BorderRadius.circular(26),
+      color: context.appColors.primaryDeep,
+      borderRadius: BorderRadius.circular(22),
+      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
     ),
     child: const Row(
       children: [
@@ -203,14 +358,14 @@ class _PasswordHero extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               Text(
                 'اختر كلمة مختلفة وقوية لا تقل عن 8 أحرف.',
                 style: TextStyle(
                   color: Colors.white70,
-                  fontSize: 10.5,
+                  fontSize: 13,
                   height: 1.5,
                 ),
               ),
@@ -229,8 +384,8 @@ class _PasswordHeroIcon extends StatelessWidget {
     width: 52,
     height: 52,
     decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: .12),
-      borderRadius: BorderRadius.circular(17),
+      color: Colors.white.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(18),
     ),
     child: Icon(
       Icons.lock_reset_rounded,

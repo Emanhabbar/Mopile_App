@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../shared/widgets/profile_avatar.dart';
 import '../../../auth/data/models/auth_session.dart';
@@ -113,13 +114,11 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
+                        AppTextField(
+                          label: 'الاسم الكامل',
                           controller: _nameController,
+                          icon: Icons.person_outline_rounded,
                           textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'الاسم الكامل',
-                            prefixIcon: Icon(Icons.person_outline_rounded),
-                          ),
                           validator: (value) {
                             final text = value?.trim() ?? '';
                             if (text.isEmpty) return 'أدخل الاسم الكامل';
@@ -133,20 +132,63 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                         TextFormField(
                           initialValue: data.email,
                           enabled: false,
-                          decoration: const InputDecoration(
+                          cursorColor: context.appColors.primary,
+                          cursorWidth: 1.4,
+                          style: TextStyle(
+                            color: context.appColors.text,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
                             labelText: 'البريد الإلكتروني',
-                            prefixIcon: Icon(Icons.email_outlined),
+                            labelStyle: TextStyle(
+                              color: context.appColors.text,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3,
+                            ),
+                            prefixIcon: Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                start: 14,
+                                end: 10,
+                              ),
+                              child: Icon(
+                                Icons.email_outlined,
+                                size: 21,
+                                color: context.appColors.primary,
+                              ),
+                            ),
+                            prefixIconConstraints: const BoxConstraints(
+                              minWidth: 46,
+                              minHeight: 52,
+                            ),
+                            filled: true,
+                            fillColor: context.appColors.surfaceSoft,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 15,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        TextFormField(
+                        AppTextField(
+                          label: 'رقم الهاتف',
                           controller: _phoneController,
+                          icon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            labelText: 'رقم الهاتف',
-                            hintText: 'اختياري',
-                            prefixIcon: Icon(Icons.phone_outlined),
-                          ),
+                          hint: 'اختياري',
                           validator: (value) => (value?.trim().length ?? 0) > 30
                               ? 'يجب ألا يتجاوز الرقم 30 محرفًا'
                               : null,
@@ -304,17 +346,9 @@ class _AvatarEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
-      borderRadius: BorderRadius.circular(27),
-      boxShadow: [
-        BoxShadow(
-          color: context.appColors.primaryDeep.withValues(alpha: .15),
-          blurRadius: 22,
-          offset: const Offset(0, 10),
-        ),
-      ],
+      color: context.appColors.primaryDeep,
+      borderRadius: BorderRadius.circular(22),
+      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
     ),
     child: Padding(
       padding: const EdgeInsets.all(20),
@@ -326,15 +360,16 @@ class _AvatarEditor extends StatelessWidget {
             user.fullName,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Colors.white,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 3),
           Text(
             user.email,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 13,
+            ),
           ),
           const SizedBox(height: 14),
           Wrap(

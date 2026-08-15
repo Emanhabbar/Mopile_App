@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../app/theme/app_colors.dart';
+
 class PharmacyBarcodeScannerPage extends StatefulWidget {
   const PharmacyBarcodeScannerPage({super.key});
 
@@ -64,8 +66,8 @@ class _PharmacyBarcodeScannerPageState
         MobileScanner(
           controller: _controller,
           onDetect: _onDetect,
-          placeholderBuilder: (_) => const Center(
-            child: CircularProgressIndicator(color: Color(0xFFF5CB72)),
+          placeholderBuilder: (_) => Center(
+            child: CircularProgressIndicator(color: context.appColors.secondary),
           ),
           errorBuilder: (_, _) => const ColoredBox(
             color: Color(0xFF061D23),
@@ -92,7 +94,7 @@ class _PharmacyBarcodeScannerPageState
             ),
           ),
         ),
-        const _ScannerOverlay(),
+        _ScannerOverlay(secondaryColor: context.appColors.secondary),
         PositionedDirectional(
           start: 20,
           end: 20,
@@ -194,14 +196,20 @@ class _PharmacyBarcodeScannerPageState
 }
 
 class _ScannerOverlay extends StatelessWidget {
-  const _ScannerOverlay();
+  const _ScannerOverlay({required this.secondaryColor});
+
+  final Color secondaryColor;
 
   @override
   Widget build(BuildContext context) =>
-      IgnorePointer(child: CustomPaint(painter: _ScannerOverlayPainter()));
+      IgnorePointer(child: CustomPaint(painter: _ScannerOverlayPainter(secondaryColor: secondaryColor)));
 }
 
 class _ScannerOverlayPainter extends CustomPainter {
+  const _ScannerOverlayPainter({required this.secondaryColor});
+
+  final Color secondaryColor;
+
   @override
   void paint(Canvas canvas, Size size) {
     final windowWidth = (size.width - 52).clamp(250.0, 380.0);
@@ -217,7 +225,7 @@ class _ScannerOverlayPainter extends CustomPainter {
     canvas.drawPath(path, Paint()..color = Colors.black.withValues(alpha: .48));
 
     final border = Paint()
-      ..color = Color(0xFFF5CB72)
+      ..color = secondaryColor
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
     canvas.drawRRect(
@@ -228,7 +236,7 @@ class _ScannerOverlayPainter extends CustomPainter {
       Offset(window.left + 20, window.center.dy),
       Offset(window.right - 20, window.center.dy),
       Paint()
-        ..color = Color(0xFFF5CB72).withValues(alpha: .75)
+        ..color = secondaryColor.withValues(alpha: .75)
         ..strokeWidth = 2,
     );
   }

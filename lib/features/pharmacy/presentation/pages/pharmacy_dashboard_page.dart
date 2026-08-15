@@ -230,9 +230,8 @@ class PharmacyDashboardPage extends ConsumerWidget {
   }
 }
 
-/// Hero الصيدلية: بنوحد مظهرها مع RoleDashboardHero (التدرّج، الأوربس،
-/// الأيقونة، الظل) مع الحفاظ على المحتوى الحيوي الخاص بالصيدلي
-/// (الحالة، الموقع، نسبة الاكتمال، التقييم، الطلبات النشطة).
+/// Hero الصيدلية: تصميم نظيف بأسلوب موحّد مع RoleDashboardHero
+/// (لون ثابت + حدود) مع الحفاظ على المحتوى الحيوي الخاص بالصيدلي.
 class _PharmacyHero extends StatelessWidget {
   const _PharmacyHero({required this.data, this.openStatus});
 
@@ -253,150 +252,118 @@ class _PharmacyHero extends StatelessWidget {
       data.area,
       data.city,
     ].where((part) => part.trim().isNotEmpty).join('، ');
-    final accent = context.appColors.primary;
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: AlignmentDirectional.topStart,
-          end: AlignmentDirectional.bottomEnd,
-          colors: [context.appColors.primaryDeep, accent],
+        color: context.appColors.primaryDeep,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: context.appColors.primary.withValues(alpha: 0.15),
         ),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: accent.withValues(alpha: 0.2),
-            blurRadius: 28,
-            offset: const Offset(0, 13),
-          ),
-        ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          PositionedDirectional(
-            top: -55,
-            end: -40,
-            child: _Orb(
-              size: 145,
-              color: Colors.white.withValues(alpha: 0.07),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: -50,
-            start: -35,
-            child: _Orb(
-              size: 120,
-              color: accent.withValues(alpha: 0.18),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(21),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(21),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 62,
-                      height: 62,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(21),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.local_pharmacy_rounded,
-                        color: Color(0xFFF5CB72),
-                        size: 31,
-                      ),
-                    ),
-                    const Spacer(),
-                    _StatusPill(
-                      text: status,
-                      icon: isOpen
-                          ? Icons.circle_rounded
-                          : Icons.schedule_rounded,
-                      color: isOpen
-                          ? context.appColors.primaryLight
-                          : Colors.white70,
-                    ),
-                  ],
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Icon(
+                    Icons.local_pharmacy_rounded,
+                    color: context.appColors.secondary,
+                    size: 28,
+                  ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        data.pharmacyName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(color: Colors.white, fontSize: 22),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Icon(
-                      data.isApproved
-                          ? Icons.verified_rounded
-                          : Icons.hourglass_top_rounded,
-                      color: context.appColors.secondary,
-                      size: 23,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Icon(
-                      data.hasLocation
-                          ? Icons.location_on_rounded
-                          : Icons.location_off_rounded,
-                      color: Colors.white.withValues(alpha: 0.62),
-                      size: 17,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        data.hasLocation && location.isNotEmpty
-                            ? location
-                            : 'أضف موقع الصيدلية لتظهر للمستخدمين',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                _CompletionProgress(value: data.profileCompletionPercentage),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    _HeroMetric(
-                      icon: Icons.star_rounded,
-                      label: 'التقييم',
-                      value: data.ratingsCount == 0
-                          ? 'جديد'
-                          : data.averageRating.toStringAsFixed(1),
-                    ),
-                    const SizedBox(width: 10),
-                    _HeroMetric(
-                      icon: Icons.assignment_rounded,
-                      label: 'طلبات نشطة',
-                      value: '${data.activeRequestsCount}',
-                    ),
-                  ],
+                const Spacer(),
+                _StatusPill(
+                  text: status,
+                  icon: isOpen
+                      ? Icons.circle_rounded
+                      : Icons.schedule_rounded,
+                  color: isOpen
+                      ? context.appColors.primaryLight
+                      : Colors.white70,
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    data.pharmacyName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.headlineSmall
+                        ?.copyWith(color: Colors.white, fontSize: 22),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Icon(
+                  data.isApproved
+                      ? Icons.verified_rounded
+                      : Icons.hourglass_top_rounded,
+                  color: context.appColors.secondary,
+                  size: 23,
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(
+                  data.hasLocation
+                      ? Icons.location_on_rounded
+                      : Icons.location_off_rounded,
+                  color: Colors.white.withValues(alpha: 0.62),
+                  size: 17,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    data.hasLocation && location.isNotEmpty
+                        ? location
+                        : 'أضف موقع الصيدلية لتظهر للمستخدمين',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            _CompletionProgress(value: data.profileCompletionPercentage),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                _HeroMetric(
+                  icon: Icons.star_rounded,
+                  label: 'التقييم',
+                  value: data.ratingsCount == 0
+                      ? 'جديد'
+                      : data.averageRating.toStringAsFixed(1),
+                ),
+                const SizedBox(width: 10),
+                _HeroMetric(
+                  icon: Icons.assignment_rounded,
+                  label: 'طلبات نشطة',
+                  value: '${data.activeRequestsCount}',
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -564,9 +531,9 @@ class _ReadinessStep extends StatelessWidget {
                 ),
               ),
               if (onTap != null)
-                const Icon(
+                Icon(
                   Icons.chevron_left_rounded,
-                  color: Color(0xFF216474),
+                  color: context.appColors.primary,
                 ),
             ],
           ),
@@ -576,8 +543,7 @@ class _ReadinessStep extends StatelessWidget {
   }
 }
 
-/// تنبيه المخزون (محتوى خاص) — حافظنا عليها مع تنسيق منسجم: radius 21
-/// (= AppRadius.tile) وخلفية بتدرّج بدل اللون المسطّح.
+/// تنبيه المخزون — تصميم نظيف بأسلوب موحّد مع البطاقات المشتركة.
 class _InventoryAlertCard extends StatelessWidget {
   const _InventoryAlertCard({required this.alert, required this.onTap});
 
@@ -593,20 +559,13 @@ class _InventoryAlertCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(21),
+        borderRadius: BorderRadius.circular(16),
         child: Ink(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.topStart,
-              end: AlignmentDirectional.bottomEnd,
-              colors: [
-                color.withValues(alpha: 0.08),
-                color.withValues(alpha: 0.03),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(21),
-            border: Border.all(color: color.withValues(alpha: 0.12)),
+            color: context.appColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [
@@ -614,14 +573,7 @@ class _InventoryAlertCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      color.withValues(alpha: 0.18),
-                      color.withValues(alpha: 0.08),
-                    ],
-                  ),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -819,22 +771,6 @@ class _HeroMetric extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Orb extends StatelessWidget {
-  const _Orb({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

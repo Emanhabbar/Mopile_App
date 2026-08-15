@@ -69,6 +69,28 @@ class UserDashboard {
     this.locationContext,
   });
 
+  /// إنشاء نسخة فارغة当السيرفر يرجع خطأ (مثل عدم تكوين Google Places).
+  factory UserDashboard.fallback() => UserDashboard(
+    profile: const UserProfile(
+      userId: '',
+      fullName: '',
+      email: '',
+      isActive: true,
+      hasSavedLocation: false,
+      hasMedicalProfile: false,
+      hasEmergencyContact: false,
+      searchHistoryCount: 0,
+      ratingsCount: 0,
+    ),
+    activeRequestsCount: 0,
+    pendingRequestsCount: 0,
+    completedRequestsCount: 0,
+    recentSearchesCount: 0,
+    openNearbyPharmaciesCount: 0,
+    recentRequests: const [],
+    recentSearches: const [],
+  );
+
   final UserProfile profile;
   final UserLocationContext? locationContext;
   final int activeRequestsCount;

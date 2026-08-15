@@ -369,9 +369,9 @@ class _PharmacyResponse extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9EC),
+        color: context.appColors.surfaceWarm,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF1DDAF)),
+        border: Border.all(color: context.appColors.secondary.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -395,9 +395,9 @@ class _InventoryOverview extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.inventory_2_rounded,
-                  color: Color(0xFFF5CB72),
+                  color: context.appColors.secondary,
                 ),
               ),
               const SizedBox(width: 11),

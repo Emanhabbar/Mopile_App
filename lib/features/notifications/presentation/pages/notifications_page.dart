@@ -200,10 +200,9 @@ class _NotificationsHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(17),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
-      borderRadius: BorderRadius.circular(24),
+      color: context.appColors.primaryDeep,
+      borderRadius: BorderRadius.circular(22),
+      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
     ),
     child: Row(
       children: [
@@ -211,8 +210,8 @@ class _NotificationsHero extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: .12),
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(18),
           ),
           child: Icon(
             Icons.notifications_active_outlined,

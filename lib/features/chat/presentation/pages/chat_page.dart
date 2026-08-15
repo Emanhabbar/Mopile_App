@@ -324,12 +324,12 @@ class _MessageBubble extends StatelessWidget {
           : MainAxisAlignment.end,
       children: [
         if (!message.isUser) ...[
-          const CircleAvatar(
+          CircleAvatar(
             radius: 15,
-            backgroundColor: Color(0xFF102F37),
+            backgroundColor: const Color(0xFF102F37),
             child: Icon(
               Icons.auto_awesome_rounded,
-              color: Color(0xFFF5CB72),
+              color: context.appColors.secondary,
               size: 15,
             ),
           ),

@@ -38,7 +38,7 @@ class AdminHomePage extends ConsumerWidget {
                 subtitle:
                     'تابع الاعتمادات والحسابات ونشاط المنصة من نقطة واحدة.',
                 icon: Icons.admin_panel_settings_rounded,
-                accent: const Color(0xFF256D66),
+                accent: context.appColors.primaryDark,
                 badge: pendingApprovals > 0
                     ? '$pendingApprovals عناصر بانتظار المراجعة'
                     : 'جميع المراجعات محدثة',
@@ -155,7 +155,12 @@ class _AiServicesCard extends StatelessWidget {
   final VoidCallback onRefresh;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) => Container(
+    decoration: BoxDecoration(
+      color: context.appColors.surface,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: context.appColors.border),
+    ),
     child: Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -163,7 +168,7 @@ class _AiServicesCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.hub_rounded, color: Color(0xFF216474)),
+              Icon(Icons.hub_rounded, color: context.appColors.primary),
               const SizedBox(width: 9),
               Expanded(
                 child: Text(
@@ -181,15 +186,15 @@ class _AiServicesCard extends StatelessWidget {
           const SizedBox(height: 10),
           state.when(
             loading: () => const LinearProgressIndicator(minHeight: 3),
-            error: (_, _) => const Text(
+            error: (_, _) => Text(
               'تعذر قراءة حالة الخدمات حالياً.',
-              style: TextStyle(color: Color(0xFFB33A3A), fontSize: 12),
+              style: TextStyle(color: context.appColors.danger, fontSize: 12),
             ),
             data: (health) => Column(
               children: [
-                _service('مراجعة التراخيص', health.licenseVerification),
-                _service('البحث الدوائي', health.drugSearch),
-                _service('المساعد الدوائي', health.smartPharmacyBot),
+                _service(context, 'مراجعة التراخيص', health.licenseVerification),
+                _service(context, 'البحث الدوائي', health.drugSearch),
+                _service(context, 'المساعد الدوائي', health.smartPharmacyBot),
               ],
             ),
           ),
@@ -198,13 +203,13 @@ class _AiServicesCard extends StatelessWidget {
     ),
   );
 
-  Widget _service(String label, AdminAiServiceStatus status) => Padding(
+  Widget _service(BuildContext context, String label, AdminAiServiceStatus status) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 5),
     child: Row(
       children: [
         Icon(
           status.available ? Icons.check_circle_rounded : Icons.error_rounded,
-          color: status.available ? Color(0xFF167D5A) : Color(0xFFB33A3A),
+          color: status.available ? context.appColors.success : context.appColors.danger,
           size: 18,
         ),
         const SizedBox(width: 8),
@@ -212,7 +217,7 @@ class _AiServicesCard extends StatelessWidget {
         Text(
           status.available ? 'يعمل' : 'غير متاح',
           style: TextStyle(
-            color: status.available ? Color(0xFF167D5A) : Color(0xFFB33A3A),
+            color: status.available ? context.appColors.success : context.appColors.danger,
             fontSize: 11,
             fontWeight: FontWeight.w800,
           ),

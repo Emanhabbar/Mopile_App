@@ -64,7 +64,7 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
                           icon: Icons.star_rounded,
                           text:
                               '${pharmacy.rating.toStringAsFixed(1)} من ${pharmacy.totalRatings} تقييم',
-                          color: const Color(0xFFE0A33A),
+                          color: context.appColors.secondary,
                         ),
                       ],
                       if (pharmacy.distanceMeters > 0) ...[

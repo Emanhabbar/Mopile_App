@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../data/models/user_discovery_models.dart';
 import '../controllers/user_providers.dart';
@@ -227,9 +228,9 @@ class _LocationRequiredState extends StatelessWidget {
                   color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(21),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.add_location_alt_rounded,
-                  color: Color(0xFF216474),
+                  color: context.appColors.primary,
                   size: 31,
                 ),
               ),
@@ -269,19 +270,9 @@ class _SearchHero extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF174B57), Color(0xFF216474)],
-        ),
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: context.appColors.primaryDark.withValues(alpha: 0.17),
-            blurRadius: 26,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        color: context.appColors.primaryDeep,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
@@ -289,12 +280,12 @@ class _SearchHero extends StatelessWidget {
             width: 55,
             height: 55,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(17),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.manage_search_rounded,
-              color: Color(0xFFF5CB72),
+              color: context.appColors.secondary,
               size: 29,
             ),
           ),
@@ -357,129 +348,158 @@ class _SearchControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(23),
-        side: const BorderSide(color: Color(0xFFD9E4E5)),
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.border),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: controller,
-              maxLength: 200,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => onSearch(),
-              decoration: const InputDecoration(
-                hintText: 'اسم الدواء أو الاسم العلمي',
-                prefixIcon: Icon(Icons.medication_outlined),
-                counterText: '',
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _RadiusDropdown(
-                    value: radius,
-                    onChanged: onRadiusChanged,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _SortDropdown(
-                    value: sortBy,
-                    options: sortOptions,
-                    onChanged: onSortChanged,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 13),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: searching ? null : onSearch,
-                icon: searching
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Icon(Icons.search_rounded),
-                label: Text(
-                  searching ? 'جاري البحث...' : 'عرض أماكن توفر الدواء',
+      child: Column(
+        children: [
+          AppTextField(
+            label: 'اسم الدواء',
+            hint: 'اسم الدواء أو الاسم العلمي',
+            controller: controller,
+            icon: Icons.medication_outlined,
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => onSearch(),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _CleanDropdown<int>(
+                  label: 'النطاق',
+                  icon: Icons.radar_rounded,
+                  value: radius,
+                  items: const [
+                    DropdownMenuItem(value: 1000, child: Text('1 كم')),
+                    DropdownMenuItem(value: 3000, child: Text('3 كم')),
+                    DropdownMenuItem(value: 5000, child: Text('5 كم')),
+                    DropdownMenuItem(value: 10000, child: Text('10 كم')),
+                    DropdownMenuItem(value: 25000, child: Text('25 كم')),
+                  ],
+                  onChanged: (v) { if (v != null) onRadiusChanged(v); },
                 ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _CleanDropdown<String>(
+                  label: 'الترتيب',
+                  icon: Icons.tune_rounded,
+                  value: sortBy,
+                  isExpanded: true,
+                  items: sortOptions.entries
+                      .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                      .toList(growable: false),
+                  onChanged: (v) { if (v != null) onSortChanged(v); },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: searching ? null : onSearch,
+              icon: searching
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.search_rounded, size: 22),
+              label: Text(
+                searching ? 'جاري البحث...' : 'عرض أماكن توفر الدواء',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _RadiusDropdown extends StatelessWidget {
-  const _RadiusDropdown({required this.value, required this.onChanged});
-
-  final int value;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<int>(
-      initialValue: value,
-      decoration: const InputDecoration(
-        labelText: 'النطاق',
-        prefixIcon: Icon(Icons.radar_rounded),
-      ),
-      items: const [
-        DropdownMenuItem(value: 1000, child: Text('1 كم')),
-        DropdownMenuItem(value: 3000, child: Text('3 كم')),
-        DropdownMenuItem(value: 5000, child: Text('5 كم')),
-        DropdownMenuItem(value: 10000, child: Text('10 كم')),
-        DropdownMenuItem(value: 25000, child: Text('25 كم')),
-      ],
-      onChanged: (value) {
-        if (value != null) onChanged(value);
-      },
-    );
-  }
-}
-
-class _SortDropdown extends StatelessWidget {
-  const _SortDropdown({
+class _CleanDropdown<T> extends StatelessWidget {
+  const _CleanDropdown({
+    required this.label,
+    required this.icon,
     required this.value,
-    required this.options,
+    required this.items,
     required this.onChanged,
+    this.isExpanded = false,
   });
 
-  final String value;
-  final Map<String, String> options;
-  final ValueChanged<String> onChanged;
+  final String label;
+  final IconData icon;
+  final T value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final bool isExpanded;
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      isExpanded: true,
-      decoration: const InputDecoration(
-        labelText: 'الترتيب',
-        prefixIcon: Icon(Icons.tune_rounded),
-      ),
-      items: options.entries
-          .map(
-            (entry) =>
-                DropdownMenuItem(value: entry.key, child: Text(entry.value)),
-          )
-          .toList(growable: false),
-      onChanged: (value) {
-        if (value != null) onChanged(value);
-      },
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: colors.text,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: colors.surfaceSoft,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: DropdownButtonFormField<T>(
+            initialValue: value,
+            isExpanded: isExpanded,
+            icon: Icon(Icons.keyboard_arrow_down_rounded, color: colors.textMuted, size: 22),
+            decoration: InputDecoration(
+              prefixIcon: Padding(
+                padding: const EdgeInsetsDirectional.only(start: 14, end: 10),
+                child: Icon(icon, size: 21, color: colors.primary),
+              ),
+              prefixIconConstraints: const BoxConstraints(minWidth: 46, minHeight: 52),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: colors.primary.withValues(alpha: 0.4),
+                  width: 1.2,
+                ),
+              ),
+            ),
+            items: items,
+            onChanged: onChanged,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -534,13 +554,13 @@ class _MedicineResultCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF5DE),
+                      color: context.appColors.surfaceWarm,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
+                    child: Text(
                       'يتطلب وصفة',
                       style: TextStyle(
-                        color: Color(0xFF996619),
+                        color: context.appColors.warning,
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                       ),
@@ -574,9 +594,9 @@ class _MedicineResultCard extends StatelessWidget {
             const SizedBox(height: 14),
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.local_pharmacy_rounded,
-                  color: Color(0xFF216474),
+                  color: context.appColors.primary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -646,8 +666,8 @@ class _Fact extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF142E35),
+            style: TextStyle(
+              color: context.appColors.text,
               fontWeight: FontWeight.w800,
               fontSize: 12,
             ),

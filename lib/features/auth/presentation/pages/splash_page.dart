@@ -153,9 +153,9 @@ class _TopCaption extends StatelessWidget {
         Container(
           width: 7,
           height: 7,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(0xFFF5CB72),
+            color: context.appColors.secondary,
           ),
         ),
         const SizedBox(width: 9),
@@ -196,8 +196,8 @@ class _AnimatedBrandTitle extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFFF5CB72).withValues(alpha: 0.0),
-                    const Color(0xFFF5CB72).withValues(alpha: 0.6),
+                    context.appColors.secondary.withValues(alpha: 0.0),
+                    context.appColors.secondary.withValues(alpha: 0.6),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(1),
@@ -231,8 +231,8 @@ class _AnimatedBrandTitle extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFFF5CB72).withValues(alpha: 0.6),
-                    const Color(0xFFF5CB72).withValues(alpha: 0.0),
+                    context.appColors.secondary.withValues(alpha: 0.6),
+                    context.appColors.secondary.withValues(alpha: 0.0),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(1),
@@ -301,13 +301,13 @@ class _LoadingTrack extends StatelessWidget {
                 child: Container(
                   width: 148,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFF5CB72), Color(0xFFFFE6A7)],
+                    gradient: LinearGradient(
+                      colors: [context.appColors.secondary, context.appColors.secondary.withValues(alpha: 0.7)],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFF5CB72).withValues(alpha: 0.28),
+                        color: context.appColors.secondary.withValues(alpha: 0.28),
                         blurRadius: 9,
                       ),
                     ],

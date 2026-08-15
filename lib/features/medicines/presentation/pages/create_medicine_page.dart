@@ -67,7 +67,7 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
           children: [
             const _Intro(),
             const SizedBox(height: 22),

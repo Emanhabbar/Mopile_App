@@ -12,15 +12,22 @@ class UserRemoteDataSource {
   final Dio _dio;
 
   Future<UserDashboard> getDashboard() async {
-    final data = await _get(
-      ApiEndpoints.userDashboard,
-      queryParameters: const {
-        'take': 3,
-        'externalTake': 3,
-        'includeExternalFallback': true,
-      },
-    );
-    return UserDashboard.fromJson(data);
+    try {
+      final data = await _get(
+        ApiEndpoints.userDashboard,
+        queryParameters: const {
+          'take': 3,
+          'externalTake': 3,
+          'includeExternalFallback': true,
+        },
+      );
+      return UserDashboard.fromJson(data);
+    } on ApiException catch (e) {
+      if (e.statusCode == 400) {
+        return UserDashboard.fallback();
+      }
+      rethrow;
+    }
   }
 
   Future<UserProfile> getProfile() async {

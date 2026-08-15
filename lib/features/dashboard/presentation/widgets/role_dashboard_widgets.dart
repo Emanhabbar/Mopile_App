@@ -23,95 +23,71 @@ class RoleDashboardHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     clipBehavior: Clip.antiAlias,
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: AlignmentDirectional.topStart,
-        end: AlignmentDirectional.bottomEnd,
-        colors: [context.appColors.primaryDeep, accent],
+      color: context.appColors.primaryDeep,
+      borderRadius: BorderRadius.circular(22),
+      border: Border.all(
+        color: context.appColors.primary.withValues(alpha: 0.15),
       ),
-      borderRadius: BorderRadius.circular(30),
-      boxShadow: [
-        BoxShadow(
-          color: accent.withValues(alpha: .2),
-          blurRadius: 28,
-          offset: const Offset(0, 13),
-        ),
-      ],
     ),
-    child: Stack(
-      children: [
-        PositionedDirectional(
-          top: -55,
-          end: -40,
-          child: _GlowCircle(
-            size: 145,
-            color: Colors.white.withValues(alpha: .07),
-          ),
-        ),
-        PositionedDirectional(
-          bottom: -50,
-          start: -35,
-          child: _GlowCircle(size: 120, color: accent.withValues(alpha: .18)),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(21),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (badge != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: .11),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          badge!,
-                          style: TextStyle(
-                            color: context.appColors.secondary,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 13),
-                    ],
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(color: Colors.white, fontSize: 22),
+    child: Padding(
+      padding: const EdgeInsets.all(21),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (badge != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
                     ),
-                    const SizedBox(height: 7),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: .78),
-                        height: 1.55,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: TextStyle(
+                        color: context.appColors.secondary,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                  ],
+                  ),
+                  const SizedBox(height: 13),
+                ],
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Colors.white,
+                    fontSize: 22,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Container(
-                width: 62,
-                height: 62,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(21),
-                  border: Border.all(color: Colors.white.withValues(alpha: .1)),
+                const SizedBox(height: 7),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    height: 1.55,
+                  ),
                 ),
-                child: Icon(icon, color: context.appColors.secondary, size: 31),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 14),
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(icon, color: context.appColors.secondary, size: 28),
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -156,34 +132,20 @@ class RoleMetricsGrid extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.topStart,
-              end: AlignmentDirectional.bottomEnd,
-              colors: [
-                item.color.withValues(alpha: 0.06),
-                context.appColors.surface,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: item.color.withValues(alpha: 0.12)),
+            color: context.appColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 42,
+                height: 42,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      item.color.withValues(alpha: 0.18),
-                      item.color.withValues(alpha: 0.08),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
+                  color: item.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(item.icon, color: item.color, size: 22),
+                child: Icon(item.icon, color: item.color, size: 21),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -277,20 +239,13 @@ class RoleActionsGrid extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: item.onTap,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18),
           child: Ink(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: AlignmentDirectional.topStart,
-                end: AlignmentDirectional.bottomEnd,
-                colors: [
-                  item.color.withValues(alpha: .14),
-                  item.color.withValues(alpha: .04),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: item.color.withValues(alpha: .12)),
+              color: context.appColors.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: context.appColors.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,20 +253,13 @@ class RoleActionsGrid extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .9),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: item.color.withValues(alpha: 0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        color: item.color.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(item.icon, color: item.color, size: 23),
+                      child: Icon(item.icon, color: item.color, size: 22),
                     ),
                     const Spacer(),
                     if (item.badge != null)
@@ -338,7 +286,7 @@ class RoleActionsGrid extends StatelessWidget {
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(
-                          color: item.color.withValues(alpha: 0.1),
+                          color: item.color.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -439,23 +387,28 @@ class RoleNoticeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: color.withValues(alpha: .075),
-    borderRadius: BorderRadius.circular(21),
+    color: Colors.transparent,
+    borderRadius: BorderRadius.circular(18),
     child: InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(21),
-      child: Padding(
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
         padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: context.appColors.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: context.appColors.border),
+        ),
         child: Row(
           children: [
             Container(
-              width: 46,
-              height: 46,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(15),
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: color),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -476,19 +429,5 @@ class RoleNoticeCard extends StatelessWidget {
         ),
       ),
     ),
-  );
-}
-
-class _GlowCircle extends StatelessWidget {
-  const _GlowCircle({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
   );
 }

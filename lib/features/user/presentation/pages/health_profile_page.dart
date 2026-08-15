@@ -469,9 +469,9 @@ class _HealthCardView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.favorite_rounded, color: Color(0xFFF5CB72)),
+                  Icon(Icons.favorite_rounded, color: context.appColors.secondary),
                   SizedBox(width: 8),
                   Text(
                     'البطاقة الصحية',

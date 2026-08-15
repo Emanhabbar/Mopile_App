@@ -166,43 +166,108 @@ class _CatalogHeaderState extends State<_CatalogHeader> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
-        color: colors.surface,
-        border: Border(bottom: BorderSide(color: colors.border)),
+        color: colors.background,
       ),
-      child: TextField(
-        controller: widget.controller,
-        maxLength: 200,
-        textInputAction: TextInputAction.search,
-        onSubmitted: (_) => widget.onSearch(),
-        decoration: InputDecoration(
-          hintText: 'اسم الدواء، الاسم العلمي أو الشركة',
-          prefixIcon: const Icon(Icons.search_rounded),
-          counterText: '',
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'دليل الأدوية',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              color: colors.text,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'ابحث عن الأدوية واطلع على تفاصيلها',
+            style: TextStyle(
+              fontSize: 14,
+              color: colors.textMuted,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_hasText)
-                IconButton(
-                  onPressed: widget.onClear,
-                  tooltip: 'مسح',
-                  icon: const Icon(Icons.close_rounded),
+              Text(
+                'بحث',
+                style: TextStyle(
+                  color: colors.text,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
                 ),
-              if (_hasText)
-                IconButton.filled(
-                  onPressed: widget.onSearch,
-                  tooltip: 'بحث',
-                  style: IconButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: Colors.white,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: widget.controller,
+                maxLength: 200,
+                textInputAction: TextInputAction.search,
+                onSubmitted: (_) => widget.onSearch(),
+                cursorColor: colors.primary,
+                cursorWidth: 1.4,
+                style: TextStyle(
+                  color: colors.text,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'ابحث باسم الدواء، الاسم العلمي أو الشركة',
+                  hintStyle: TextStyle(
+                    color: colors.textMuted.withValues(alpha: 0.6),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
                   ),
-                  icon: const Icon(Icons.arrow_back_rounded),
+                  filled: true,
+                  fillColor: colors.surfaceSoft,
+                  prefixIcon: const Padding(
+                    padding: EdgeInsetsDirectional.only(
+                      start: 14,
+                      end: 10,
+                    ),
+                    child: Icon(
+                      Icons.search_rounded,
+                      size: 21,
+                    ),
+                  ),
+                  prefixIconConstraints: const BoxConstraints(minWidth: 46, minHeight: 52),
+                  suffixIcon: _hasText
+                      ? IconButton(
+                          onPressed: widget.onClear,
+                          icon: const Icon(Icons.close_rounded),
+                        )
+                      : null,
+                  suffixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 52),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 15,
+                  ),
+                  counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: colors.primary.withValues(alpha: 0.4),
+                      width: 1.2,
+                    ),
+                  ),
                 ),
-              const SizedBox(width: 7),
+              ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -217,27 +282,40 @@ class _MedicineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return Card(
-      clipBehavior: Clip.antiAlias,
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(18),
           child: Row(
             children: [
               Container(
-                width: 50,
-                height: 50,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
-                  color: colors.primary.withValues(alpha: 0.09),
-                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colors.primary.withValues(alpha: .15),
+                      colors.primary.withValues(alpha: .05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: Icon(
                   Icons.medication_liquid_rounded,
                   color: colors.primary,
+                  size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,53 +324,59 @@ class _MedicineCard extends StatelessWidget {
                       medicine.displayName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: colors.text,
+                      ),
                     ),
                     if (medicine.arabicName != null &&
                         medicine.name.trim().isNotEmpty) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         medicine.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: colors.textMuted,
-                          fontSize: 11,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                     if ((medicine.arabicScientificName ??
                             medicine.scientificName)
                         case final name?) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: colors.textMuted,
-                            ),
+                        style: TextStyle(
+                          color: colors.textMuted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
-                    const SizedBox(height: 7),
+                    const SizedBox(height: 10),
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 5,
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
-                        _Tag(
+                        _ModernTag(
                           icon: Icons.payments_outlined,
                           text: _currency(medicine.sellingPrice),
                           color: colors.primary,
                         ),
                         if (medicine.dosageForm case final form?)
-                          _Tag(
+                          _ModernTag(
                             icon: Icons.category_outlined,
                             text: form,
                             color: colors.primaryDark,
                           ),
                         if (medicine.requiresPrescription)
-                          _Tag(
+                          _ModernTag(
                             icon: Icons.receipt_long_outlined,
                             text: 'بوصفة طبية',
                             color: colors.warning,
@@ -302,8 +386,12 @@ class _MedicineCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 4),
-              Icon(Icons.chevron_left_rounded, color: colors.textMuted),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colors.textMuted,
+                size: 24,
+              ),
             ],
           ),
         ),
@@ -312,8 +400,8 @@ class _MedicineCard extends StatelessWidget {
   }
 }
 
-class _Tag extends StatelessWidget {
-  const _Tag({
+class _ModernTag extends StatelessWidget {
+  const _ModernTag({
     required this.icon,
     required this.text,
     this.color = const Color(0xFF216474),
@@ -325,21 +413,21 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(20),
+      color: color.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(12),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 12, color: color),
-        const SizedBox(width: 3),
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 6),
         Text(
           text,
           style: TextStyle(
             color: color,
-            fontSize: 10.5,
+            fontSize: 12,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -394,25 +482,43 @@ class _EmptyCatalog extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(34),
       children: [
-        const SizedBox(height: 90),
-        Icon(
-          Icons.medication_outlined,
-          size: 52,
-          color: colors.textMuted,
+        const SizedBox(height: 120),
+        Center(
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: colors.primary.withValues(alpha: .08),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Icon(
+              hasSearch ? Icons.search_off_rounded : Icons.medication_outlined,
+              size: 40,
+              color: colors.primary,
+            ),
+          ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 24),
         Text(
           hasSearch ? 'لا توجد نتائج مطابقة' : 'دليل الأدوية فارغ',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleLarge,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: colors.text,
+          ),
         ),
-        const SizedBox(height: 7),
+        const SizedBox(height: 8),
         Text(
           hasSearch
               ? 'جرّب اسمًا آخر أو جزءًا من الاسم العلمي.'
               : 'ستظهر الأدوية المسجلة هنا.',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: TextStyle(
+            fontSize: 14,
+            color: colors.textMuted,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );

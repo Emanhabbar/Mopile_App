@@ -50,14 +50,14 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
               dashboard.valueOrNull!.pendingWarehouses;
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('مركز الإدارة'),
+            const Text('مركز الإدارة'),
             Text(
               'إدارة منصة دوائي ومتابعة عملياتها',
               style: TextStyle(
-                color: Color(0xFF668087),
+                color: context.appColors.textMuted,
                 fontSize: 10.5,
                 fontWeight: FontWeight.w500,
               ),
@@ -238,182 +238,31 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
         .read(adminRepositoryProvider)
         .getTickerPharmacies();
     if (!mounted) return;
-    final title = TextEditingController(text: item?.title);
-    final message = TextEditingController(text: item?.message);
-    var active = item?.isActive ?? true;
-    var type = item?.type ?? 'Announcement';
-    String? pharmacyId = item?.pharmacyProfileId;
-    final save = await showModalBottomSheet<bool>(
+    final result = await showModalBottomSheet<_TickerSheetResult>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       useRootNavigator: true,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            0,
-            20,
-            20 + MediaQuery.viewInsetsOf(context).bottom,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 47,
-                      height: 47,
-                      decoration: BoxDecoration(
-                        color: context.appColors.surfaceSoft,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Icon(
-                        Icons.campaign_outlined,
-                        color: Color(0xFF216474),
-                      ),
-                    ),
-                    const SizedBox(width: 11),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item == null ? 'محتوى جديد' : 'تعديل المحتوى',
-                            style: const TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const Text(
-                            'سيظهر هذا المحتوى في الصفحة الرئيسية للمستخدمين.',
-                            style: TextStyle(
-                              color: Color(0xFF668087),
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                DropdownButtonFormField<String>(
-                  initialValue: type,
-                  decoration: const InputDecoration(
-                    labelText: 'نوع المحتوى',
-                    prefixIcon: Icon(Icons.category_outlined),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Announcement',
-                      child: Text('إعلان عام'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'DutyPharmacy',
-                      child: Text('صيدلية مناوبة'),
-                    ),
-                  ],
-                  onChanged: (value) =>
-                      setSheetState(() => type = value ?? type),
-                ),
-                if (type == 'DutyPharmacy') ...[
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    initialValue:
-                        pharmacies.any((item) => item.id == pharmacyId)
-                        ? pharmacyId
-                        : null,
-                    decoration: const InputDecoration(
-                      labelText: 'الصيدلية المناوبة',
-                      prefixIcon: Icon(Icons.local_pharmacy_outlined),
-                    ),
-                    items: pharmacies
-                        .map(
-                          (pharmacy) => DropdownMenuItem(
-                            value: pharmacy.id,
-                            child: Text(pharmacy.name),
-                          ),
-                        )
-                        .toList(growable: false),
-                    onChanged: (value) =>
-                        setSheetState(() => pharmacyId = value),
-                  ),
-                ],
-                const SizedBox(height: 10),
-                TextField(
-                  controller: title,
-                  maxLength: 150,
-                  decoration: const InputDecoration(
-                    labelText: 'العنوان',
-                    prefixIcon: Icon(Icons.title_rounded),
-                  ),
-                ),
-                TextField(
-                  controller: message,
-                  maxLength: 500,
-                  minLines: 3,
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    labelText: 'النص الظاهر للمستخدم',
-                    alignLabelWithHint: true,
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: context.appColors.surfaceSoft,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: SwitchListTile(
-                    title: const Text('نشر المحتوى'),
-                    subtitle: Text(
-                      active ? 'ظاهر حاليًا للمستخدمين' : 'محفوظ دون نشر',
-                    ),
-                    secondary: Icon(
-                      active
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                    ),
-                    value: active,
-                    onChanged: (value) => setSheetState(() => active = value),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => Navigator.pop(sheetContext, true),
-                    icon: const Icon(Icons.check_rounded),
-                    label: const Text('حفظ المحتوى'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      builder: (_) => _TickerSheetBody(item: item, pharmacies: pharmacies),
     );
-    if (save == true &&
-        title.text.trim().length >= 2 &&
-        message.text.trim().length >= 2 &&
-        (type != 'DutyPharmacy' || pharmacyId != null)) {
+    if (result == null) return;
+    if (result.title.length >= 2 &&
+        result.message.length >= 2 &&
+        (result.type != 'DutyPharmacy' || result.pharmacyId != null)) {
       await _run(item?.id ?? 'ticker-new', () async {
         await ref
             .read(adminRepositoryProvider)
             .saveTicker(
               id: item?.id,
-              type: type,
-              title: title.text.trim(),
-              message: message.text.trim(),
-              active: active,
-              pharmacyProfileId: pharmacyId,
+              type: result.type,
+              title: result.title,
+              message: result.message,
+              active: result.active,
+              pharmacyProfileId: result.pharmacyId,
             );
         ref.invalidate(adminTickerProvider);
       });
     }
-    title.dispose();
-    message.dispose();
   }
 
   Future<void> _deleteTicker(String id) => _run(id, () async {
@@ -602,8 +451,8 @@ class _AdminSectionNavigation extends StatelessWidget {
                               child: Text(
                                 '${item.count}',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Color(0xFF102F37),
+              style: TextStyle(
+                                   color: context.appColors.primaryDeep,
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -618,6 +467,474 @@ class _AdminSectionNavigation extends StatelessWidget {
               );
             })
             .toList(growable: false),
+      ),
+    );
+  }
+}
+
+class _TickerSheetResult {
+  const _TickerSheetResult({
+    required this.title,
+    required this.message,
+    required this.type,
+    required this.active,
+    this.pharmacyId,
+  });
+  final String title;
+  final String message;
+  final String type;
+  final bool active;
+  final String? pharmacyId;
+}
+
+class _TickerSheetBody extends StatefulWidget {
+  const _TickerSheetBody({required this.item, required this.pharmacies});
+  final HomeTickerItem? item;
+  final List<HomeTickerPharmacy> pharmacies;
+
+  @override
+  State<_TickerSheetBody> createState() => _TickerSheetBodyState();
+}
+
+class _TickerSheetBodyState extends State<_TickerSheetBody> {
+  late final TextEditingController _titleCtrl;
+  late final TextEditingController _messageCtrl;
+  late bool _active;
+  late String _type;
+  String? _pharmacyId;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleCtrl = TextEditingController(text: widget.item?.title);
+    _messageCtrl = TextEditingController(text: widget.item?.message);
+    _active = widget.item?.isActive ?? true;
+    _type = widget.item?.type ?? 'Announcement';
+    _pharmacyId = widget.item?.pharmacyProfileId;
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _messageCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final duty = _type == 'DutyPharmacy';
+    final color = colors.primary;
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          0,
+          20,
+          20 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+            
+            // Header
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          color.withValues(alpha: .2),
+                          color.withValues(alpha: .05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      duty ? Icons.local_pharmacy_outlined : Icons.campaign_outlined,
+                      color: color,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.item == null ? 'محتوى جديد' : 'تعديل المحتوى',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            color: colors.text,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'سيظهر هذا المحتوى في الصفحة الرئيسية للمستخدمين.',
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Type Selection
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: colors.surfaceSoft,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _type = 'Announcement'),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _type == 'Announcement' ? color : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.campaign_outlined,
+                              size: 18,
+                              color: _type == 'Announcement' ? Colors.white : colors.textMuted,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'إعلان عام',
+                              style: TextStyle(
+                                color: _type == 'Announcement' ? Colors.white : colors.textMuted,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _type = 'DutyPharmacy'),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _type == 'DutyPharmacy' ? color : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.local_pharmacy_outlined,
+                              size: 18,
+                              color: _type == 'DutyPharmacy' ? Colors.white : colors.textMuted,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'صيدلية مناوبة',
+                              style: TextStyle(
+                                color: _type == 'DutyPharmacy' ? Colors.white : colors.textMuted,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Pharmacy Selection
+            if (duty) ...[
+              const SizedBox(height: 8),
+              Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.local_pharmacy_outlined,
+                          color: color,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'الصيدلية المناوبة',
+                          style: TextStyle(
+                            color: colors.primary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: widget.pharmacies.any((p) => p.id == _pharmacyId)
+                          ? _pharmacyId
+                          : null,
+                      decoration: InputDecoration(
+                        hintText: 'اختر الصيدلية',
+                        filled: true,
+                        fillColor: colors.surfaceSoft,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      items: widget.pharmacies
+                          .map(
+                            (p) => DropdownMenuItem(value: p.id, child: Text(p.name)),
+                          )
+                          .toList(growable: false),
+                      onChanged: (value) => setState(() => _pharmacyId = value),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            
+            // Title Field
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.title_rounded,
+                        color: color,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'العنوان',
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _titleCtrl,
+                    maxLength: 150,
+                    decoration: InputDecoration(
+                      hintText: 'أدخل عنوان المحتوى',
+                      filled: true,
+                      fillColor: colors.surfaceSoft,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Message Field
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.description_outlined,
+                        color: color,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'النص الظاهر للمستخدم',
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _messageCtrl,
+                    maxLength: 500,
+                    minLines: 3,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: 'أدخل النص المراد إظهاره',
+                      filled: true,
+                      fillColor: colors.surfaceSoft,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Active Toggle
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.border),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: _active ? colors.success.withValues(alpha: .12) : colors.textMuted.withValues(alpha: .08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      _active ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      color: _active ? colors.success : colors.textMuted,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'نشر المحتوى',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            color: colors.text,
+                          ),
+                        ),
+                        Text(
+                          _active ? 'ظاهر حاليًا للمستخدمين' : 'محفوظ دون نشر',
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: _active,
+                    onChanged: (value) => setState(() => _active = value),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Save Button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.pop(
+                    context,
+                    _TickerSheetResult(
+                      title: _titleCtrl.text.trim(),
+                      message: _messageCtrl.text.trim(),
+                      type: _type,
+                      active: _active,
+                      pharmacyId: _pharmacyId,
+                    ),
+                  ),
+                  icon: const Icon(Icons.check_rounded, size: 22),
+                  label: const Text(
+                    'حفظ المحتوى',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: color,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
@@ -717,140 +1034,122 @@ class _AdminHero extends StatelessWidget {
         data.pendingOrganizationVerifications +
         data.pendingWarehouses;
     return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF102F37), Color(0xFF216474)],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
-        borderRadius: BorderRadius.circular(27),
-      ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          PositionedDirectional(
-            top: -75,
-            end: -45,
-            child: Container(
-              width: 190,
-              height: 190,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: .055),
-              ),
-            ),
-          ),
-          PositionedDirectional(
-            bottom: -60,
-            start: -40,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: context.appColors.secondary.withValues(alpha: .065),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            context.appColors.primaryDeep,
+            context.appColors.primaryDark,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: context.appColors.primary.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 55,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .12),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: const Icon(
-                        Icons.admin_panel_settings_rounded,
-                        color: Color(0xFFF5CB72),
-                        size: 30,
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'نبض منصة دوائي',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          Text(
-                            'نظرة موحدة على الحسابات والجهات والخدمات',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 9,
-                      ),
-                      decoration: BoxDecoration(
-                        color: pending > 0
-                            ? context.appColors.secondary.withValues(alpha: .18)
-                            : Colors.white.withValues(alpha: .1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: .09),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: .15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    Icons.admin_panel_settings_rounded,
+                    color: context.appColors.secondary,
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'نبض منصة دوائي',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Text(
-                            '$pending',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 21,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const Text(
-                            'تحتاج قرارًا',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 8.5,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 4),
+                      Text(
+                        'نظرة موحدة على الحسابات والجهات والخدمات',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    _AdminHeroMetric(
-                      label: 'حساب نشط',
-                      value: data.activeUsers,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: pending > 0
+                        ? context.appColors.secondary.withValues(alpha: .2)
+                        : Colors.white.withValues(alpha: .12),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: .15),
                     ),
-                    _AdminHeroMetric(
-                      label: 'نقاط دوائية',
-                      value: data.totalPharmacies + data.totalWarehouses,
-                    ),
-                    _AdminHeroMetric(
-                      label: 'منظمات',
-                      value: data.totalOrganizations,
-                    ),
-                  ],
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        '$pending',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const Text(
+                        'تحتاج قرارًا',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                _AdminHeroMetric(
+                  label: 'حساب نشط',
+                  value: data.activeUsers,
+                ),
+                _AdminHeroMetric(
+                  label: 'نقاط دوائية',
+                  value: data.totalPharmacies + data.totalWarehouses,
+                ),
+                _AdminHeroMetric(
+                  label: 'منظمات',
+                  value: data.totalOrganizations,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -864,11 +1163,14 @@ class _AdminHeroMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Expanded(
     child: Container(
-      margin: const EdgeInsetsDirectional.only(end: 7),
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+      margin: const EdgeInsetsDirectional.only(end: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .08),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white.withValues(alpha: .1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: .15),
+        ),
       ),
       child: Column(
         children: [
@@ -876,14 +1178,19 @@ class _AdminHeroMetric extends StatelessWidget {
             '$value',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 19,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
             ),
           ),
+          const SizedBox(height: 4),
           Text(
             label,
             maxLines: 1,
-            style: const TextStyle(color: Colors.white60, fontSize: 9),
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -891,7 +1198,7 @@ class _AdminHeroMetric extends StatelessWidget {
   );
 }
 
-class _ApprovalsTab extends ConsumerWidget {
+class _ApprovalsTab extends ConsumerStatefulWidget {
   const _ApprovalsTab({
     required this.workingId,
     required this.onPharmacy,
@@ -904,139 +1211,11 @@ class _ApprovalsTab extends ConsumerWidget {
   final Future<void> Function(String, bool, String?) onWarehouse;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pharmacies = ref.watch(adminPendingPharmaciesProvider);
-    final organizations = ref.watch(adminPendingOrganizationsProvider);
-    final warehouses = ref.watch(adminPendingWarehousesProvider);
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref
-          ..invalidate(adminPendingPharmaciesProvider)
-          ..invalidate(adminPendingOrganizationsProvider)
-          ..invalidate(adminPendingWarehousesProvider);
-        await Future.wait([
-          ref.read(adminPendingPharmaciesProvider.future),
-          ref.read(adminPendingOrganizationsProvider.future),
-          ref.read(adminPendingWarehousesProvider.future),
-        ]);
-      },
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 112),
-        children: [
-          const _AdminSectionHeading(
-            eyebrow: 'قرارات الاعتماد',
-            title: 'طلبات تحتاج مراجعتك',
-            subtitle: 'تحقق من بيانات الجهة قبل منحها صلاحية العمل على المنصة.',
-          ),
-          const SizedBox(height: 16),
-          _ApprovalGroup<AdminPharmacy>(
-            title: 'الصيدليات',
-            icon: Icons.local_pharmacy_outlined,
-            color: context.appColors.primary,
-            state: pharmacies,
-            builder: (item) => _ApprovalCard(
-              icon: Icons.local_pharmacy_outlined,
-              color: context.appColors.primary,
-              title: item.pharmacyName,
-              subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
-              location: '${item.city}، ${item.area}',
-              working: workingId == item.pharmacyId,
-              onApprove: () => _showReasonSheet(
-                context,
-                title: 'اعتماد الصيدلية',
-                onConfirm: (reason) => onPharmacy(item.pharmacyId, true, reason),
-              ),
-              onReject: () => _showReasonSheet(
-                context,
-                title: 'رفض الصيدلية',
-                onConfirm: (reason) => onPharmacy(item.pharmacyId, false, reason),
-              ),
-              onDetails: () => _showPharmacyLicense(context, ref, item),
-              expandedChild: _ApprovalDetails(
-                rows: [
-                  _DetailRow(label: 'المالك', value: item.ownerFullName),
-                  _DetailRow(label: 'البريد', value: item.ownerEmail),
-                  _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
-                  _DetailRow(label: 'المدينة', value: item.city),
-                  _DetailRow(label: 'المنطقة', value: item.area),
-                  _DetailRow(label: 'العنوان', value: item.address),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 18),
-          _ApprovalGroup<AdminOrganization>(
-            title: 'المنظمات',
-            icon: Icons.apartment_outlined,
-            color: context.appColors.primaryDark,
-            state: organizations,
-            builder: (item) => _ApprovalCard(
-              icon: Icons.apartment_outlined,
-              color: context.appColors.primaryDark,
-              title: item.organizationName,
-              subtitle:
-                  '${item.ownerFullName} · ${item.verificationDocumentsCount} وثائق',
-              location: '${item.city}، ${item.area}',
-              working: workingId == item.organizationId,
-              onApprove: () => onOrganization(item, true),
-              onReject: () => onOrganization(item, false),
-              expandedChild: _ApprovalDetails(
-                rows: [
-                  _DetailRow(label: 'المالك', value: item.ownerFullName),
-                  _DetailRow(label: 'البريد', value: item.ownerEmail),
-                  _DetailRow(label: 'رقم السجل', value: item.registrationNumber),
-                  _DetailRow(label: 'المدينة', value: item.city),
-                  _DetailRow(label: 'المنطقة', value: item.area),
-                  _DetailRow(label: 'حالة التحقق', value: item.verificationStatus),
-                  _DetailRow(label: 'الوثائق', value: '${item.verificationDocumentsCount}'),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 18),
-          _ApprovalGroup<AdminWarehouse>(
-            title: 'المستودعات',
-            icon: Icons.warehouse_outlined,
-            color: context.appColors.primaryLight,
-            state: warehouses,
-            builder: (item) => _ApprovalCard(
-              icon: Icons.warehouse_outlined,
-              color: context.appColors.primaryLight,
-              title: item.warehouseName,
-              subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
-              location: '${item.city}، ${item.area}',
-              working: workingId == item.warehouseId,
-              onApprove: () => _showReasonSheet(
-                context,
-                title: 'اعتماد المستودع',
-                onConfirm: (reason) => onWarehouse(item.warehouseId, true, reason),
-              ),
-              onReject: () => _showReasonSheet(
-                context,
-                title: 'رفض المستودع',
-                onConfirm: (reason) => onWarehouse(item.warehouseId, false, reason),
-              ),
-              expandedChild: _ApprovalDetails(
-                rows: [
-                  _DetailRow(label: 'المالك', value: item.ownerFullName),
-                  _DetailRow(label: 'البريد', value: item.ownerEmail),
-                  _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
-                  _DetailRow(label: 'المدينة', value: item.city),
-                  _DetailRow(label: 'المنطقة', value: item.area),
-                  _DetailRow(label: 'العنوان', value: item.address),
-                  _DetailRow(label: 'حد الطلب الأدنى', value: '${item.minimumOrderAmount} ر.س'),
-                  _DetailRow(label: 'رسوم التوصيل', value: '${item.deliveryFee} ر.س'),
-                  _DetailRow(label: 'دفعات الأدوية', value: '${item.medicineBatchesCount}'),
-                  _DetailRow(label: 'المندوبين', value: '${item.representativesCount}'),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<_ApprovalsTab> createState() => _ApprovalsTabState();
+}
+
+class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
+  String? _selectedRole;
 
   Future<void> _showReasonSheet(
     BuildContext context, {
@@ -1168,6 +1347,511 @@ class _ApprovalsTab extends ConsumerWidget {
       );
     }
   }
+
+  String _error(Object error) {
+    return error is ApiException ? error.message : 'حدث خطأ غير متوقع.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pharmacies = ref.watch(adminPendingPharmaciesProvider);
+    final organizations = ref.watch(adminPendingOrganizationsProvider);
+    final warehouses = ref.watch(adminPendingWarehousesProvider);
+    
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref
+          ..invalidate(adminPendingPharmaciesProvider)
+          ..invalidate(adminPendingOrganizationsProvider)
+          ..invalidate(adminPendingWarehousesProvider);
+        await Future.wait([
+          ref.read(adminPendingPharmaciesProvider.future),
+          ref.read(adminPendingOrganizationsProvider.future),
+          ref.read(adminPendingWarehousesProvider.future),
+        ]);
+      },
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 112),
+        children: [
+          const _AdminSectionHeading(
+            eyebrow: 'قرارات الاعتماد',
+            title: 'طلبات تحتاج مراجعتك',
+            subtitle: 'تحقق من بيانات الجهة قبل منحها صلاحية العمل على المنصة.',
+          ),
+          const SizedBox(height: 16),
+          _RoleSelector(
+            selectedRole: _selectedRole,
+            onRoleSelected: (role) => setState(() => _selectedRole = role),
+          ),
+          const SizedBox(height: 20),
+          if (_selectedRole == null)
+            Text(
+              'الصيدليات',
+              style: TextStyle(
+                color: context.appColors.primary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          if (_selectedRole == null)
+            const SizedBox(height: 12),
+          if (_selectedRole == null || _selectedRole == 'pharmacies')
+            pharmacies.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (error, _) => Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: context.appColors.danger.withValues(alpha: .06),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: context.appColors.danger.withValues(alpha: .15),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      color: context.appColors.danger,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _error(error),
+                        style: TextStyle(
+                          color: context.appColors.danger,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              data: (items) => items.isEmpty
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: context.appColors.surfaceSoft,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.task_alt_rounded,
+                            color: context.appColors.primary,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'لا توجد طلبات معلقة ضمن هذا القسم.',
+                              style: TextStyle(
+                                color: context.appColors.textMuted,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      children: items
+                          .map(
+                            (item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _ApprovalCard(
+                                icon: Icons.local_pharmacy_outlined,
+                                color: context.appColors.primary,
+                                title: item.pharmacyName,
+                                subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
+                                location: '${item.city}، ${item.area}',
+                                working: widget.workingId == item.pharmacyId,
+                                onApprove: () => _showReasonSheet(
+                                  context,
+                                  title: 'اعتماد الصيدلية',
+                                  onConfirm: (reason) => widget.onPharmacy(item.pharmacyId, true, reason),
+                                ),
+                                onReject: () => _showReasonSheet(
+                                  context,
+                                  title: 'رفض الصيدلية',
+                                  onConfirm: (reason) => widget.onPharmacy(item.pharmacyId, false, reason),
+                                ),
+                                onDetails: () => _showPharmacyLicense(context, ref, item),
+                                expandedChild: _ApprovalDetails(
+                                  rows: [
+                                    _DetailRow(label: 'المالك', value: item.ownerFullName),
+                                    _DetailRow(label: 'البريد', value: item.ownerEmail),
+                                    _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
+                                    _DetailRow(label: 'المدينة', value: item.city),
+                                    _DetailRow(label: 'المنطقة', value: item.area),
+                                    _DetailRow(label: 'العنوان', value: item.address),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(growable: false),
+                    ),
+            ),
+          if (_selectedRole == null && pharmacies.value?.isNotEmpty == true)
+            const SizedBox(height: 24),
+          if (_selectedRole == null)
+            Text(
+              'المنظمات',
+              style: TextStyle(
+                color: context.appColors.primaryDark,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          if (_selectedRole == null)
+            const SizedBox(height: 12),
+          if (_selectedRole == null || _selectedRole == 'organizations')
+            organizations.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (error, _) => Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: context.appColors.danger.withValues(alpha: .06),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: context.appColors.danger.withValues(alpha: .15),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      color: context.appColors.danger,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _error(error),
+                        style: TextStyle(
+                          color: context.appColors.danger,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              data: (items) => items.isEmpty
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: context.appColors.surfaceSoft,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.task_alt_rounded,
+                            color: context.appColors.primaryDark,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'لا توجد طلبات معلقة ضمن هذا القسم.',
+                              style: TextStyle(
+                                color: context.appColors.textMuted,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      children: items
+                          .map(
+                            (item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _ApprovalCard(
+                                icon: Icons.apartment_outlined,
+                                color: context.appColors.primaryDark,
+                                title: item.organizationName,
+                                subtitle:
+                                    '${item.ownerFullName} · ${item.verificationDocumentsCount} وثائق',
+                                location: '${item.city}، ${item.area}',
+                                working: widget.workingId == item.organizationId,
+                                onApprove: () => widget.onOrganization(item, true),
+                                onReject: () => widget.onOrganization(item, false),
+                                expandedChild: _ApprovalDetails(
+                                  rows: [
+                                    _DetailRow(label: 'المالك', value: item.ownerFullName),
+                                    _DetailRow(label: 'البريد', value: item.ownerEmail),
+                                    _DetailRow(label: 'رقم السجل', value: item.registrationNumber),
+                                    _DetailRow(label: 'المدينة', value: item.city),
+                                    _DetailRow(label: 'المنطقة', value: item.area),
+                                    _DetailRow(label: 'حالة التحقق', value: item.verificationStatus),
+                                    _DetailRow(label: 'الوثائق', value: '${item.verificationDocumentsCount}'),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(growable: false),
+                    ),
+            ),
+          if (_selectedRole == null && organizations.value?.isNotEmpty == true)
+            const SizedBox(height: 24),
+          if (_selectedRole == null)
+            Text(
+              'المستودعات',
+              style: TextStyle(
+                color: context.appColors.primary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          if (_selectedRole == null)
+            const SizedBox(height: 12),
+          if (_selectedRole == null || _selectedRole == 'warehouses')
+            warehouses.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (error, _) => Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: context.appColors.danger.withValues(alpha: .06),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: context.appColors.danger.withValues(alpha: .15),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      color: context.appColors.danger,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _error(error),
+                        style: TextStyle(
+                          color: context.appColors.danger,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              data: (items) => items.isEmpty
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: context.appColors.surfaceSoft,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.task_alt_rounded,
+                            color: context.appColors.primary,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'لا توجد طلبات معلقة ضمن هذا القسم.',
+                              style: TextStyle(
+                                color: context.appColors.textMuted,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      children: items
+                          .map(
+                            (item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _ApprovalCard(
+                                icon: Icons.warehouse_outlined,
+                                color: context.appColors.primary,
+                                title: item.warehouseName,
+                                subtitle: '${item.ownerFullName} · ${item.licenseNumber}',
+                                location: '${item.city}، ${item.area}',
+                                working: widget.workingId == item.warehouseId,
+                                onApprove: () => _showReasonSheet(
+                                  context,
+                                  title: 'اعتماد المستودع',
+                                  onConfirm: (reason) => widget.onWarehouse(item.warehouseId, true, reason),
+                                ),
+                                onReject: () => _showReasonSheet(
+                                  context,
+                                  title: 'رفض المستودع',
+                                  onConfirm: (reason) => widget.onWarehouse(item.warehouseId, false, reason),
+                                ),
+                                expandedChild: _ApprovalDetails(
+                                  rows: [
+                                    _DetailRow(label: 'المالك', value: item.ownerFullName),
+                                    _DetailRow(label: 'البريد', value: item.ownerEmail),
+                                    _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
+                                    _DetailRow(label: 'المدينة', value: item.city),
+                                    _DetailRow(label: 'المنطقة', value: item.area),
+                                    _DetailRow(label: 'العنوان', value: item.address),
+                                    _DetailRow(label: 'حد الطلب الأدنى', value: '${item.minimumOrderAmount} ر.س'),
+                                    _DetailRow(label: 'رسوم التوصيل', value: '${item.deliveryFee} ر.س'),
+                                    _DetailRow(label: 'دفعات الأدوية', value: '${item.medicineBatchesCount}'),
+                                    _DetailRow(label: 'المندوبين', value: '${item.representativesCount}'),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(growable: false),
+                    ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoleSelector extends StatelessWidget {
+  const _RoleSelector({
+    required this.selectedRole,
+    required this.onRoleSelected,
+  });
+
+  final String? selectedRole;
+  final Function(String?) onRoleSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Row(
+      children: [
+        Expanded(
+          child: _RoleButton(
+            label: 'الكل',
+            icon: Icons.apps_rounded,
+            color: colors.text,
+            isSelected: selectedRole == null,
+            onTap: () => onRoleSelected(null),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _RoleButton(
+            label: 'الصيدليات',
+            icon: Icons.local_pharmacy_outlined,
+            color: colors.primary,
+            isSelected: selectedRole == 'pharmacies',
+            onTap: () => onRoleSelected('pharmacies'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _RoleButton(
+            label: 'المنظمات',
+            icon: Icons.apartment_outlined,
+            color: colors.primaryDark,
+            isSelected: selectedRole == 'organizations',
+            onTap: () => onRoleSelected('organizations'),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _RoleButton(
+            label: 'المستودعات',
+            icon: Icons.warehouse_outlined,
+            color: colors.primary,
+            isSelected: selectedRole == 'warehouses',
+            onTap: () => onRoleSelected('warehouses'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RoleButton extends StatelessWidget {
+  const _RoleButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? color : colors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? color : colors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : color,
+              size: 22,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : colors.text,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _AccountsTab extends ConsumerStatefulWidget {
@@ -1205,22 +1889,81 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
                 subtitle: 'ابحث عن الحسابات وراجع حالتها ودورها.',
               ),
               const SizedBox(height: 14),
-              TextField(
-                controller: _search,
-                onChanged: (value) => setState(() => _query = value.trim()),
-                decoration: InputDecoration(
-                  hintText: 'ابحث بالاسم أو البريد الإلكتروني',
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon: _query.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _search.clear();
-                            setState(() => _query = '');
-                          },
-                          icon: const Icon(Icons.close_rounded),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'بحث',
+                    style: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _search,
+                    onChanged: (value) => setState(() => _query = value.trim()),
+                    cursorColor: context.appColors.primary,
+                    cursorWidth: 1.4,
+                    style: TextStyle(
+                      color: context.appColors.text,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'ابحث بالاسم أو البريد الإلكتروني',
+                      hintStyle: TextStyle(
+                        color: context.appColors.textMuted.withValues(alpha: 0.6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      filled: true,
+                      fillColor: context.appColors.surfaceSoft,
+                      prefixIcon: const Padding(
+                        padding: EdgeInsetsDirectional.only(
+                          start: 14,
+                          end: 10,
                         ),
-                ),
+                        child: Icon(
+                          Icons.search_rounded,
+                          size: 21,
+                        ),
+                      ),
+                      prefixIconConstraints: const BoxConstraints(minWidth: 46, minHeight: 52),
+                      suffixIcon: _query.isEmpty
+                          ? null
+                          : IconButton(
+                              onPressed: () {
+                                _search.clear();
+                                setState(() => _query = '');
+                              },
+                              icon: const Icon(Icons.close_rounded),
+                            ),
+                      suffixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 52),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 15,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(
+                          color: context.appColors.primary.withValues(alpha: 0.4),
+                          width: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               SingleChildScrollView(
@@ -1415,12 +2158,21 @@ class _AdminSectionHeading extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              width: double.infinity,
+              height: 3,
+              margin: const EdgeInsets.only(bottom: 14),
+              decoration: BoxDecoration(
+                color: context.appColors.primary.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             Text(
               eyebrow,
-              style: const TextStyle(
-                color: Color(0xFF216474),
-                fontSize: 10.5,
-                fontWeight: FontWeight.w900,
+              style: TextStyle(
+                color: context.appColors.primary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
                 letterSpacing: .3,
               ),
             ),
@@ -1432,88 +2184,6 @@ class _AdminSectionHeading extends StatelessWidget {
         ),
       ),
       ?action,
-    ],
-  );
-}
-
-class _ApprovalGroup<T> extends StatelessWidget {
-  const _ApprovalGroup({
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.state,
-    required this.builder,
-  });
-  final String title;
-  final IconData icon;
-  final Color color;
-  final AsyncValue<List<T>> state;
-  final Widget Function(T) builder;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: .08),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-          ),
-          if (state.valueOrNull != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: .08),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Text(
-                '${state.valueOrNull!.length}',
-                style: TextStyle(color: color, fontWeight: FontWeight.w900),
-              ),
-            ),
-        ],
-      ),
-      const SizedBox(height: 10),
-      state.when(
-        loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_error(error)),
-        data: (items) => items.isEmpty
-            ? Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: context.appColors.surfaceSoft,
-                  borderRadius: BorderRadius.circular(17),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.task_alt_rounded, color: color, size: 19),
-                    const SizedBox(width: 8),
-                    Text('لا توجد طلبات معلقة ضمن هذا القسم.'),
-                  ],
-                ),
-              )
-            : Column(
-                children: items
-                    .map(
-                      (item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 9),
-                        child: builder(item),
-                      ),
-                    )
-                    .toList(growable: false),
-              ),
-      ),
     ],
   );
 }
@@ -1556,7 +2226,7 @@ class _ApprovalCardState extends State<_ApprovalCard>
     super.initState();
     _animCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
@@ -1581,36 +2251,36 @@ class _ApprovalCardState extends State<_ApprovalCard>
     return GestureDetector(
       onTap: widget.expandedChild != null ? _toggle : null,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: _expanded ? colors.primary : colors.border,
-            width: _expanded ? 1.5 : 1,
+            color: _expanded ? widget.color : colors.border,
+            width: _expanded ? 2 : 1,
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Container(
-                        width: 42,
-                        height: 42,
+                        width: 52,
+                        height: 52,
                         decoration: BoxDecoration(
-                          color: widget.color.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(13),
+                          color: widget.color.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(18),
                         ),
-                        child: Icon(widget.icon, color: widget.color, size: 22),
+                        child: Icon(widget.icon, color: widget.color, size: 26),
                       ),
-                      const SizedBox(width: 11),
+                      const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1619,61 +2289,77 @@ class _ApprovalCardState extends State<_ApprovalCard>
                               widget.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleMedium,
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: colors.text,
+                              ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 4),
                             Text(
                               widget.subtitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodySmall,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: colors.textMuted,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       if (widget.working)
                         const SizedBox.square(
-                          dimension: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          dimension: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
                         )
                       else if (widget.expandedChild != null)
                         AnimatedRotation(
                           turns: _expanded ? 0.5 : 0,
-                          duration: const Duration(milliseconds: 250),
+                          duration: const Duration(milliseconds: 300),
                           child: Icon(
                             Icons.keyboard_arrow_down_rounded,
-                            color: colors.textMuted,
+                            color: widget.color,
+                            size: 28,
                           ),
                         ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 15,
-                        color: colors.textMuted,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          widget.location,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colors.textMuted,
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceSoft,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: widget.color,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            widget.location,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: colors.textMuted,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             if (widget.onDetails != null)
               Padding(
-                padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
                 child: SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -1681,26 +2367,28 @@ class _ApprovalCardState extends State<_ApprovalCard>
                     icon: const Icon(Icons.badge_outlined, size: 18),
                     label: const Text('مراجعة الترخيص'),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      foregroundColor: widget.color,
+                      side: BorderSide(color: widget.color.withValues(alpha: .3)),
                     ),
                   ),
                 ),
               ),
             AnimatedSize(
-              duration: const Duration(milliseconds: 250),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               child: _expanded && widget.expandedChild != null
                   ? Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
                           child: Divider(
                             height: 1,
                             color: colors.border,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
                           child: widget.expandedChild,
                         ),
                       ],
@@ -1708,22 +2396,26 @@ class _ApprovalCardState extends State<_ApprovalCard>
                   : const SizedBox.shrink(),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
               child: Row(
                 children: [
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: widget.working ? null : widget.onApprove,
-                      icon: const Icon(Icons.check_rounded, size: 18),
+                      icon: const Icon(Icons.check_rounded, size: 20),
                       label: const Text('اعتماد'),
                       style: FilledButton.styleFrom(
-                        backgroundColor: colors.primary,
+                        backgroundColor: widget.color,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: widget.working ? null : widget.onReject,
@@ -1932,24 +2624,44 @@ class _AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _roleColor(account.role);
-    return Card(
+    final colors = context.appColors;
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: account.isActive ? color.withValues(alpha: .3) : colors.border,
+          width: account.isActive ? 1.5 : 1,
+        ),
+      ),
       child: InkWell(
         onTap: onDetails,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(18),
           child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: .09),
-                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withValues(alpha: .15),
+                      color.withValues(alpha: .05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
                 ),
-                child: Icon(_roleIcon(account.role), color: color),
+                child: Icon(
+                  _roleIcon(account.role),
+                  color: color,
+                  size: 28,
+                ),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1958,33 +2670,44 @@ class _AccountCard extends StatelessWidget {
                       account.profileName ?? account.fullName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: colors.text,
+                      ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       account.email,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: TextStyle(
+                        color: colors.textMuted,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    const SizedBox(height: 5),
-                    Row(
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
                         _AdminPill(
                           label: _roleLabel(account.role),
                           color: color,
                         ),
-                        const SizedBox(width: 6),
                         _AdminPill(
                           label: account.isActive ? 'نشط' : 'موقوف',
                           color: account.isActive
-                              ? context.appColors.success
-                              : context.appColors.danger,
+                              ? colors.success
+                              : colors.danger,
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
               Switch(
                 value: account.isActive,
                 onChanged: working ? null : (_) => onStatus(),
@@ -2004,7 +2727,9 @@ class _AccountDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = <({String label, String value, IconData icon})>[
+    final colors = context.appColors;
+
+    final basicInfo = <({String label, String value, IconData icon})>[
       (
         label: 'الاسم',
         value: details['profileName']?.toString() ?? account.fullName,
@@ -2014,20 +2739,23 @@ class _AccountDetailsSheet extends StatelessWidget {
       (
         label: 'الدور',
         value: _roleLabel(account.role),
-        icon: Icons.badge_outlined,
+        icon: _roleIcon(account.role),
       ),
-      if (details['phoneNumber']?.toString().isNotEmpty == true)
-        (
-          label: 'الهاتف',
-          value: details['phoneNumber'].toString(),
-          icon: Icons.phone_outlined,
-        ),
+    ];
+
+    final additionalInfo = <({String label, String value, IconData icon})>[
       if (details['city']?.toString().isNotEmpty == true)
         (
           label: 'الموقع',
           value:
-              '${details['city'] ?? ''}، ${details['area'] ?? ''} · ${details['address'] ?? ''}',
+              '${details['city'] ?? ''}، ${details['area'] ?? ''}',
           icon: Icons.location_on_outlined,
+        ),
+      if (details['address']?.toString().isNotEmpty == true)
+        (
+          label: 'العنوان',
+          value: details['address'].toString(),
+          icon: Icons.home_outlined,
         ),
       if (details['licenseOrRegistrationNumber']?.toString().isNotEmpty == true)
         (
@@ -2036,71 +2764,154 @@ class _AccountDetailsSheet extends StatelessWidget {
           icon: Icons.verified_outlined,
         ),
     ];
+
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, bottomPadding + 24),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.background,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Center(
+              child: Container(
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: _roleColor(account.role).withValues(alpha: .09),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  _roleIcon(account.role),
-                  color: _roleColor(account.role),
+                  color: colors.border,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      account.profileName ?? account.fullName,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Text(
-                      account.isActive ? 'حساب نشط' : 'حساب موقوف',
-                      style: TextStyle(
-                        color: account.isActive
-                            ? context.appColors.success
-                            : context.appColors.danger,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-          const SizedBox(height: 18),
-          ...rows.map(
-            (row) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: colors.primary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    _roleIcon(account.role),
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        account.profileName ?? account.fullName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: colors.text,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: account.isActive
+                              ? colors.success.withValues(alpha: .15)
+                              : colors.danger.withValues(alpha: .15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              account.isActive ? Icons.check_circle_outline : Icons.block_outlined,
+                              size: 16,
+                              color: account.isActive ? colors.success : colors.danger,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              account.isActive ? 'حساب نشط' : 'حساب موقوف',
+                              style: TextStyle(
+                                color: account.isActive ? colors.success : colors.danger,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Basic Info Section
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+            child: Text(
+              'المعلومات الأساسية',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: colors.primary,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+
+          ...basicInfo.map(
+            (row) => Container(
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.border),
+              ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(row.icon, color: context.appColors.primary, size: 20),
-                  const SizedBox(width: 10),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: .1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(row.icon, color: colors.primary, size: 20),
+                  ),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           row.label,
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
+                        const SizedBox(height: 2),
                         Text(
                           row.value,
-                          style: const TextStyle(fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: colors.text,
+                          ),
                         ),
                       ],
                     ),
@@ -2109,8 +2920,73 @@ class _AccountDetailsSheet extends StatelessWidget {
               ),
             ),
           ),
+
+          // Additional Info Section
+          if (additionalInfo.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+              child: Text(
+                'معلومات إضافية',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: colors.primary,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            ...additionalInfo.map(
+              (row) => Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colors.primary.withValues(alpha: .08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(row.icon, color: colors.primary, size: 20),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            row.label,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            row.value,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: colors.text,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
+          SizedBox(height: bottomPadding + 24),
         ],
-        ),
       ),
     );
   }
@@ -2131,53 +3007,122 @@ class _TickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duty = item.type == 'DutyPharmacy';
-    final color = duty ? context.appColors.primaryLight : context.appColors.primary;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    final colors = context.appColors;
+    final color = colors.primary;
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: item.isActive ? color.withValues(alpha: .3) : colors.border,
+          width: item.isActive ? 1.5 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: .05),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Row(
               children: [
                 Container(
-                  width: 45,
-                  height: 45,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: .09),
-                    borderRadius: BorderRadius.circular(15),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        color.withValues(alpha: .2),
+                        color.withValues(alpha: .05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: Icon(
                     duty
                         ? Icons.local_pharmacy_outlined
                         : Icons.campaign_outlined,
                     color: color,
+                    size: 26,
                   ),
                 ),
-                const SizedBox(width: 11),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         item.title,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: colors.text,
+                        ),
                       ),
-                      Text(
-                        duty ? 'صيدلية مناوبة' : 'إعلان عام',
-                        style: Theme.of(context).textTheme.bodySmall,
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: .12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              duty ? 'صيدلية مناوبة' : 'إعلان عام',
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: item.isActive
+                                  ? colors.success.withValues(alpha: .12)
+                                  : colors.textMuted.withValues(alpha: .08),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  item.isActive ? Icons.check_circle_outline : Icons.block_outlined,
+                                  size: 12,
+                                  color: item.isActive ? colors.success : colors.textMuted,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  item.isActive ? 'منشور' : 'متوقف',
+                                  style: TextStyle(
+                                    color: item.isActive ? colors.success : colors.textMuted,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                _AdminPill(
-                  label: item.isActive ? 'منشور' : 'متوقف',
-                  color: item.isActive
-                      ? context.appColors.success
-                      : context.appColors.textMuted,
-                ),
                 PopupMenuButton<String>(
                   enabled: !working,
+                  icon: Icon(Icons.more_vert_rounded, color: colors.textMuted),
                   onSelected: (value) =>
                       value == 'edit' ? onEdit() : onDelete(),
                   itemBuilder: (_) => const [
@@ -2187,27 +3132,57 @@ class _TickerCard extends StatelessWidget {
                 ),
               ],
             ),
-            const Divider(height: 23),
-            Text(item.message, style: const TextStyle(height: 1.55)),
-            if (item.pharmacyName != null) ...[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.local_pharmacy_rounded,
-                    size: 17,
-                    color: Color(0xFF216474),
+          ),
+          
+          // Content
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.message,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                    color: colors.text,
+                    fontWeight: FontWeight.w500,
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    item.pharmacyName!,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                if (item.pharmacyName != null) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: .06),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.local_pharmacy_rounded,
+                          size: 18,
+                          color: colors.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            item.pharmacyName!,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: colors.text,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-            ],
-          ],
-        ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

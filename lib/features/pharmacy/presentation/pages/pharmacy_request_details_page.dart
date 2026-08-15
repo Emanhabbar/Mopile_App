@@ -308,9 +308,9 @@ class _Hero extends StatelessWidget {
                   color: Colors.white.withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.medication_rounded,
-                  color: Color(0xFFF5CB72),
+                  color: context.appColors.secondary,
                   size: 27,
                 ),
               ),

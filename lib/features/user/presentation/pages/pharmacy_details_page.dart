@@ -299,10 +299,10 @@ class _PharmacyHero extends StatelessWidget {
                     : Colors.white60,
               ),
               if (pharmacy.hasDeliveryService)
-                const _HeroPill(
+                _HeroPill(
                   icon: Icons.delivery_dining_rounded,
                   text: 'توصيل متاح',
-                  color: Color(0xFFF5CB72),
+                  color: context.appColors.secondary,
                 ),
             ],
           ),
@@ -328,9 +328,9 @@ class _PharmacyHero extends StatelessWidget {
           const SizedBox(height: 15),
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.star_rounded,
-                color: Color(0xFFF5CB72),
+                color: context.appColors.secondary,
                 size: 19,
               ),
               const SizedBox(width: 5),
@@ -358,7 +358,7 @@ class _PharmacyHero extends StatelessWidget {
                     icon: const Icon(Icons.phone_rounded),
                     label: const Text('اتصال'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFFF5CB72),
+                      backgroundColor: context.appColors.secondary,
                       foregroundColor: const Color(0xFF173D46),
                     ),
                   ),
@@ -651,7 +651,7 @@ class _RatingForm extends StatelessWidget {
                   icon: Icon(
                     Icons.star_rounded,
                     color: index < rating
-                        ? const Color(0xFFE4A84B)
+                        ? context.appColors.secondary
                         : context.appColors.border,
                   ),
                 ),
