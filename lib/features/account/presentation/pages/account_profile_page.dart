@@ -7,6 +7,7 @@ import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/profile_avatar.dart';
 import '../../../auth/data/models/auth_session.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -39,15 +40,16 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
   Widget build(BuildContext context) {
     final profile = ref.watch(accountProfileProvider);
     final session = ref.watch(authControllerProvider).valueOrNull;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('الملف الشخصي'),
+            Text(l10n.accountProfileTitle),
             Text(
-              'بيانات حسابك وصورتك',
+              l10n.accountProfileSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -58,7 +60,7 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
         ),
       ),
       body: profile.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل بياناتك...'),
+        loading: () => AppLoadingState(label: l10n.accountLoadingProfile),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(accountProfileProvider),
@@ -108,22 +110,22 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                             ),
                             const SizedBox(width: 9),
                             Text(
-                              'البيانات الأساسية',
+                              l10n.accountBasicData,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
                         AppTextField(
-                          label: 'الاسم الكامل',
+                          label: l10n.accountFullName,
                           controller: _nameController,
                           icon: Icons.person_outline_rounded,
                           textInputAction: TextInputAction.next,
                           validator: (value) {
                             final text = value?.trim() ?? '';
-                            if (text.isEmpty) return 'أدخل الاسم الكامل';
+                            if (text.isEmpty) return l10n.accountFullNameRequired;
                             if (text.length > 150) {
-                              return 'يجب ألا يتجاوز الاسم 150 حرفًا';
+                              return l10n.accountFullNameTooLong;
                             }
                             return null;
                           },
@@ -140,7 +142,7 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
-                            labelText: 'البريد الإلكتروني',
+                            labelText: l10n.accountEmailLabel,
                             labelStyle: TextStyle(
                               color: context.appColors.text,
                               fontSize: 14,
@@ -184,13 +186,13 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                         ),
                         const SizedBox(height: 12),
                         AppTextField(
-                          label: 'رقم الهاتف',
+                          label: l10n.accountPhoneLabel,
                           controller: _phoneController,
                           icon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
-                          hint: 'اختياري',
+                          hint: l10n.accountOptionalHint,
                           validator: (value) => (value?.trim().length ?? 0) > 30
-                              ? 'يجب ألا يتجاوز الرقم 30 محرفًا'
+                              ? l10n.accountPhoneTooLong
                               : null,
                         ),
                         const SizedBox(height: 22),
@@ -205,7 +207,7 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
                                   ),
                                 )
                               : const Icon(Icons.save_outlined),
-                          label: const Text('حفظ التعديلات'),
+                          label: Text(l10n.saveChanges),
                           style: FilledButton.styleFrom(
                             minimumSize: const Size.fromHeight(54),
                           ),
@@ -231,6 +233,7 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
 
   Future<void> _saveProfile() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final l10n = AppLocalizations.of(context);
     await _run(() async {
       final profile = await ref
           .read(accountRepositoryProvider)
@@ -239,19 +242,20 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
             phoneNumber: _phoneController.text.trim(),
           );
       await _applyProfile(profile);
-      _showMessage('تم حفظ بيانات الحساب');
+      _showMessage(l10n.accountSaved);
     });
   }
 
   Future<void> _uploadAvatar() async {
-    const group = XTypeGroup(
-      label: 'صور',
+    final l10n = AppLocalizations.of(context);
+    final group = XTypeGroup(
+      label: l10n.accountImagesGroup,
       extensions: ['jpg', 'jpeg', 'png', 'webp'],
     );
-    final file = await openFile(acceptedTypeGroups: const [group]);
+    final file = await openFile(acceptedTypeGroups: [group]);
     if (file == null) return;
     if (await file.length() > 5 * 1024 * 1024) {
-      _showMessage('حجم الصورة يجب ألا يتجاوز 5 ميغابايت', isError: true);
+      _showMessage(l10n.accountImageTooLarge, isError: true);
       return;
     }
     await _run(() async {
@@ -259,33 +263,36 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
           .read(accountRepositoryProvider)
           .updateAvatar(filePath: file.path, fileName: file.name);
       await _applyProfile(profile);
-      _showMessage('تم تحديث الصورة الشخصية');
+      _showMessage(l10n.accountAvatarUpdated);
     });
   }
 
   Future<void> _deleteAvatar() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('حذف الصورة'),
-        content: const Text('هل تريد إزالة صورتك الشخصية؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('حذف'),
-          ),
-        ],
-      ),
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.deleteImageTitle),
+          content: Text(l10n.deleteImageConfirm),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.delete),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true) return;
     await _run(() async {
       final profile = await ref.read(accountRepositoryProvider).deleteAvatar();
       await _applyProfile(profile);
-      _showMessage('تم حذف الصورة الشخصية');
+      _showMessage(l10n.accountAvatarDeleted);
     });
   }
 
@@ -309,6 +316,10 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
       if (mounted) setState(() => _saving = false);
     }
   }
+
+  String _message(Object error) => error is ApiException
+      ? error.message
+      : AppLocalizations.of(context).accountOperationFailed;
 
   void _showMessage(String message, {bool isError = false}) {
     if (!mounted) return;
@@ -346,9 +357,9 @@ class _AvatarEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      color: context.appColors.primaryDeep,
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
+      border: Border.all(color: context.appColors.primaryDark.withValues(alpha: 0.35)),
     ),
     child: Padding(
       padding: const EdgeInsets.all(20),
@@ -381,7 +392,9 @@ class _AvatarEditor extends StatelessWidget {
                 onPressed: busy ? null : onUpload,
                 icon: const Icon(Icons.photo_camera_outlined),
                 label: Text(
-                  user.hasProfileImage ? 'تغيير الصورة' : 'إضافة صورة',
+                  user.hasProfileImage
+                      ? AppLocalizations.of(context).changePhoto
+                      : AppLocalizations.of(context).addPhoto,
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: context.appColors.secondary,
@@ -392,7 +405,9 @@ class _AvatarEditor extends StatelessWidget {
                 TextButton.icon(
                   onPressed: busy ? null : onDelete,
                   icon: const Icon(Icons.delete_outline_rounded),
-                  label: const Text('إزالة'),
+                  label: Text(
+                    AppLocalizations.of(context).removePhoto,
+                  ),
                   style: TextButton.styleFrom(foregroundColor: Colors.white),
                 ),
             ],
@@ -402,6 +417,3 @@ class _AvatarEditor extends StatelessWidget {
     ),
   );
 }
-
-String _message(Object error) =>
-    error is ApiException ? error.message : 'تعذر إكمال العملية حاليًا.';

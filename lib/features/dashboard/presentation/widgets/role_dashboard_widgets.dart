@@ -23,10 +23,10 @@ class RoleDashboardHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     clipBehavior: Clip.antiAlias,
     decoration: BoxDecoration(
-      color: context.appColors.primaryDeep,
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(22),
       border: Border.all(
-        color: context.appColors.primary.withValues(alpha: 0.15),
+        color: context.appColors.primaryDark.withValues(alpha: 0.35),
       ),
     ),
     child: Padding(

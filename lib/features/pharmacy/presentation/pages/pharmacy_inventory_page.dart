@@ -516,12 +516,10 @@ class _InventoryCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onEdit,
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(width: 5, color: statusColor),
-              Expanded(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
                   child: Column(
@@ -663,8 +661,7 @@ class _InventoryCard extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );

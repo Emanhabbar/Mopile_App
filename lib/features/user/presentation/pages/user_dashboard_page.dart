@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/data/models/auth_session.dart';
 import '../../../dashboard/presentation/controllers/home_ticker_provider.dart';
 import '../../../dashboard/presentation/widgets/home_ticker_panel.dart';
@@ -23,7 +24,8 @@ class UserDashboardPage extends ConsumerWidget {
     final dashboard = ref.watch(userDashboardProvider);
 
     return dashboard.when(
-      loading: () => const AppLoadingState(label: 'نجهز مساحتك الشخصية...'),
+      loading: () =>
+          AppLoadingState(label: AppLocalizations.of(context).dashboardLoading),
       error: (error, _) => AppErrorState(
         error: error,
         onRetry: () => ref.invalidate(userDashboardProvider),
@@ -50,6 +52,7 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final displayName = data.profile.fullName.isNotEmpty
         ? data.profile.fullName
         : fallbackUser.fullName;
@@ -78,36 +81,36 @@ class _DashboardContent extends StatelessWidget {
                 child: RoleMetricsGrid(
                   items: [
                     RoleMetricData(
-                      label: 'طلبات نشطة',
+                      label: l10n.metricActiveRequests,
                       value: '${data.activeRequestsCount}',
                       icon: Icons.bolt_rounded,
                       color: context.appColors.primary,
                     ),
                     RoleMetricData(
-                      label: 'قيد المراجعة',
+                      label: l10n.underReview,
                       value: '${data.pendingRequestsCount}',
                       icon: Icons.schedule_rounded,
-                      color: context.appColors.primaryDark,
+                      color: context.appColors.primary,
                     ),
                     RoleMetricData(
-                      label: 'طلبات مكتملة',
+                      label: l10n.metricCompletedRequests,
                       value: '${data.completedRequestsCount}',
                       icon: Icons.task_alt_rounded,
-                      color: context.appColors.primaryLight,
+                      color: context.appColors.primary,
                     ),
                     RoleMetricData(
-                      label: 'صيدليات مفتوحة',
+                      label: l10n.metricOpenPharmacies,
                       value: '${data.openNearbyPharmaciesCount}',
                       icon: Icons.local_pharmacy_rounded,
-                      color: context.appColors.primaryLight,
+                      color: context.appColors.primary,
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 8),
-              const RoleSectionHeader(
-                title: 'وصول سريع',
-                subtitle: 'الخدمات التي قد تحتاجها اليوم',
+              RoleSectionHeader(
+                title: l10n.quickAccessTitle,
+                subtitle: l10n.quickAccessSubtitle,
               ),
               const SizedBox(height: 6),
               AppReveal(
@@ -115,43 +118,43 @@ class _DashboardContent extends StatelessWidget {
                 child: RoleActionsGrid(
                   items: [
                     RoleActionData(
-                      title: 'وصفاتي',
-                      subtitle: 'إدارة الوصفات والطلبات',
+                      title: l10n.myPrescriptions,
+                      subtitle: l10n.myPrescriptionsSubtitle,
                       icon: Icons.receipt_long_rounded,
                       color: context.appColors.primary,
                       onTap: () => context.push('/user/prescriptions'),
                     ),
                     RoleActionData(
-                      title: 'التبرعات',
-                      subtitle: 'قدّم دواءً أو اطلب مساعدة',
+                      title: l10n.donations,
+                      subtitle: l10n.donationsSubtitle,
                       icon: Icons.volunteer_activism_rounded,
                       color: context.appColors.primaryDark,
                       onTap: () => context.push('/user/donations'),
                     ),
                     RoleActionData(
-                      title: 'المنظمات',
-                      subtitle: 'اكتشف الحملات الفعّالة',
+                      title: l10n.organizations,
+                      subtitle: l10n.organizationsSubtitle,
                       icon: Icons.apartment_rounded,
-                      color: context.appColors.primaryLight,
+                      color: context.appColors.primary,
                       onTap: () => context.push('/organizations'),
                     ),
                     RoleActionData(
-                      title: 'المساعد الدوائي',
-                      subtitle: 'اسأل وتابع محادثاتك',
+                      title: l10n.pharmacyAssistant,
+                      subtitle: l10n.pharmacyAssistantSubtitle,
                       icon: Icons.chat_bubble_rounded,
                       color: context.appColors.primary,
                       onTap: () => context.push('/user/chat'),
                     ),
                     RoleActionData(
-                      title: 'البدائل الدوائية',
-                      subtitle: 'قارن البدائل المتاحة',
+                      title: l10n.medicineAlternatives,
+                      subtitle: l10n.medicineAlternativesSubtitle,
                       icon: Icons.compare_arrows_rounded,
-                      color: context.appColors.primaryLight,
+                      color: context.appColors.primary,
                       onTap: () => context.push('/intelligence'),
                     ),
                     RoleActionData(
-                      title: 'سجل البحث',
-                      subtitle: 'ارجع لعمليات البحث السابقة',
+                      title: l10n.searchHistoryTitle,
+                      subtitle: l10n.searchHistorySubtitle,
                       icon: Icons.history_rounded,
                       color: context.appColors.primaryDark,
                       onTap: () => context.push('/user/search-history'),
@@ -160,9 +163,9 @@ class _DashboardContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const RoleSectionHeader(
-                title: 'الموقع والصيدليات',
-                subtitle: 'نتائج قريبة اعتمادًا على موقعك المحفوظ',
+              RoleSectionHeader(
+                title: l10n.locationSectionTitle,
+                subtitle: l10n.locationSectionSubtitle,
               ),
               const SizedBox(height: 6),
               AppReveal(
@@ -191,15 +194,15 @@ class _DashboardContent extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 8),
-              const RoleSectionHeader(
-                title: 'أحدث الطلبات',
-                subtitle: 'آخر المستجدات على طلبات الأدوية',
+              RoleSectionHeader(
+                title: l10n.latestRequestsTitle,
+                subtitle: l10n.latestRequestsSubtitle,
               ),
               const SizedBox(height: 6),
               if (data.recentRequests.isEmpty)
-                const _EmptyActivity(
+                _EmptyActivity(
                   icon: Icons.inventory_2_outlined,
-                  text: 'لا توجد طلبات بعد. يمكنك البدء بالبحث عن دوائك.',
+                  text: l10n.emptyRequestsActivity,
                 )
               else
                 ...data.recentRequests.map(
@@ -213,15 +216,15 @@ class _DashboardContent extends StatelessWidget {
                   ),
                 ),
               const SizedBox(height: 8),
-              const RoleSectionHeader(
-                title: 'نشاط البحث',
-                subtitle: 'عمليات البحث الحديثة',
+              RoleSectionHeader(
+                title: l10n.searchActivityTitle,
+                subtitle: l10n.searchActivitySubtitle,
               ),
               const SizedBox(height: 6),
               if (data.recentSearches.isEmpty)
-                const _EmptyActivity(
+                _EmptyActivity(
                   icon: Icons.search_off_rounded,
-                  text: 'لم تبدأ البحث بعد.',
+                  text: l10n.emptySearchActivity,
                 )
               else
                 Container(
@@ -261,14 +264,15 @@ class _HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final hasLocation = data.profile.hasSavedLocation;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: context.appColors.primary.withValues(alpha: 0.15),
+          color: context.appColors.primaryDark.withValues(alpha: 0.35),
         ),
       ),
       child: Padding(
@@ -301,7 +305,7 @@ class _HeroSection extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              'مساحتك الصحية',
+                              l10n.healthSpace,
                               style: TextStyle(
                                 color: context.appColors.primaryLight,
                                 fontWeight: FontWeight.w700,
@@ -334,7 +338,7 @@ class _HeroSection extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'أهلًا $firstName',
+              l10n.welcomeName(firstName),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -345,7 +349,7 @@ class _HeroSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'ابحث عن دوائك، تابع طلباتك واحتفظ\nبمعلوماتك الصحية في مكان واحد.',
+              l10n.heroSubtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 13.5,
@@ -378,7 +382,7 @@ class _HeroSection extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'ابحث عن دواء...',
+                          l10n.searchPlaceholder,
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 14,
@@ -395,9 +399,9 @@ class _HeroSection extends StatelessWidget {
                           color: context.appColors.secondary,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text(
-                          'بحث',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.searchCta,
+                          style: const TextStyle(
                             color: Color(0xFF173D46),
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -434,8 +438,8 @@ class _HeroSection extends StatelessWidget {
                   Flexible(
                     child: Text(
                       hasLocation
-                          ? 'موقعك محفوظ — النتائج الأقرب لك'
-                          : 'أضف موقعك لعرض الصيدليات القريبة',
+                          ? l10n.locationSavedHero
+                          : l10n.addLocationHero,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.65),
                         fontSize: 12,
@@ -471,6 +475,7 @@ class _LocationSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final hasLocation = profile.hasSavedLocation;
     return Material(
       color: Colors.transparent,
@@ -511,7 +516,7 @@ class _LocationSummary extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      hasLocation ? 'موقعك محفوظ' : 'حدد موقعك',
+                      hasLocation ? l10n.locationSavedTitle : l10n.setLocationTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -519,8 +524,11 @@ class _LocationSummary extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       hasLocation
-                          ? 'نطاق ${(contextData?.radiusInMeters ?? 5000) ~/ 1000} كم — ${contextData?.registeredCount ?? 0} صيدليات مسجلة'
-                          : 'أضف موقعك من خدمة الصيدليات القريبة',
+                          ? l10n.locationSummarySubtitle(
+                              (contextData?.radiusInMeters ?? 5000) ~/ 1000,
+                              contextData?.registeredCount ?? 0,
+                            )
+                          : l10n.addLocationSubtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 12.5,
                       ),
@@ -561,6 +569,7 @@ class _NearbyPharmacyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SizedBox(
       width: 255,
       child: Card(
@@ -618,15 +627,15 @@ class _NearbyPharmacyCard extends StatelessWidget {
                   children: [
                     _SmallPill(
                       icon: Icons.route_rounded,
-                      text: _formatDistance(pharmacy.distanceMeters),
+                      text: _formatDistance(l10n, pharmacy.distanceMeters),
                     ),
                     const SizedBox(width: 7),
                     _SmallPill(
                       icon: Icons.circle,
                       text: pharmacy.statusText.isEmpty
                           ? pharmacy.isOpenNow
-                                ? 'مفتوحة'
-                                : 'مغلقة'
+                                ? l10n.openLabel
+                                : l10n.closedLabel
                           : pharmacy.statusText,
                       color: pharmacy.isOpenNow
                           ? context.appColors.success
@@ -651,6 +660,7 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -686,7 +696,7 @@ class _RequestCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${request.pharmacyName} — الكمية ${request.requestedQuantity}',
+                      '${request.pharmacyName} — ${l10n.requestQuantity} ${request.requestedQuantity}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -730,6 +740,7 @@ class _SearchActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -756,7 +767,7 @@ class _SearchActivity extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.query.isEmpty ? 'بحث عن صيدلية' : item.query,
+                    item.query.isEmpty ? l10n.searchForPharmacy : item.query,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -766,7 +777,7 @@ class _SearchActivity extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _searchType(item.searchType),
+                    _searchType(l10n, item.searchType),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 11.5,
                       color: context.appColors.textMuted,
@@ -782,7 +793,7 @@ class _SearchActivity extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                '${item.resultCount} نتيجة',
+                l10n.searchResultCount(item.resultCount),
                 style: TextStyle(
                   color: context.appColors.primary,
                   fontSize: 11,
@@ -884,20 +895,21 @@ class _SmallPill extends StatelessWidget {
   }
 }
 
-String _formatDistance(double meters) {
-  if (meters < 1000) return '${meters.round()} م';
-  return '${(meters / 1000).toStringAsFixed(1)} كم';
+String _formatDistance(AppLocalizations l10n, double meters) {
+  if (meters < 1000) return l10n.distanceMeters('${meters.round()}');
+  return l10n.distanceKm((meters / 1000).toStringAsFixed(1));
 }
 
-String _searchType(String value) => switch (value.toLowerCase()) {
-  'medicine' || 'medicines' || 'medicinesearch' => 'بحث عن دواء',
-  'pharmacy' ||
-  'pharmacies' ||
-  'nearestpharmacies' ||
-  'pharmacydetails' => 'بحث عن صيدلية',
-  'medicinerequest' => 'طلب دواء',
-  _ => 'نشاط بحث',
-};
+String _searchType(AppLocalizations l10n, String value) =>
+    switch (value.toLowerCase()) {
+      'medicine' || 'medicines' || 'medicinesearch' => l10n.searchForMedicine,
+      'pharmacy' ||
+      'pharmacies' ||
+      'nearestpharmacies' ||
+      'pharmacydetails' => l10n.searchForPharmacy,
+      'medicinerequest' => l10n.medicineRequestType,
+      _ => l10n.searchActivityTitle,
+    };
 
 void _openSearchActivity(BuildContext context, UserSearchHistory item) {
   final type = item.searchType.toLowerCase();

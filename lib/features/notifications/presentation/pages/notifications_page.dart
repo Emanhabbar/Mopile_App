@@ -200,9 +200,9 @@ class _NotificationsHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(17),
     decoration: BoxDecoration(
-      color: context.appColors.primaryDeep,
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(22),
-      border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
+      border: Border.all(color: context.appColors.primaryDark.withValues(alpha: 0.35)),
     ),
     child: Row(
       children: [

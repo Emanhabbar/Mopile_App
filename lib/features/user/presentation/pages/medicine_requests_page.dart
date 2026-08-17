@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_request_models.dart';
 import '../controllers/user_providers.dart';
 
@@ -22,13 +23,14 @@ class _MedicineRequestsPageState extends ConsumerState<MedicineRequestsPage> {
   @override
   Widget build(BuildContext context) {
     final requests = ref.watch(userMedicineRequestsProvider(_status));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('طلباتي'),
+        title: Text(l10n.requestsTitle),
         actions: [
           IconButton(
             onPressed: () => context.push('/user/search-history'),
-            tooltip: 'سجل البحث',
+            tooltip: l10n.searchHistoryTitle,
             icon: const Icon(Icons.history_rounded),
           ),
           const SizedBox(width: 8),
@@ -53,8 +55,7 @@ class _MedicineRequestsPageState extends ConsumerState<MedicineRequestsPage> {
           ),
           Expanded(
             child: requests.when(
-              loading: () =>
-                  const AppLoadingState(label: 'جاري تحميل طلباتك...'),
+              loading: () => AppLoadingState(label: l10n.requestsLoading),
               error: (error, _) => AppErrorState(
                 error: error,
                 onRetry: () =>
@@ -97,13 +98,14 @@ class _RequestsIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: context.appColors.primary.withValues(alpha: 0.15),
+          color: context.appColors.primaryDark.withValues(alpha: 0.35),
         ),
       ),
       child: Row(
@@ -126,14 +128,14 @@ class _RequestsIntro extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'تابع طلبات أدويتك',
+                  l10n.requestsIntroTitle,
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'اطّلع على رد الصيدلية وحالة كل طلب.',
+                  l10n.requestsIntroSubtitle,
                   style: Theme.of(
                     context,
                   ).textTheme.bodySmall?.copyWith(color: Colors.white70),
@@ -143,7 +145,7 @@ class _RequestsIntro extends StatelessWidget {
           ),
           IconButton(
             onPressed: onNewRequest,
-            tooltip: 'طلب جديد',
+            tooltip: l10n.newRequest,
             style: IconButton.styleFrom(
               backgroundColor: context.appColors.secondary,
               foregroundColor: context.appColors.primaryDark,
@@ -164,12 +166,13 @@ class _StatusFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const filters = <String?, String>{
-      null: 'الكل',
-      'Pending': 'قيد الانتظار',
-      'Available': 'متوفر',
-      'Unavailable': 'غير متوفر',
-      'Cancelled': 'ملغى',
+    final l10n = AppLocalizations.of(context);
+    final filters = <String?, String>{
+      null: l10n.statusAll,
+      'Pending': l10n.statusPending,
+      'Available': l10n.statusAvailable,
+      'Unavailable': l10n.statusUnavailable,
+      'Cancelled': l10n.statusCancelled,
     };
     return SizedBox(
       height: 65,
@@ -217,6 +220,7 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final status = _statusStyle(request.status);
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -256,7 +260,7 @@ class _RequestCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _StatusBadge(text: _statusText(request), color: status.color),
+                  _StatusBadge(text: _statusText(l10n, request), color: status.color),
                 ],
               ),
               const SizedBox(height: 14),
@@ -268,12 +272,12 @@ class _RequestCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    _Fact(label: 'رقم الطلب', value: request.requestCode),
+                    _Fact(label: l10n.requestNumber, value: request.requestCode),
                     _Fact(
-                      label: 'الكمية',
+                      label: l10n.requestQuantity,
                       value: '${request.requestedQuantity}',
                     ),
-                    _Fact(label: 'التاريخ', value: _date(request.createdAtUtc)),
+                    _Fact(label: l10n.requestDate, value: _date(request.createdAtUtc)),
                   ],
                 ),
               ),
@@ -300,6 +304,7 @@ class _EmptyRequests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(32),
@@ -312,13 +317,13 @@ class _EmptyRequests extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Text(
-          'لا توجد طلبات ضمن هذا التصنيف',
+          l10n.requestsEmptyTitle,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 6),
         Text(
-          'ابحث عن دوائك واختر الصيدلية المناسبة لإرسال طلب.',
+          l10n.requestsEmptySubtitle,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
@@ -385,16 +390,16 @@ class _StatusBadge extends StatelessWidget {
   _ => (color: const Color(0xFFB47618), icon: Icons.schedule_rounded),
 };
 
-String _statusText(UserMedicineRequest request) {
+String _statusText(AppLocalizations l10n, UserMedicineRequest request) {
   if (request.statusDisplayText.trim().isNotEmpty &&
       !request.statusDisplayText.toLowerCase().contains('waiting')) {
     return request.statusDisplayText;
   }
   return switch (request.status.toLowerCase()) {
-    'available' => 'الدواء متوفر',
-    'unavailable' => 'غير متوفر',
-    'cancelled' => 'ملغى',
-    _ => 'قيد الانتظار',
+    'available' => l10n.medicineAvailable,
+    'unavailable' => l10n.statusUnavailable,
+    'cancelled' => l10n.statusCancelled,
+    _ => l10n.statusPending,
   };
 }
 

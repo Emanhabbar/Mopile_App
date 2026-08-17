@@ -6,6 +6,7 @@ import '../../../../app/localization/locale_controller.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/widgets/app_reveal.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/profile_avatar.dart';
 import '../../../auth/data/models/auth_session.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
@@ -18,6 +19,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeControllerProvider);
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
@@ -34,12 +36,12 @@ class SettingsPage extends ConsumerWidget {
               child: Icon(Icons.tune_rounded, color: context.appColors.primary),
             ),
             const SizedBox(width: 10),
-            Text('حسابي', style: Theme.of(context).textTheme.headlineSmall),
+            Text(l10n.account, style: Theme.of(context).textTheme.headlineSmall),
           ],
         ),
         const SizedBox(height: 4),
         Text(
-          'بياناتك وتفضيلات استخدام التطبيق',
+          l10n.settingsProfileSubtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: context.appColors.text,
             fontSize: 13,
@@ -51,23 +53,25 @@ class SettingsPage extends ConsumerWidget {
         ),
         const SizedBox(height: 28),
         _SectionLabel(
-          title: 'التفضيلات والحساب',
-          subtitle: 'إدارة بياناتك وطريقة استخدام التطبيق',
+          title: l10n.settingsPrefsSection,
+          subtitle: l10n.settingsPrefsSubtitle,
         ),
         const SizedBox(height: 12),
         _AccentSettingsItem(
           accentColor: context.appColors.primary,
           icon: Icons.person_outline_rounded,
-          title: 'الملف الشخصي',
-          subtitle: 'الاسم ورقم الهاتف والصورة',
+          title: l10n.settingsProfile,
+          subtitle: l10n.settingsProfileDesc,
           onTap: () => context.push('/account/profile'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primaryDark,
           icon: Icons.language_rounded,
-          title: 'لغة التطبيق',
-          subtitle: locale.languageCode == 'ar' ? 'العربية' : 'English',
+          title: l10n.settingsLanguage,
+          subtitle: locale.languageCode == 'ar'
+              ? l10n.settingsLanguageAr
+              : l10n.settingsLanguageEn,
           onTap: () =>
               ref.read(localeControllerProvider.notifier).toggle(),
         ),
@@ -75,77 +79,77 @@ class SettingsPage extends ConsumerWidget {
         _AccentSettingsItem(
           accentColor: context.appColors.primary,
           icon: Icons.palette_outlined,
-          title: 'المظهر',
-          subtitle: 'فاتح أو داكن أو حسب إعداد الجهاز',
+          title: l10n.settingsAppearance,
+          subtitle: l10n.settingsAppearanceDesc,
           onTap: () => context.push('/settings/appearance'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primary,
           icon: Icons.notifications_none_rounded,
-          title: 'تفضيلات الإشعارات',
-          subtitle: 'الطلبات والتذكيرات والحملات',
+          title: l10n.settingsNotifications,
+          subtitle: l10n.settingsNotificationsDesc,
           onTap: () => context.push('/settings/notifications'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primaryDark,
           icon: Icons.lock_outline_rounded,
-          title: 'تغيير كلمة المرور',
-          subtitle: 'تحديث كلمة مرور حسابك',
+          title: l10n.settingsChangePassword,
+          subtitle: l10n.settingsChangePasswordDesc,
           onTap: () => context.push('/account/password'),
         ),
         const SizedBox(height: 28),
         _SectionLabel(
-          title: 'الخصوصية والمساعدة',
-          subtitle: 'الصلاحيات والمعلومات المهمة عن استخدام دوائي',
+          title: l10n.settingsPrivacyHelpSection,
+          subtitle: l10n.settingsPrivacyHelpSubtitle,
         ),
         const SizedBox(height: 12),
         _AccentSettingsItem(
           accentColor: context.appColors.primary,
           icon: Icons.inbox_outlined,
-          title: 'مركز الإشعارات',
-          subtitle: 'عرض التنبيهات الواردة وحالتها',
+          title: l10n.settingsNotificationCenter,
+          subtitle: l10n.settingsNotificationCenterDesc,
           onTap: () => context.push('/notifications'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primaryDark,
           icon: Icons.admin_panel_settings_outlined,
-          title: 'صلاحيات الجهاز',
-          subtitle: 'الموقع والكاميرا والملفات',
+          title: l10n.settingsPermissions,
+          subtitle: l10n.settingsPermissionsDesc,
           onTap: () => context.push('/settings/permissions'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primaryLight,
           icon: Icons.shield_outlined,
-          title: 'الخصوصية',
-          subtitle: 'بياناتك الآمنة وخصوصيتك',
+          title: l10n.settingsPrivacy,
+          subtitle: l10n.settingsPrivacyDesc,
           onTap: () => context.push('/settings/privacy'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primary,
           icon: Icons.description_outlined,
-          title: 'شروط الاستخدام',
-          subtitle: 'البنود والأحكام العامة',
+          title: l10n.termsOfUse,
+          subtitle: l10n.settingsTermsDesc,
           onTap: () => context.push('/settings/terms'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primaryDark,
           icon: Icons.help_outline_rounded,
-          title: 'المساعدة',
-          subtitle: 'الدعم الفني والأسئلة الشائعة',
+          title: l10n.settingsHelp,
+          subtitle: l10n.settingsHelpDesc,
           onTap: () => context.push('/settings/help'),
         ),
         const SizedBox(height: 6),
         _AccentSettingsItem(
           accentColor: context.appColors.primaryLight,
           icon: Icons.info_outline_rounded,
-          title: 'عن دوائي',
-          subtitle: 'الإصدار 1.0.0',
+          title: l10n.settingsAbout,
+          subtitle: l10n.settingsVersion,
           onTap: () => context.push('/settings/about'),
         ),
         const SizedBox(height: 28),
@@ -178,7 +182,7 @@ class SettingsPage extends ConsumerWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
-                      'تسجيل الخروج',
+                      l10n.signOut,
                       style: TextStyle(
                         color: context.appColors.danger,
                         fontWeight: FontWeight.w700,
@@ -198,21 +202,24 @@ class SettingsPage extends ConsumerWidget {
   Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
     final shouldLogout = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: context.appColors.surface,
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل تريد تسجيل الخروج من حسابك؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('تسجيل الخروج'),
-          ),
-        ],
-      ),
+      builder: (dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext);
+        return AlertDialog(
+          backgroundColor: context.appColors.surface,
+          title: Text(l10n.signOut),
+          content: Text(l10n.logoutConfirm),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.signOut),
+            ),
+          ],
+        );
+      },
     );
     if (shouldLogout == true) {
       await ref.read(authControllerProvider.notifier).logout();
@@ -220,13 +227,13 @@ class SettingsPage extends ConsumerWidget {
   }
 }
 
-String _roleLabel(AppRole role) => switch (role) {
-  AppRole.user => 'مستخدم',
-  AppRole.pharmacy => 'صيدلية',
-  AppRole.organization => 'منظمة',
-  AppRole.warehouse => 'مستودع أدوية',
-  AppRole.representative => 'مندوب مستودع',
-  AppRole.admin => 'إدارة المنصة',
+String _roleLabel(AppRole role, AppLocalizations l10n) => switch (role) {
+  AppRole.user => l10n.registerTypeUser,
+  AppRole.pharmacy => l10n.registerTypePharmacy,
+  AppRole.organization => l10n.registerTypeOrganization,
+  AppRole.warehouse => l10n.registerTypeWarehouse,
+  AppRole.representative => l10n.roleRepresentative,
+  AppRole.admin => l10n.roleAdmin,
 };
 
 class _ProfileHero extends StatelessWidget {
@@ -237,13 +244,14 @@ class _ProfileHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = user.hasProfileImage;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
+        border: Border.all(color: context.appColors.primaryDark.withValues(alpha: 0.35)),
       ),
       child: Stack(
         children: [
@@ -311,7 +319,7 @@ class _ProfileHero extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        _roleLabel(user.primaryRole),
+                        _roleLabel(user.primaryRole, l10n),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w700,
@@ -332,7 +340,9 @@ class _ProfileHero extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            hasImage ? 'حساب موثّق' : 'حساب غير موثّق',
+                            hasImage
+                                ? l10n.verifiedAccount
+                                : l10n.unverifiedAccount,
                             style: TextStyle(
                               color: hasImage
                                   ? context.appColors.primaryDeep

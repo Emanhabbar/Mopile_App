@@ -30,7 +30,7 @@ class WarehouseHomePage extends ConsumerWidget {
               subtitle:
                   'راقب التشغيلات والطلبات والشحنات قبل أن تتحول إلى تأخير.',
               icon: Icons.warehouse_rounded,
-              accent: const Color(0xFF166E64),
+              accent: context.appColors.primary,
               badge: data.pendingOrders > 0
                   ? '${data.pendingOrders} طلبات توريد بانتظارك'
                   : 'الطلبات محدثة',
@@ -53,13 +53,13 @@ class WarehouseHomePage extends ConsumerWidget {
                   label: 'مخزون منخفض',
                   value: '${data.lowStockBatches}',
                   icon: Icons.warning_amber_rounded,
-                  color: context.appColors.primaryDeep,
+                  color: context.appColors.primary,
                 ),
                 RoleMetricData(
                   label: 'قريبة الانتهاء',
                   value: '${data.expiringBatches}',
                   icon: Icons.event_busy_outlined,
-                  color: context.appColors.primaryDark,
+                  color: context.appColors.primary,
                 ),
                 RoleMetricData(
                   label: 'شحنات نشطة',
@@ -103,7 +103,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       ? '${data.pendingOrders}'
                       : null,
                   icon: Icons.receipt_long_rounded,
-                  color: context.appColors.primaryDeep,
+                  color: context.appColors.primary,
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
@@ -113,7 +113,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       ? '${data.activeDeliveries}'
                       : null,
                   icon: Icons.local_shipping_outlined,
-                  color: context.appColors.primaryDark,
+                  color: context.appColors.primary,
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
@@ -148,9 +148,7 @@ class WarehouseHomePage extends ConsumerWidget {
                         icon: batch.sellableQuantity <= 0
                             ? Icons.remove_circle_outline_rounded
                             : Icons.inventory_2_outlined,
-                        color: batch.sellableQuantity <= 0
-                            ? context.appColors.primaryDark
-                            : context.appColors.primary,
+                        color: context.appColors.primary,
                         onTap: () => context.go('/supply-chain'),
                       ),
                     ),
@@ -205,7 +203,7 @@ String _orderStatus(String status) => switch (status) {
 
 Color _orderColor(AppColors colors, String status) => switch (status) {
   'Delivered' => colors.primary,
-  'Rejected' || 'Cancelled' => colors.primaryDark,
-  'OutForDelivery' => colors.primaryDeep,
+  'Rejected' || 'Cancelled' => colors.primary,
+  'OutForDelivery' => colors.primary,
   _ => colors.primary,
 };

@@ -7,6 +7,7 @@ import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_discovery_models.dart';
 import '../controllers/user_providers.dart';
 
@@ -24,14 +25,6 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
   int _radius = 5000;
   String _sortBy = 'BestMatch';
   bool _hasSearched = false;
-
-  static const _sortOptions = {
-    'BestMatch': 'الأفضل تطابقًا',
-    'Distance': 'الأقرب',
-    'OpenNow': 'المفتوحة الآن',
-    'Rating': 'الأعلى تقييمًا',
-    'PriceLowToHigh': 'السعر الأقل',
-  };
 
   @override
   void initState() {
@@ -53,14 +46,22 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
   @override
   Widget build(BuildContext context) {
     final search = ref.watch(userMedicineSearchProvider);
+    final l10n = AppLocalizations.of(context);
+    final sortOptions = <String, String>{
+      'BestMatch': l10n.sortBestMatch,
+      'Distance': l10n.sortDistance,
+      'OpenNow': l10n.sortOpenNow,
+      'Rating': l10n.sortRating,
+      'PriceLowToHigh': l10n.sortPriceLowToHigh,
+    };
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('البحث عن دواء'),
+        title: Text(l10n.medicineSearchTitle),
         actions: [
           IconButton(
             onPressed: () => context.go('/user/nearby-pharmacies'),
-            tooltip: 'الصيدليات القريبة',
+            tooltip: l10n.nearbyPharmacies,
             icon: const Icon(Icons.map_outlined),
           ),
           const SizedBox(width: 8),
@@ -89,7 +90,7 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
                       controller: _queryController,
                       radius: _radius,
                       sortBy: _sortBy,
-                      sortOptions: _sortOptions,
+                      sortOptions: sortOptions,
                       searching: search.isLoading,
                       onRadiusChanged: (value) =>
                           setState(() => _radius = value),
@@ -113,23 +114,23 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
     BuildContext context,
     AsyncValue<List<NearbyMedicineResult>> search,
   ) {
+    final l10n = AppLocalizations.of(context);
     if (!_hasSearched) {
-      return const SliverPadding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         sliver: SliverToBoxAdapter(
           child: _DiscoveryEmpty(
             icon: Icons.medication_liquid_outlined,
-            title: 'ابدأ بكتابة اسم الدواء',
-            message:
-                'ستظهر الصيدليات التي يتوفر لديها الدواء مع السعر والمسافة.',
+            title: l10n.searchStartTitle,
+            message: l10n.searchStartMessage,
           ),
         ),
       );
     }
     return search.when(
-      loading: () => const SliverFillRemaining(
+      loading: () => SliverFillRemaining(
         hasScrollBody: false,
-        child: AppLoadingState(label: 'نبحث في الصيدليات القريبة...'),
+        child: AppLoadingState(label: l10n.searchLoadingNearby),
       ),
       error: (error, _) => SliverFillRemaining(
         hasScrollBody: false,
@@ -141,14 +142,13 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
       ),
       data: (results) {
         if (results.isEmpty) {
-          return const SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+          return SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverToBoxAdapter(
               child: _DiscoveryEmpty(
                 icon: Icons.search_off_rounded,
-                title: 'لم نجد نتائج مطابقة',
-                message:
-                    'جرّب الاسم العلمي أو وسّع نطاق البحث وتحقق من كتابة الاسم.',
+                title: l10n.searchNoResultsTitle,
+                message: l10n.searchNoResultsMessage,
               ),
             ),
           );
@@ -162,9 +162,11 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               _ResultsTitle(
-                title: 'نتائج البحث',
-                subtitle:
-                    '${results.length} نتيجة لدى $pharmaciesCount صيدليات',
+                title: l10n.searchResultsTitle,
+                subtitle: l10n.searchResultsSubtitle(
+                  results.length,
+                  pharmaciesCount,
+                ),
               ),
               const SizedBox(height: 12),
               ...results.map((result) {
@@ -187,9 +189,9 @@ class _MedicineSearchPageState extends ConsumerState<MedicineSearchPage> {
   Future<void> _search() async {
     final query = _queryController.text.trim();
     if (query.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('اكتب اسم الدواء للبحث.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).searchEmptyQuery)),
+      );
       return;
     }
     FocusManager.instance.primaryFocus?.unfocus();
@@ -211,8 +213,9 @@ class _LocationRequiredState extends StatelessWidget {
 
   final VoidCallback onSetLocation;
 
-  @override
+@override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28),
@@ -236,13 +239,13 @@ class _LocationRequiredState extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'حدد موقعك أولًا',
+                l10n.setLocationFirst,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'نستخدم موقعك لعرض الدواء والصيدليات الأقرب إليك.',
+                l10n.setLocationDesc,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -250,7 +253,7 @@ class _LocationRequiredState extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onSetLocation,
                 icon: const Icon(Icons.my_location_rounded),
-                label: const Text('تحديد الموقع'),
+                label: Text(l10n.setLocationAction),
               ),
             ],
           ),
@@ -267,12 +270,13 @@ class _SearchHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: context.appColors.primary.withValues(alpha: 0.15)),
+        border: Border.all(color: context.appColors.primaryDark.withValues(alpha: 0.35)),
       ),
       child: Row(
         children: [
@@ -295,14 +299,14 @@ class _SearchHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'ابحث عن دوائك بسهولة',
+                  l10n.searchHeroTitle,
                   style: Theme.of(
                     context,
                   ).textTheme.titleLarge?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'قارن التوفر والسعر والمسافة.',
+                  l10n.searchHeroSubtitle,
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
@@ -312,7 +316,7 @@ class _SearchHero extends StatelessWidget {
           ),
           IconButton.filledTonal(
             onPressed: onLocation,
-            tooltip: 'الصيدليات القريبة',
+            tooltip: l10n.nearbyPharmacies,
             style: IconButton.styleFrom(
               backgroundColor: Colors.white.withValues(alpha: 0.12),
               foregroundColor: Colors.white,
@@ -349,6 +353,7 @@ class _SearchControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -359,8 +364,8 @@ class _SearchControls extends StatelessWidget {
       child: Column(
         children: [
           AppTextField(
-            label: 'اسم الدواء',
-            hint: 'اسم الدواء أو الاسم العلمي',
+            label: l10n.medicineNameLabel,
+            hint: l10n.medicineNameHint,
             controller: controller,
             icon: Icons.medication_outlined,
             textInputAction: TextInputAction.search,
@@ -371,15 +376,30 @@ class _SearchControls extends StatelessWidget {
             children: [
               Expanded(
                 child: _CleanDropdown<int>(
-                  label: 'النطاق',
+                  label: l10n.radiusLabel,
                   icon: Icons.radar_rounded,
                   value: radius,
-                  items: const [
-                    DropdownMenuItem(value: 1000, child: Text('1 كم')),
-                    DropdownMenuItem(value: 3000, child: Text('3 كم')),
-                    DropdownMenuItem(value: 5000, child: Text('5 كم')),
-                    DropdownMenuItem(value: 10000, child: Text('10 كم')),
-                    DropdownMenuItem(value: 25000, child: Text('25 كم')),
+                  items: [
+                    DropdownMenuItem(
+                      value: 1000,
+                      child: Text(l10n.distanceKm('1')),
+                    ),
+                    DropdownMenuItem(
+                      value: 3000,
+                      child: Text(l10n.distanceKm('3')),
+                    ),
+                    DropdownMenuItem(
+                      value: 5000,
+                      child: Text(l10n.distanceKm('5')),
+                    ),
+                    DropdownMenuItem(
+                      value: 10000,
+                      child: Text(l10n.distanceKm('10')),
+                    ),
+                    DropdownMenuItem(
+                      value: 25000,
+                      child: Text(l10n.distanceKm('25')),
+                    ),
                   ],
                   onChanged: (v) { if (v != null) onRadiusChanged(v); },
                 ),
@@ -387,7 +407,7 @@ class _SearchControls extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _CleanDropdown<String>(
-                  label: 'الترتيب',
+                  label: l10n.sortLabel,
                   icon: Icons.tune_rounded,
                   value: sortBy,
                   isExpanded: true,
@@ -416,7 +436,7 @@ class _SearchControls extends StatelessWidget {
                     )
                   : const Icon(Icons.search_rounded, size: 22),
               label: Text(
-                searching ? 'جاري البحث...' : 'عرض أماكن توفر الدواء',
+                searching ? l10n.searchingProgress : l10n.searchAction,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -511,6 +531,7 @@ class _MedicineResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final details = [
       if (result.arabicMedicineName != null) result.medicineName,
       result.arabicScientificName ?? result.scientificName,
@@ -558,7 +579,7 @@ class _MedicineResultCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'يتطلب وصفة',
+                      l10n.requiresPrescription,
                       style: TextStyle(
                         color: context.appColors.warning,
                         fontSize: 11,
@@ -577,14 +598,20 @@ class _MedicineResultCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _Fact(label: 'السعر', value: _price(result.sellingPrice)),
-                  _Fact(label: 'الكمية', value: '${result.quantityAvailable}'),
                   _Fact(
-                    label: 'المسافة',
-                    value: _distance(result.pharmacy.distanceMeters),
+                    label: l10n.priceLabel,
+                    value: _price(l10n, result.sellingPrice),
                   ),
                   _Fact(
-                    label: 'التقييم',
+                    label: l10n.requestQuantity,
+                    value: '${result.quantityAvailable}',
+                  ),
+                  _Fact(
+                    label: l10n.distanceLabel,
+                    value: _distance(l10n, result.pharmacy.distanceMeters),
+                  ),
+                  _Fact(
+                    label: l10n.ratingLabel,
                     value:
                         '${result.pharmacy.averageRating.toStringAsFixed(1)} ★',
                   ),
@@ -638,7 +665,7 @@ class _MedicineResultCard extends StatelessWidget {
                   '?medicine=${result.medicineId}',
                 ),
                 icon: const Icon(Icons.inventory_2_outlined),
-                label: const Text('عرض الصيدلية وطلب الدواء'),
+                label: Text(l10n.viewPharmacyAndRequest),
               ),
             ),
           ],
@@ -734,9 +761,10 @@ class _DiscoveryEmpty extends StatelessWidget {
 bool _isMissingLocation(Object error) =>
     error is ApiException && error.isLocationRequired;
 
-String _distance(double meters) => meters < 1000
-    ? '${meters.round()} م'
-    : '${(meters / 1000).toStringAsFixed(1)} كم';
+String _distance(AppLocalizations l10n, double meters) => meters < 1000
+    ? l10n.distanceMeters('${meters.round()}')
+    : l10n.distanceKm((meters / 1000).toStringAsFixed(1));
 
-String _price(double? value) =>
-    value == null ? 'غير معلن' : '${value.toStringAsFixed(0)} ل.س';
+String _price(AppLocalizations l10n, double? value) => value == null
+    ? l10n.priceUnannounced
+    : l10n.currencySYP(value.toStringAsFixed(0));

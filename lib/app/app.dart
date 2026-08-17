@@ -61,8 +61,8 @@ class _SessionExpiredListenerState
     if (expired) {
       ref.read(sessionExpiredProvider.notifier).state = false;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('انتهت جلستك، سجّل دخولك مجدداً.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).sessionExpired),
         ),
       );
     }
@@ -74,8 +74,8 @@ class _SessionExpiredListenerState
       if (next && mounted) {
         ref.read(sessionExpiredProvider.notifier).state = false;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('انتهت جلستك، سجّل دخولك مجدداً.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).sessionExpired),
           ),
         );
       }

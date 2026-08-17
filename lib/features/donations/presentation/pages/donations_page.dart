@@ -90,6 +90,8 @@ class _DonationsPageState extends ConsumerState<DonationsPage>
               ? '/user/donations/create-offer'
               : '/user/donations/create-request',
         ),
+        backgroundColor: context.appColors.primary,
+        foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: Text(_tabs.index == 0 ? 'عرض تبرع' : 'طلب مساعدة'),
       ),
@@ -103,9 +105,7 @@ class _DonationHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(25),
     ),
     child: const Row(
@@ -192,12 +192,12 @@ class _DonationSegment extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           padding: const EdgeInsets.symmetric(vertical: 11),
           decoration: BoxDecoration(
-            color: active ? Colors.white : Colors.transparent,
+            color: active ? colors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(14),
             boxShadow: active
                 ? [
                     BoxShadow(
-                      color: colors.shadow.withValues(alpha: .08),
+                      color: colors.primary.withValues(alpha: .18),
                       blurRadius: 10,
                     ),
                   ]
@@ -206,11 +206,16 @@ class _DonationSegment extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: colors.primary, size: 18),
+              Icon(
+                icon,
+                color: active ? Colors.white : colors.primary,
+                size: 18,
+              ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
+                  color: active ? Colors.white : colors.text,
                   fontSize: 11,
                   fontWeight: active ? FontWeight.w900 : FontWeight.w600,
                 ),
@@ -360,6 +365,15 @@ class _StatusFilter extends StatelessWidget {
                 selected: selected == entry.key,
                 onSelected: (_) => onChanged(entry.key),
                 showCheckmark: false,
+                backgroundColor: context.appColors.surfaceSoft,
+                selectedColor: context.appColors.primary,
+                side: BorderSide.none,
+                labelStyle: TextStyle(
+                  color: selected == entry.key
+                      ? Colors.white
+                      : context.appColors.text,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           )
@@ -507,16 +521,20 @@ class _EmptyList extends StatelessWidget {
 
 ({String label, Color color}) donationStatus(AppColors colors, String value) =>
     switch (value.toLowerCase()) {
-  'approved' => (label: 'مقبول', color: colors.success),
-  'received' || 'fulfilled' => (
-    label: value.toLowerCase() == 'received' ? 'تم الاستلام' : 'تمت المساعدة',
-    color: colors.success,
-  ),
-  'rejected' => (label: 'مرفوض', color: colors.danger),
-  'cancelled' => (label: 'ملغى', color: colors.textMuted),
-  'underreview' ||
-  'pendingreview' => (label: 'قيد المراجعة', color: const Color(0xFFB47618)),
-  _ => (label: 'مفتوح', color: colors.primary),
-};
+      'approved' => (label: 'مقبول', color: colors.success),
+      'received' || 'fulfilled' => (
+        label: value.toLowerCase() == 'received'
+            ? 'تم الاستلام'
+            : 'تمت المساعدة',
+        color: colors.success,
+      ),
+      'rejected' => (label: 'مرفوض', color: colors.danger),
+      'cancelled' => (label: 'ملغى', color: colors.textMuted),
+      'underreview' || 'pendingreview' => (
+        label: 'قيد المراجعة',
+        color: const Color(0xFFB47618),
+      ),
+      _ => (label: 'مفتوح', color: colors.primary),
+    };
 
 String _date(DateTime value) => '${value.year}/${value.month}/${value.day}';

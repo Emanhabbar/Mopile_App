@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../controllers/settings_controller.dart';
 
 class AppearanceSettingsPage extends ConsumerWidget {
@@ -11,15 +12,16 @@ class AppearanceSettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(settingsControllerProvider).themeMode;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('المظهر')),
+      appBar: AppBar(title: Text(l10n.settingsAppearance)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const _IntroCard(
+          _IntroCard(
             icon: Icons.palette_outlined,
-            title: 'مظهر مريح لك',
-            subtitle: 'اختر مظهر التطبيق أو اجعله يتبع إعداد جهازك.',
+            title: l10n.appearanceIntroTitle,
+            subtitle: l10n.appearanceIntroSubtitle,
           ),
           const SizedBox(height: 18),
           Container(
@@ -32,18 +34,18 @@ class AppearanceSettingsPage extends ConsumerWidget {
               children: ThemeMode.values.map((value) {
                 final data = switch (value) {
                   ThemeMode.system => (
-                    'إعداد الجهاز',
-                    'يتغير تلقائيًا مع مظهر الهاتف',
+                    l10n.themeSystem,
+                    l10n.themeSystemDesc,
                     Icons.brightness_auto_outlined,
                   ),
                   ThemeMode.light => (
-                    'فاتح',
-                    'ألوان واضحة ومضيئة',
+                    l10n.themeLight,
+                    l10n.themeLightDesc,
                     Icons.light_mode_outlined,
                   ),
                   ThemeMode.dark => (
-                    'داكن',
-                    'أكثر راحة في الإضاءة المنخفضة',
+                    l10n.themeDark,
+                    l10n.themeDarkDesc,
                     Icons.dark_mode_outlined,
                   ),
                 };
@@ -79,16 +81,16 @@ class NotificationPreferencesPage extends ConsumerWidget {
     final preferences = ref.watch(settingsControllerProvider);
     final controller = ref.read(settingsControllerProvider.notifier);
     final enabled = preferences.notificationsEnabled;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفضيلات الإشعارات')),
+      appBar: AppBar(title: Text(l10n.settingsNotifications)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const _IntroCard(
+          _IntroCard(
             icon: Icons.notifications_active_outlined,
-            title: 'ابقَ على اطلاع',
-            subtitle:
-                'تحكم بأنواع التنبيهات التي يعرضها التطبيق لك. صلاحية الإشعارات تُدار من إعدادات الهاتف.',
+            title: l10n.notifIntroTitle,
+            subtitle: l10n.notifIntroSubtitle,
           ),
           const SizedBox(height: 18),
           Container(
@@ -103,34 +105,32 @@ class NotificationPreferencesPage extends ConsumerWidget {
                   value: enabled,
                   onChanged: controller.setNotificationsEnabled,
                   secondary: const Icon(Icons.notifications_outlined),
-                  title: const Text('الإشعارات داخل التطبيق'),
-                  subtitle: const Text('تشغيل أو إيقاف عرض التنبيهات'),
+                  title: Text(l10n.notifInApp),
+                  subtitle: Text(l10n.notifInAppDesc),
                 ),
                 const Divider(height: 1, indent: 20, endIndent: 20),
                 SwitchListTile(
                   value: enabled && preferences.requestUpdates,
                   onChanged: enabled ? controller.setRequestUpdates : null,
                   secondary: const Icon(Icons.receipt_long_outlined),
-                  title: const Text('تحديثات الطلبات'),
-                  subtitle: const Text('حالة طلب الدواء والتجهيز والاستجابة'),
+                  title: Text(l10n.notifRequestUpdates),
+                  subtitle: Text(l10n.notifRequestUpdatesDesc),
                 ),
                 const Divider(height: 1, indent: 20, endIndent: 20),
                 SwitchListTile(
                   value: enabled && preferences.healthReminders,
                   onChanged: enabled ? controller.setHealthReminders : null,
                   secondary: const Icon(Icons.alarm_outlined),
-                  title: const Text('التذكيرات الصحية'),
-                  subtitle: const Text(
-                    'مواعيد الدواء والتنبيهات المرتبطة بصحتك',
-                  ),
+                  title: Text(l10n.notifHealthReminders),
+                  subtitle: Text(l10n.notifHealthRemindersDesc),
                 ),
                 const Divider(height: 1, indent: 20, endIndent: 20),
                 SwitchListTile(
                   value: enabled && preferences.campaignUpdates,
                   onChanged: enabled ? controller.setCampaignUpdates : null,
                   secondary: const Icon(Icons.volunteer_activism_outlined),
-                  title: const Text('الحملات والمبادرات'),
-                  subtitle: const Text('المستجدات المتعلقة بالتبرعات والحملات'),
+                  title: Text(l10n.notifCampaigns),
+                  subtitle: Text(l10n.notifCampaignsDesc),
                 ),
               ],
             ),
@@ -181,16 +181,16 @@ class _PermissionsSettingsPageState extends State<PermissionsSettingsPage> {
     final granted =
         _locationPermission == LocationPermission.always ||
         _locationPermission == LocationPermission.whileInUse;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('صلاحيات الجهاز')),
+      appBar: AppBar(title: Text(l10n.settingsPermissions)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const _IntroCard(
+          _IntroCard(
             icon: Icons.admin_panel_settings_outlined,
-            title: 'أنت المتحكم',
-            subtitle:
-                'يطلب دوائي الصلاحية عند الحاجة فقط، ويمكنك تعديلها من إعدادات هاتفك.',
+            title: l10n.permIntroTitle,
+            subtitle: l10n.permIntroSubtitle,
           ),
           const SizedBox(height: 18),
           Container(
@@ -203,26 +203,26 @@ class _PermissionsSettingsPageState extends State<PermissionsSettingsPage> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.location_on_outlined),
-                  title: const Text('الموقع'),
+                  title: Text(l10n.permLocation),
                   subtitle: Text(
                     granted
                         ? _serviceEnabled
-                              ? 'مسموح أثناء استخدام التطبيق'
-                              : 'الصلاحية متاحة، وخدمة الموقع متوقفة'
-                        : 'غير مسموح حاليًا',
+                              ? l10n.permLocationAllowed
+                              : l10n.permLocationServiceOff
+                        : l10n.permLocationNotAllowed,
                   ),
                   trailing: granted
                       ? Icon(Icons.check_circle, color: context.appColors.success)
                       : TextButton(
                           onPressed: _requestLocation,
-                          child: const Text('سماح'),
+                          child: Text(l10n.permAllow),
                         ),
                 ),
                 const Divider(height: 1, indent: 20, endIndent: 20),
-                const ListTile(
-                  leading: Icon(Icons.camera_alt_outlined),
-                  title: Text('الكاميرا والملفات'),
-                  subtitle: Text('تُطلب فقط عند اختيار صورة أو مستند لإرساله'),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: Text(l10n.permCameraFiles),
+                  subtitle: Text(l10n.permCameraFilesDesc),
                 ),
               ],
             ),
@@ -232,13 +232,13 @@ class _PermissionsSettingsPageState extends State<PermissionsSettingsPage> {
             OutlinedButton.icon(
               onPressed: Geolocator.openLocationSettings,
               icon: const Icon(Icons.location_searching_rounded),
-              label: const Text('فتح إعدادات الموقع'),
+              label: Text(l10n.permOpenLocationSettings),
             ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: Geolocator.openAppSettings,
             icon: const Icon(Icons.settings_outlined),
-            label: const Text('فتح إعدادات التطبيق في الهاتف'),
+            label: Text(l10n.permOpenAppSettings),
           ),
         ],
       ),
@@ -255,89 +255,90 @@ class InformationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final data = switch (kind) {
       InformationPageKind.privacy => (
-        'الخصوصية',
+        l10n.settingsPrivacy,
         Icons.shield_outlined,
         <(String, String)>[
           (
-            'بيانات الحساب',
-            'نستخدم بيانات الحساب لتقديم الخدمات المرتبطة بدورك داخل النظام.',
+            l10n.infoAccountData,
+            l10n.infoAccountDataDesc,
           ),
           (
-            'الموقع',
-            'يُستخدم موقعك عند طلب البحث عن الصيدليات القريبة أو حساب المسار، ويمكنك إيقاف الصلاحية من هاتفك.',
+            l10n.infoLocation,
+            l10n.infoLocationDesc,
           ),
           (
-            'البيانات الصحية',
-            'تُرسل البيانات التي تدخلها إلى الخادم لتقديم المزايا الصحية المطلوبة، ولا ينبغي مشاركة بيانات الدخول مع أي شخص.',
+            l10n.infoHealthData,
+            l10n.infoHealthDataDesc,
           ),
           (
-            'التحكم',
-            'يمكنك تعديل بياناتك وكلمة مرورك وصلاحيات الجهاز من صفحات الحساب والإعدادات.',
+            l10n.infoControl,
+            l10n.infoControlDesc,
           ),
         ],
       ),
       InformationPageKind.terms => (
-        'شروط الاستخدام',
+        l10n.termsOfUse,
         Icons.description_outlined,
         <(String, String)>[
           (
-            'دقة المعلومات',
-            'اعتمد على العبوة والصيدلي أو الطبيب في القرارات الطبية؛ المعلومات داخل التطبيق مساندة وليست بديلًا عن المختص.',
+            l10n.infoInfoAccuracy,
+            l10n.infoInfoAccuracyDesc,
           ),
           (
-            'الاستخدام المسؤول',
-            'يجب إدخال بيانات صحيحة وعدم إساءة استخدام الطلبات أو التبرعات أو حسابات الجهات.',
+            l10n.infoResponsibleUse,
+            l10n.infoResponsibleUseDesc,
           ),
           (
-            'الطوارئ',
-            'لا يُستخدم التطبيق لطلب إسعاف أو معالجة حالة طارئة؛ تواصل مع خدمات الطوارئ المحلية فورًا.',
+            l10n.infoEmergency,
+            l10n.infoEmergencyDesc,
           ),
           (
-            'الحساب',
-            'أنت مسؤول عن الحفاظ على سرية بيانات الدخول والإبلاغ عن أي استخدام غير معتاد.',
+            l10n.infoAccount,
+            l10n.infoAccountDesc,
           ),
         ],
       ),
       InformationPageKind.help => (
-        'المساعدة',
+        l10n.settingsHelp,
         Icons.help_outline_rounded,
         <(String, String)>[
           (
-            'الخريطة لا تظهر',
-            'تأكد من تشغيل خدمة الموقع ومنح التطبيق صلاحية الموقع، ثم أعد تحميل الصفحة.',
+            l10n.infoMapNotShown,
+            l10n.infoMapNotShownDesc,
           ),
           (
-            'تعذر الاتصال',
-            'تأكد أن الهاتف والخادم على الشبكة نفسها وأن عنوان الخادم صحيح ومتاح.',
+            l10n.infoConnectionFailed,
+            l10n.infoConnectionFailedDesc,
           ),
           (
-            'لم يصل رمز الاستعادة',
-            'تحقق من البريد غير المرغوب فيه ثم اطلب رمزًا جديدًا. أثناء التطوير المحلي يظهر الرمز داخل صفحة الاستعادة.',
+            l10n.infoRecoveryCodeMissing,
+            l10n.infoRecoveryCodeMissingDesc,
           ),
           (
-            'مشكلة في الحساب',
-            'جرّب تسجيل الخروج والدخول مجددًا، وتأكد من اعتماد حساب الجهة إن كان يتطلب موافقة الإدارة.',
+            l10n.infoAccountIssue,
+            l10n.infoAccountIssueDesc,
           ),
         ],
       ),
       InformationPageKind.about => (
-        'عن دوائي',
+        l10n.settingsAbout,
         Icons.info_outline_rounded,
         <(String, String)>[
           (
-            'دوائي',
-            'منصة تربط المستخدم بالصيدليات والمنظمات وسلسلة توريد الدواء ضمن تجربة موحدة.',
+            l10n.appTitle,
+            l10n.infoDawaaiDesc,
           ),
           (
-            'هدف المشروع',
-            'تسهيل العثور على الدواء، متابعة الطلبات، دعم المبادرات الدوائية، وتنظيم عمل الجهات المشاركة.',
+            l10n.infoProjectGoal,
+            l10n.infoProjectGoalDesc,
           ),
-          ('الإصدار', '1.0.0'),
+          (l10n.settingsVersion, '1.0.0'),
           (
-            'تنبيه طبي',
-            'لا يقدم التطبيق تشخيصًا طبيًا، ويجب الرجوع إلى الطبيب أو الصيدلي عند الحاجة.',
+            l10n.infoMedicalNotice,
+            l10n.infoMedicalNoticeDesc,
           ),
         ],
       ),

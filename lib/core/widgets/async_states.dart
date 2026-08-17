@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../errors/api_exception.dart';
 
 class AppLoadingState extends StatelessWidget {
-  const AppLoadingState({super.key, this.label = 'جاري تحميل البيانات...'});
+  const AppLoadingState({super.key, this.label});
 
-  final String label;
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
+    final text = label ?? AppLocalizations.of(context).loadingDefault;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -25,7 +27,7 @@ class AppLoadingState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            Text(label, style: Theme.of(context).textTheme.bodyLarge),
+            Text(text, style: Theme.of(context).textTheme.bodyLarge),
           ],
         ),
       ),
@@ -41,9 +43,10 @@ class AppErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final message = error is ApiException
         ? (error as ApiException).message
-        : 'تعذر تحميل البيانات حاليًا.';
+        : l10n.loadFailedMessage;
 
     return Center(
       child: Padding(
@@ -68,7 +71,7 @@ class AppErrorState extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                'تعذر إكمال التحميل',
+                l10n.loadFailedTitle,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
@@ -82,7 +85,7 @@ class AppErrorState extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('إعادة المحاولة'),
+                label: Text(l10n.retry),
               ),
             ],
           ),

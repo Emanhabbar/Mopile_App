@@ -215,17 +215,10 @@ class _MedicineHero extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            colors.primaryDeep,
-            colors.primaryDark,
-          ],
-        ),
+        color: colors.primary,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: colors.primary.withValues(alpha: 0.15),
+          color: colors.primaryDark.withValues(alpha: 0.35),
         ),
       ),
       child: Column(
@@ -341,13 +334,13 @@ class _QuickInfoStrip extends StatelessWidget {
           icon: Icons.category_outlined,
           label: 'الشكل',
           value: form,
-          color: colors.primaryDeep,
+          color: colors.primary,
         ),
       _QuickInfo(
         icon: Icons.inventory_2_outlined,
         label: 'المخزون',
         value: '${medicine.quantityInStock}',
-        color: colors.primaryDark,
+        color: colors.primary,
       ),
     ];
     return Row(

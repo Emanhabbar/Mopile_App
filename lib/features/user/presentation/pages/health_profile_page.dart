@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_models.dart';
 import '../controllers/user_providers.dart';
 
@@ -61,14 +62,14 @@ class _HealthProfilePageState extends ConsumerState<HealthProfilePage> {
       if (error == null || previous?.error == error || !mounted) return;
       final message = error is ApiException
           ? error.message
-          : 'تعذر حفظ الملف الصحي.';
+          : AppLocalizations.of(context).healthProfileSaveFailed;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(message)));
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('ملفي الصحي')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).medicalProfileTitle)),
       body: Column(
         children: [
           Padding(
@@ -83,8 +84,10 @@ class _HealthProfilePageState extends ConsumerState<HealthProfilePage> {
               duration: const Duration(milliseconds: 220),
               child: _selectedSection == 0
                   ? medicalState.when(
-                      loading: () => const AppLoadingState(
-                        label: 'جاري تحميل ملفك الصحي...',
+                      loading: () => AppLoadingState(
+                        label: AppLocalizations.of(
+                          context,
+                        ).medicalProfileLoading,
                       ),
                       error: (error, _) => AppErrorState(
                         error: error,
@@ -122,8 +125,8 @@ class _HealthProfilePageState extends ConsumerState<HealthProfilePage> {
                       },
                     )
                   : healthCardState.when(
-                      loading: () => const AppLoadingState(
-                        label: 'جاري إعداد البطاقة الصحية...',
+                      loading: () => AppLoadingState(
+                        label: AppLocalizations.of(context).healthCardLoading,
                       ),
                       error: (error, _) => AppErrorState(
                         error: error,
@@ -142,21 +145,23 @@ class _HealthProfilePageState extends ConsumerState<HealthProfilePage> {
   }
 
   Future<void> _pickDate() async {
+    final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: _dateOfBirth ?? DateTime(now.year - 20),
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year, now.month, now.day),
-      helpText: 'تاريخ الميلاد',
-      cancelText: 'إلغاء',
-      confirmText: 'اختيار',
+      helpText: l10n.birthDate,
+      cancelText: l10n.cancel,
+      confirmText: l10n.selectDate,
     );
     if (picked != null) setState(() => _dateOfBirth = picked);
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context);
     final saved = await ref
         .read(userMedicalProfileProvider.notifier)
         .save(
@@ -174,9 +179,7 @@ class _HealthProfilePageState extends ConsumerState<HealthProfilePage> {
     if (!mounted || !saved) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('تم حفظ الملف الصحي بنجاح.')),
-      );
+      ..showSnackBar(SnackBar(content: Text(l10n.medicalProfileSaved)));
   }
 }
 
@@ -191,6 +194,7 @@ class _SectionSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
@@ -201,13 +205,13 @@ class _SectionSwitcher extends StatelessWidget {
       child: Row(
         children: [
           _SwitcherItem(
-            label: 'البيانات الصحية',
+            label: l10n.healthDataTab,
             icon: Icons.favorite_outline_rounded,
             selected: selectedIndex == 0,
             onTap: () => onChanged(0),
           ),
           _SwitcherItem(
-            label: 'البطاقة الصحية',
+            label: l10n.healthCardTab,
             icon: Icons.badge_outlined,
             selected: selectedIndex == 1,
             onTap: () => onChanged(1),
@@ -310,20 +314,20 @@ class _MedicalProfileForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Form(
       key: formKey,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 32),
         children: [
-          const _PageIntro(
+          _PageIntro(
             icon: Icons.health_and_safety_rounded,
-            title: 'معلومات تساعدك وقت الحاجة',
-            subtitle:
-                'احتفظ بحساسياتك وأدويتك الحالية وبيانات التواصل الضرورية محدثة.',
+            title: l10n.healthIntroTitle,
+            subtitle: l10n.healthIntroSubtitle,
           ),
           const SizedBox(height: 22),
-          const _FormTitle(
-            title: 'المعلومات الأساسية',
+          _FormTitle(
+            title: l10n.basicInfoTitle,
             icon: Icons.person_outline_rounded,
           ),
           const SizedBox(height: 14),
@@ -332,9 +336,9 @@ class _MedicalProfileForm extends StatelessWidget {
             children: [
               Expanded(
                 child: _SelectionField(
-                  label: 'تاريخ الميلاد',
+                  label: l10n.birthDate,
                   value: dateOfBirth == null
-                      ? 'اختر التاريخ'
+                      ? l10n.chooseDate
                       : _formatDate(dateOfBirth!),
                   icon: Icons.calendar_today_rounded,
                   onTap: onPickDate,
@@ -351,14 +355,14 @@ class _MedicalProfileForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 25),
-          const _FormTitle(
-            title: 'التفاصيل الصحية',
+          _FormTitle(
+            title: l10n.healthDetailsTitle,
             icon: Icons.monitor_heart_outlined,
           ),
           const SizedBox(height: 14),
           _TagEditor(
-            label: 'الحساسيات',
-            hint: 'مثال: البنسلين',
+            label: l10n.allergiesLabel,
+            hint: l10n.allergiesHint,
             values: allergies,
             maximum: 20,
             icon: Icons.warning_amber_rounded,
@@ -366,8 +370,8 @@ class _MedicalProfileForm extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _TagEditor(
-            label: 'الحالات المزمنة',
-            hint: 'مثال: السكري',
+            label: l10n.chronicConditionsLabel,
+            hint: l10n.chronicConditionsHint,
             values: conditions,
             maximum: 20,
             icon: Icons.monitor_heart_rounded,
@@ -375,48 +379,48 @@ class _MedicalProfileForm extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _TagEditor(
-            label: 'الأدوية الحالية',
-            hint: 'اكتب اسم الدواء',
+            label: l10n.currentMedicationsLabel,
+            hint: l10n.currentMedicationsHint,
             values: medications,
             maximum: 30,
             icon: Icons.medication_outlined,
             onChanged: onMedicationsChanged,
           ),
           const SizedBox(height: 25),
-          const _FormTitle(
-            title: 'جهة الاتصال عند الحاجة',
+          _FormTitle(
+            title: l10n.emergencyContactTitle,
             icon: Icons.emergency_outlined,
           ),
           const SizedBox(height: 14),
           AppTextField(
-            label: 'اسم جهة الاتصال',
+            label: l10n.emergencyNameLabel,
             controller: emergencyName,
-            hint: 'الاسم الكامل',
+            hint: l10n.emergencyNameHint,
             icon: Icons.person_outline_rounded,
             validator: (value) =>
-                (value?.trim().length ?? 0) > 150 ? 'الاسم طويل جدًا.' : null,
+                (value?.trim().length ?? 0) > 150 ? l10n.nameTooLong : null,
           ),
           const SizedBox(height: 15),
           AppTextField(
-            label: 'رقم الهاتف',
+            label: l10n.phoneLabel,
             controller: emergencyPhone,
-            hint: 'مثال: 09XXXXXXXX',
+            hint: l10n.phoneHint,
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
             validator: (value) => (value?.trim().length ?? 0) > 30
-                ? 'رقم الهاتف طويل جدًا.'
+                ? l10n.phoneTooLong
                 : null,
           ),
           const SizedBox(height: 15),
           AppTextField(
-            label: 'ملاحظات مهمة',
+            label: l10n.importantNotesLabel,
             controller: emergencyNotes,
-            hint: 'أي معلومات تساعد جهة الاتصال',
+            hint: l10n.importantNotesHint,
             icon: Icons.notes_rounded,
             minLines: 3,
             maxLines: 5,
             validator: (value) => (value?.trim().length ?? 0) > 1000
-                ? 'الملاحظات تتجاوز الحد المسموح.'
+                ? l10n.notesTooLong
                 : null,
           ),
           const SizedBox(height: 24),
@@ -431,7 +435,7 @@ class _MedicalProfileForm extends StatelessWidget {
                     ),
                   )
                 : const Icon(Icons.check_rounded),
-            label: Text(isSaving ? 'جاري الحفظ...' : 'حفظ التغييرات'),
+            label: Text(isSaving ? l10n.savingProgress : l10n.saveChanges),
           ),
         ],
       ),
@@ -446,6 +450,7 @@ class _HealthCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 15, 20, 32),
       children: [
@@ -472,10 +477,10 @@ class _HealthCardView extends StatelessWidget {
               Row(
                 children: [
                   Icon(Icons.favorite_rounded, color: context.appColors.secondary),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'البطاقة الصحية',
-                    style: TextStyle(
+                    l10n.healthCardTab,
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontWeight: FontWeight.w800,
                     ),
@@ -496,13 +501,13 @@ class _HealthCardView extends StatelessWidget {
                 runSpacing: 9,
                 children: [
                   _CardFact(
-                    label: 'فصيلة الدم',
-                    value: card.bloodType ?? 'غير محددة',
+                    label: l10n.bloodTypeLabel,
+                    value: card.bloodType ?? l10n.notSpecified,
                   ),
                   _CardFact(
-                    label: 'تاريخ الميلاد',
+                    label: l10n.birthDate,
                     value: card.dateOfBirth == null
-                        ? 'غير محدد'
+                        ? l10n.notSpecified
                         : _formatDate(card.dateOfBirth!),
                   ),
                 ],
@@ -512,27 +517,27 @@ class _HealthCardView extends StatelessWidget {
         ),
         const SizedBox(height: 22),
         _InfoCollection(
-          title: 'الحساسيات',
+          title: l10n.allergiesLabel,
           icon: Icons.warning_amber_rounded,
           color: context.appColors.primaryDark,
           values: card.allergies,
-          emptyText: 'لا توجد حساسيات مسجلة',
+          emptyText: l10n.noAllergies,
         ),
         const SizedBox(height: 13),
         _InfoCollection(
-          title: 'الحالات المزمنة',
+          title: l10n.chronicConditionsLabel,
           icon: Icons.monitor_heart_rounded,
           color: context.appColors.primaryLight,
           values: card.chronicConditions,
-          emptyText: 'لا توجد حالات مزمنة مسجلة',
+          emptyText: l10n.noConditions,
         ),
         const SizedBox(height: 13),
         _InfoCollection(
-          title: 'الأدوية الحالية',
+          title: l10n.currentMedicationsLabel,
           icon: Icons.medication_rounded,
           color: context.appColors.primary,
           values: card.currentMedications,
-          emptyText: 'لا توجد أدوية حالية مسجلة',
+          emptyText: l10n.noMedications,
         ),
         const SizedBox(height: 13),
         _EmergencyCard(card: card),
@@ -576,7 +581,9 @@ class _TagEditorState extends State<_TagEditor> {
     if (value.isEmpty || widget.values.length >= widget.maximum) return;
     if (value.length > 150) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يجب ألا يتجاوز النص 150 حرفًا.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).textTooLong),
+        ),
       );
       return;
     }
@@ -626,7 +633,7 @@ class _TagEditorState extends State<_TagEditor> {
             const SizedBox(width: 9),
             IconButton.filled(
               onPressed: widget.values.length >= widget.maximum ? null : _add,
-              tooltip: 'إضافة',
+              tooltip: AppLocalizations.of(context).addTag,
               icon: const Icon(Icons.add_rounded),
             ),
           ],
@@ -781,11 +788,12 @@ class _BloodTypeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'فصيلة الدم',
+          l10n.bloodTypeLabel,
           style: Theme.of(
             context,
           ).textTheme.titleMedium?.copyWith(fontSize: 14),
@@ -793,7 +801,7 @@ class _BloodTypeField extends StatelessWidget {
         const SizedBox(height: 9),
         DropdownButtonFormField<String>(
           initialValue: values.contains(value) ? value : null,
-          hint: const Text('اختر'),
+          hint: Text(l10n.choose),
           decoration: const InputDecoration(
             prefixIcon: Icon(Icons.bloodtype_outlined),
           ),
@@ -907,6 +915,7 @@ class _EmergencyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final name = card.emergencyContactName;
     final phone = card.emergencyContactPhoneNumber;
     return Card(
@@ -922,16 +931,16 @@ class _EmergencyCard extends StatelessWidget {
                   color: context.appColors.primaryDark,
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'جهة الاتصال عند الحاجة',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                Text(
+                  l10n.emergencyContactTitle,
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
                 ),
               ],
             ),
             const SizedBox(height: 13),
             if (name == null && phone == null)
               Text(
-                'لم تتم إضافة جهة اتصال بعد.',
+                l10n.emergencyContactEmpty,
                 style: Theme.of(context).textTheme.bodyMedium,
               )
             else ...[

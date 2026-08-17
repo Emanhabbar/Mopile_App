@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/location/device_location_service.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/registration_request.dart';
 import '../widgets/auth_widgets.dart';
 import '../controllers/auth_controller.dart';
@@ -50,20 +51,24 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   bool get _isBusiness => _type != RegistrationType.user;
 
   String get _pageTitle => switch (_step) {
-        0 => 'اختر نوع الحساب',
-        1 => 'بيانات الحساب',
+        0 => AppLocalizations.of(context).registerTypeAccount,
+        1 => AppLocalizations.of(context).registerAccountData,
         _ => switch (_type) {
-            RegistrationType.pharmacy => 'بيانات الصيدلية',
-            RegistrationType.organization => 'بيانات المنظمة',
-            RegistrationType.warehouse => 'بيانات المستودع',
-            RegistrationType.user => 'بيانات الحساب',
+            RegistrationType.pharmacy =>
+              AppLocalizations.of(context).registerPharmacyData,
+            RegistrationType.organization =>
+              AppLocalizations.of(context).registerOrganizationData,
+            RegistrationType.warehouse =>
+              AppLocalizations.of(context).registerWarehouseData,
+            RegistrationType.user =>
+              AppLocalizations.of(context).registerAccountData,
           },
       };
 
   String get _pageSubtitle => switch (_step) {
-        0 => 'اختر نوع الحساب المناسب لاحتياجاتك.',
-        1 => 'أدخل بيانات حسابك للمتابعة.',
-        _ => 'أكمل بيانات الجهة لإنشاء الحساب.',
+        0 => AppLocalizations.of(context).registerTypeSubtitle,
+        1 => AppLocalizations.of(context).registerAccountSubtitle,
+        _ => AppLocalizations.of(context).registerEntitySubtitle,
       };
 
   @override
@@ -183,7 +188,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     if (latText.isEmpty || lngText.isEmpty) {
-      setState(() => _coordinateError = 'أدخل خط العرض وخط الطول معًا.');
+      setState(() => _coordinateError =
+          AppLocalizations.of(context).registerCoordsTogether);
       return null;
     }
 
@@ -197,7 +203,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         lng < -180 ||
         lng > 180) {
       setState(
-          () => _coordinateError = 'تحقق من قيم الإحداثيات المدخلة.');
+          () => _coordinateError =
+              AppLocalizations.of(context).registerCoordsInvalid);
       return null;
     }
 
@@ -213,7 +220,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final errorMessage = authState.hasError
         ? authState.error is ApiException
             ? (authState.error! as ApiException).message
-            : 'تعذر إنشاء الحساب حاليًا.'
+            : AppLocalizations.of(context).registerFailed
         : null;
 
     return Directionality(
@@ -367,12 +374,13 @@ class _AccountTypeStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
       children: [
         Text(
-          'لكل حساب مساحة عمل وخدمات مصممة حسب احتياجه.',
+          l10n.registerIntro,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colors.textMuted,
@@ -387,34 +395,32 @@ class _AccountTypeStep extends StatelessWidget {
               _TypeCard(
                 selected: selected == RegistrationType.user,
                 icon: Icons.person_outline_rounded,
-                label: 'مستخدم',
-                description: 'ابحث عن دوائك وتابع طلباتك ومعلوماتك الصحية.',
+                label: l10n.registerTypeUser,
+                description: l10n.registerTypeUserDesc,
                 onTap: () => onChanged(RegistrationType.user),
               ),
               const SizedBox(height: 14),
               _TypeCard(
                 selected: selected == RegistrationType.pharmacy,
                 icon: Icons.local_pharmacy_outlined,
-                label: 'صيدلية',
-                description: 'أدر المخزون وساعات العمل وطلبات المستخدمين.',
+                label: l10n.registerTypePharmacy,
+                description: l10n.registerTypePharmacyDesc,
                 onTap: () => onChanged(RegistrationType.pharmacy),
               ),
               const SizedBox(height: 14),
               _TypeCard(
                 selected: selected == RegistrationType.organization,
                 icon: Icons.apartment_outlined,
-                label: 'منظمة',
-                description:
-                    'نظّم الحملات واستقبل عروض التبرع وطلبات المساعدة.',
+                label: l10n.registerTypeOrganization,
+                description: l10n.registerTypeOrganizationDesc,
                 onTap: () => onChanged(RegistrationType.organization),
               ),
               const SizedBox(height: 14),
               _TypeCard(
                 selected: selected == RegistrationType.warehouse,
                 icon: Icons.warehouse_outlined,
-                label: 'مستودع أدوية',
-                description:
-                    'أدر التشغيلات وطلبات الصيدليات والشحن والفواتير.',
+                label: l10n.registerTypeWarehouse,
+                description: l10n.registerTypeWarehouseDesc,
                 onTap: () => onChanged(RegistrationType.warehouse),
               ),
             ],
@@ -551,13 +557,14 @@ class _AccountStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Form(
       key: formKey,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
         children: [
           Text(
-            'أدخل معلومات صحيحة لنجهز حسابك بالشكل المناسب.',
+            l10n.registerAccountInfo,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
@@ -566,18 +573,19 @@ class _AccountStep extends StatelessWidget {
           ),
           const SizedBox(height: 22),
           AppTextField(
-            label: 'الاسم الكامل',
-            hint: 'الاسم كما يظهر في الحساب',
+            label: l10n.registerFullName,
+            hint: l10n.registerFullNameHint,
             controller: fullName,
             icon: Icons.person_outline_rounded,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.name],
-            validator: _required('أدخل الاسم الكامل.'),
+            validator: _required(l10n.registerFullNameRequired),
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label:
-                isBusiness ? 'رقم الهاتف' : 'رقم الهاتف (اختياري)',
+            label: isBusiness
+                ? l10n.registerPhoneLabel
+                : l10n.registerPhoneOptionalLabel,
             hint: '+963 ...',
             controller: phoneNumber,
             icon: Icons.phone_outlined,
@@ -588,11 +596,11 @@ class _AccountStep extends StatelessWidget {
               FilteringTextInputFormatter.allow(RegExp(r'[0-9+\-() ]')),
             ],
             validator:
-                isBusiness ? _required('أدخل رقم الهاتف.') : null,
+                isBusiness ? _required(l10n.registerPhoneRequired) : null,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'البريد الإلكتروني',
+            label: l10n.registerEmailLabel,
             hint: 'name@example.com',
             controller: email,
             icon: Icons.alternate_email_rounded,
@@ -604,14 +612,14 @@ class _AccountStep extends StatelessWidget {
               if (v.isEmpty ||
                   !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
                       .hasMatch(v)) {
-                return 'أدخل بريدًا إلكترونيًا صحيحًا.';
+                return l10n.registerEmailInvalid;
               }
               return null;
             },
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'كلمة المرور',
+            label: l10n.registerPasswordLabel,
             controller: password,
             icon: Icons.lock_outline_rounded,
             obscureText: !showPassword,
@@ -633,14 +641,14 @@ class _AccountStep extends StatelessWidget {
                   !RegExp('[a-z]').hasMatch(t) ||
                   !RegExp(r'\d').hasMatch(t) ||
                   !RegExp(r'[^a-zA-Z0-9]').hasMatch(t)) {
-                return 'استخدم 8 محارف مع حرف كبير وصغير ورقم ورمز.';
+                return l10n.registerPasswordHint;
               }
               return null;
             },
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'تأكيد كلمة المرور',
+            label: l10n.registerConfirmPasswordLabel,
             controller: confirmPassword,
             icon: Icons.lock_reset_rounded,
             obscureText: !showPassword,
@@ -648,14 +656,14 @@ class _AccountStep extends StatelessWidget {
             autofillHints: const [AutofillHints.newPassword],
             validator: (value) {
               if (value != password.text) {
-                return 'كلمتا المرور غير متطابقتين.';
+                return l10n.registerPasswordsMismatch;
               }
               return null;
             },
           ),
           const SizedBox(height: 10),
           Text(
-            'تساعد بيانات الحساب الصحيحة في تقديم تجربة مناسبة وآمنة.',
+            l10n.registerAccountHelp,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall,
           ),
@@ -712,23 +720,31 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
   bool get isWarehouse => widget.type == RegistrationType.warehouse;
 
   String get _entityNameLabel => isPharmacy
-      ? 'اسم الصيدلية'
+      ? AppLocalizations.of(context).registerPharmacyName
       : isWarehouse
-          ? 'اسم المستودع'
-          : 'اسم المنظمة';
+          ? AppLocalizations.of(context).registerWarehouseName
+          : AppLocalizations.of(context).registerOrgName;
 
   String get _licenseLabel =>
-      isPharmacy || isWarehouse ? 'رقم الترخيص' : 'رقم التسجيل';
+      isPharmacy || isWarehouse
+          ? AppLocalizations.of(context).registerLicenseNumber
+          : AppLocalizations.of(context).registerRegNumber;
 
   String get _entityHint => isPharmacy
-      ? 'أدخل اسم الصيدلية.'
+      ? AppLocalizations.of(context).registerPharmacyNameHint
       : isWarehouse
-          ? 'أدخل اسم المستودع.'
-          : 'أدخل اسم المنظمة.';
+          ? AppLocalizations.of(context).registerWarehouseNameHint
+          : AppLocalizations.of(context).registerOrgNameHint;
 
   String get _licenseHint => isPharmacy || isWarehouse
-      ? 'أدخل رقم الترخيص.'
-      : 'أدخل رقم التسجيل.';
+      ? AppLocalizations.of(context).registerLicenseHint
+      : AppLocalizations.of(context).registerRegNumberHint;
+
+  String get _entityWord => isPharmacy
+      ? AppLocalizations.of(context).registerPharmacyWord
+      : isWarehouse
+          ? AppLocalizations.of(context).registerWarehouseWord
+          : AppLocalizations.of(context).registerOrgWord;
 
   IconData get _entityIcon => isPharmacy
       ? Icons.local_pharmacy_outlined
@@ -739,6 +755,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
 
     return Form(
       key: widget.formKey,
@@ -746,7 +763,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
         children: [
           Text(
-            'أدخل بيانات ${isPharmacy ? "الصيدلية" : isWarehouse ? "المستودع" : "المنظمة"}، وسيتم مراجعتها قبل تفعيل خدمات الحساب.',
+            l10n.registerBusinessIntro(_entityWord),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
@@ -775,36 +792,36 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
             children: [
               Expanded(
                 child: AppTextField(
-                  label: 'المدينة',
+                  label: l10n.registerCity,
                   controller: widget.city,
                   icon: Icons.location_city_outlined,
                   textInputAction: TextInputAction.next,
-                  validator: _required('أدخل المدينة.'),
+                  validator: _required(l10n.registerCityRequired),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: AppTextField(
-                  label: 'المنطقة',
+                  label: l10n.registerArea,
                   controller: widget.area,
                   icon: Icons.map_outlined,
                   textInputAction: TextInputAction.next,
-                  validator: _required('أدخل المنطقة.'),
+                  validator: _required(l10n.registerAreaRequired),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'العنوان',
+            label: l10n.registerAddress,
             controller: widget.address,
             icon: Icons.location_on_outlined,
             textInputAction: TextInputAction.next,
-            validator: _required('أدخل العنوان.'),
+            validator: _required(l10n.registerAddressRequired),
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'وصف مختصر (اختياري)',
+            label: l10n.registerDescription,
             controller: widget.description,
             icon: Icons.notes_rounded,
             maxLines: 3,
@@ -827,18 +844,16 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
                   Icons.delivery_dining_rounded,
                   color: colors.primary,
                 ),
-                title: const Text(
-                  'خدمة توصيل',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                title: Text(
+                  l10n.registerDeliveryService,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
-                subtitle: const Text(
-                  'حددها إذا كانت الصيدلية توفر التوصيل',
-                ),
+                subtitle: Text(l10n.registerDeliveryServiceSub),
               ),
             ),
             const SizedBox(height: 20),
             Text(
-              'موقع الصيدلية (اختياري)',
+              l10n.registerLocationTitle,
               style: Theme.of(context)
                   .textTheme
                   .titleMedium
@@ -846,7 +861,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
             ),
             const SizedBox(height: 6),
             Text(
-              'يمكن حفظ الموقع الآن أو إضافته لاحقًا من ملف الصيدلية.',
+              l10n.registerLocationHint,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 14),
@@ -855,7 +870,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'خط العرض',
+                    label: l10n.registerLatitude,
                     hint: '33.5138',
                     controller: widget.latitude,
                     icon: Icons.north_rounded,
@@ -869,7 +884,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppTextField(
-                    label: 'خط الطول',
+                    label: l10n.registerLongitude,
                     hint: '36.2765',
                     controller: widget.longitude,
                     icon: Icons.east_rounded,
@@ -894,7 +909,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.my_location_rounded, size: 18),
-                label: Text(_fetchingLocation ? 'جارٍ تحديد الموقع...' : 'تحديد الموقع تلقائيًا'),
+                label: Text(_fetchingLocation ? l10n.registerLocating : l10n.registerLocateAuto),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   side: BorderSide(color: colors.primary.withValues(alpha: 0.3)),
@@ -923,7 +938,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'الحد الأدنى للطلب',
+                    label: l10n.registerMinOrder,
                     controller: widget.minimumOrderAmount,
                     icon: Icons.payments_outlined,
                     keyboardType: TextInputType.numberWithOptions(
@@ -935,7 +950,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppTextField(
-                    label: 'رسوم التوصيل',
+                    label: l10n.registerDeliveryFee,
                     controller: widget.deliveryFee,
                     icon: Icons.local_shipping_outlined,
                     keyboardType: TextInputType.numberWithOptions(
@@ -972,7 +987,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('تعذر تحديد الموقع. حاول مجددًا.'),
+            content: Text(AppLocalizations.of(context).registerLocationFailed),
             backgroundColor: context.appColors.danger,
           ),
         );
@@ -980,6 +995,16 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
     } finally {
       if (mounted) setState(() => _fetchingLocation = false);
     }
+  }
+
+  String? _nonNegativeNumber(String? value) {
+    final number = double.tryParse(
+      value?.trim().replaceAll(',', '.') ?? '',
+    );
+    if (number == null || number < 0) {
+      return AppLocalizations.of(context).registerInvalidValue;
+    }
+    return null;
   }
 }
 
@@ -1000,6 +1025,7 @@ class _BottomActionArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 10, 24, 20),
       child: Column(
@@ -1025,8 +1051,8 @@ class _BottomActionArea extends StatelessWidget {
                     )
                   : Text(
                       step == 0 || (step == 1 && isBusiness)
-                          ? 'متابعة'
-                          : 'إنشاء الحساب',
+                          ? l10n.continueAction
+                          : l10n.registerCreate,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -1042,12 +1068,4 @@ class _BottomActionArea extends StatelessWidget {
 
 String? Function(String?) _required(String message) {
   return (value) => value?.trim().isEmpty ?? true ? message : null;
-}
-
-String? _nonNegativeNumber(String? value) {
-  final number = double.tryParse(
-    value?.trim().replaceAll(',', '.') ?? '',
-  );
-  if (number == null || number < 0) return 'أدخل قيمة صحيحة.';
-  return null;
 }

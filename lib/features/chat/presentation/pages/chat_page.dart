@@ -326,7 +326,7 @@ class _MessageBubble extends StatelessWidget {
         if (!message.isUser) ...[
           CircleAvatar(
             radius: 15,
-            backgroundColor: const Color(0xFF102F37),
+            backgroundColor: context.appColors.primary,
             child: Icon(
               Icons.auto_awesome_rounded,
               color: context.appColors.secondary,
@@ -341,14 +341,18 @@ class _MessageBubble extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           decoration: BoxDecoration(
-            color: message.isUser ? context.appColors.primary : context.appColors.surface,
+            color: message.isUser
+                ? context.appColors.primary
+                : context.appColors.surface,
             borderRadius: BorderRadiusDirectional.only(
               topStart: const Radius.circular(18),
               topEnd: const Radius.circular(18),
               bottomStart: Radius.circular(message.isUser ? 5 : 18),
               bottomEnd: Radius.circular(message.isUser ? 18 : 5),
             ),
-            border: message.isUser ? null : Border.all(color: context.appColors.border),
+            border: message.isUser
+                ? null
+                : Border.all(color: context.appColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,7 +369,9 @@ class _MessageBubble extends StatelessWidget {
                 '${message.sentAtUtc.hour.toString().padLeft(2, '0')}:'
                 '${message.sentAtUtc.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
-                  color: message.isUser ? Colors.white60 : context.appColors.textMuted,
+                  color: message.isUser
+                      ? Colors.white60
+                      : context.appColors.textMuted,
                   fontSize: 8,
                 ),
               ),

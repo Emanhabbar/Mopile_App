@@ -105,6 +105,8 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _creating ? null : _startSession,
+        backgroundColor: context.appColors.primary,
+        foregroundColor: Colors.white,
         icon: _creating
             ? const SizedBox.square(
                 dimension: 18,
@@ -182,13 +184,11 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(28),
       boxShadow: [
         BoxShadow(
-          color: context.appColors.primaryDeep.withValues(alpha: .15),
+          color: context.appColors.primary.withValues(alpha: .18),
           blurRadius: 22,
           offset: const Offset(0, 10),
         ),
@@ -369,7 +369,11 @@ class _EmptySessions extends StatelessWidget {
       padding: EdgeInsets.all(28),
       child: Column(
         children: [
-          Icon(Icons.forum_outlined, color: context.appColors.textMuted, size: 38),
+          Icon(
+            Icons.forum_outlined,
+            color: context.appColors.textMuted,
+            size: 38,
+          ),
           SizedBox(height: 10),
           Text('لا توجد محادثات سابقة'),
         ],

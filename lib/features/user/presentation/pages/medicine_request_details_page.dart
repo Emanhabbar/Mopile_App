@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_request_models.dart';
 import '../../data/repositories/user_repository.dart';
 import '../controllers/user_providers.dart';
@@ -30,11 +31,11 @@ class _MedicineRequestDetailsPageState
     final details = ref.watch(
       userMedicineRequestDetailsProvider(widget.requestId),
     );
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل الطلب')),
+      appBar: AppBar(title: Text(l10n.requestDetailsTitle)),
       body: details.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل تفاصيل الطلب...'),
+        loading: () => AppLoadingState(label: l10n.requestDetailsLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(
@@ -77,7 +78,7 @@ class _MedicineRequestDetailsPageState
                 AppReveal(
                   delay: const Duration(milliseconds: 230),
                   child: _NoteCard(
-                    title: 'ملاحظتك للصيدلية',
+                    title: l10n.yourNoteToPharmacy,
                     text: data.request.note!,
                   ),
                 ),
@@ -92,7 +93,9 @@ class _MedicineRequestDetailsPageState
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.close_rounded),
-                  label: Text(_cancelling ? 'جاري الإلغاء...' : 'إلغاء الطلب'),
+                  label: Text(
+                    _cancelling ? l10n.cancellingProgress : l10n.cancelRequest,
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: context.appColors.danger,
                     side: const BorderSide(color: Color(0xFFB33A3A)),
@@ -107,6 +110,7 @@ class _MedicineRequestDetailsPageState
   }
 
   Future<void> _confirmCancel() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -115,20 +119,20 @@ class _MedicineRequestDetailsPageState
           color: Color(0xFFB47618),
           size: 38,
         ),
-        title: const Text('إلغاء الطلب؟'),
-        content: const Text(
-          'لن تتمكن الصيدلية من متابعة هذا الطلب بعد إلغائه.',
+        title: Text(l10n.cancelRequestTitle),
+        content: Text(
+          l10n.cancelRequestConfirm,
           textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('العودة'),
+            child: Text(l10n.back),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
-            child: const Text('تأكيد الإلغاء'),
+            child: Text(l10n.confirmCancellation),
           ),
         ],
       ),
@@ -146,16 +150,14 @@ class _MedicineRequestDetailsPageState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('تم إلغاء الطلب.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.requestCancelled)));
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              error is ApiException
-                  ? error.message
-                  : 'تعذر إلغاء الطلب حاليًا.',
+              error is ApiException ? error.message : l10n.cancelRequestFailed,
             ),
             backgroundColor: context.appColors.danger,
           ),
@@ -174,6 +176,7 @@ class _RequestProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final status = request.status.toLowerCase();
     final isCancelled = status == 'cancelled';
     final hasResponse =
@@ -182,19 +185,19 @@ class _RequestProgress extends StatelessWidget {
         status == 'unavailable';
     final steps = [
       (
-        label: 'تم الإرسال',
+        label: l10n.requestStepSent,
         icon: Icons.send_rounded,
         active: true,
         danger: false,
       ),
       (
-        label: isCancelled ? 'تم الإلغاء' : 'قيد المراجعة',
+        label: isCancelled ? l10n.requestStepCancelled : l10n.underReview,
         icon: isCancelled ? Icons.block_rounded : Icons.visibility_outlined,
         active: true,
         danger: isCancelled,
       ),
       (
-        label: hasResponse ? 'تم الرد' : 'بانتظار الرد',
+        label: hasResponse ? l10n.responded : l10n.waitingForResponse,
         icon: hasResponse
             ? Icons.mark_chat_read_rounded
             : Icons.hourglass_bottom_rounded,
@@ -274,6 +277,7 @@ class _RequestHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = details.request;
+    final l10n = AppLocalizations.of(context);
     final style = _statusStyle(request.status);
     return Container(
       padding: const EdgeInsets.all(21),
@@ -295,14 +299,14 @@ class _RequestHero extends StatelessWidget {
           ),
           const SizedBox(height: 13),
           Text(
-            _statusText(request),
+            _statusText(l10n, request),
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: style.color),
           ),
           const SizedBox(height: 5),
           Text(
-            'رقم الطلب ${request.requestCode}',
+            '${l10n.requestNumber} ${request.requestCode}',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -318,6 +322,7 @@ class _DetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = details.request;
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -331,26 +336,26 @@ class _DetailsCard extends StatelessWidget {
             const SizedBox(height: 14),
             _Row(
               icon: Icons.numbers_rounded,
-              label: 'الكمية المطلوبة',
+              label: l10n.quantityRequested,
               value: '${request.requestedQuantity}',
             ),
             _Row(
               icon: Icons.calendar_today_outlined,
-              label: 'تاريخ الإنشاء',
+              label: l10n.createdDate,
               value: _dateTime(request.createdAtUtc),
             ),
             if (request.statusUpdatedAtUtc != null)
               _Row(
                 icon: Icons.update_rounded,
-                label: 'آخر تحديث',
+                label: l10n.lastUpdate,
                 value: _dateTime(request.statusUpdatedAtUtc),
               ),
             _Row(
               icon: Icons.inventory_2_outlined,
-              label: 'التوفر الحالي',
+              label: l10n.currentAvailability,
               value: details.isRequestedMedicineCurrentlyAvailable
-                  ? 'متوفر في المخزون'
-                  : 'غير متوفر حاليًا',
+                  ? l10n.availableInStock
+                  : l10n.notAvailableNow,
             ),
           ],
         ),
@@ -365,6 +370,7 @@ class _PharmacyResponse extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final alternative = request.suggestedAlternative;
     return Container(
       padding: const EdgeInsets.all(18),
@@ -376,13 +382,13 @@ class _PharmacyResponse extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.mark_chat_read_outlined, color: Color(0xFFB47618)),
-              SizedBox(width: 8),
+              const Icon(Icons.mark_chat_read_outlined, color: Color(0xFFB47618)),
+              const SizedBox(width: 8),
               Text(
-                'رد الصيدلية',
-                style: TextStyle(
+                l10n.pharmacyResponse,
+                style: const TextStyle(
                   color: Color(0xFF142E35),
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
@@ -397,9 +403,9 @@ class _PharmacyResponse extends StatelessWidget {
           if (alternative != null) ...[
             const SizedBox(height: 13),
             const Divider(),
-            const Text(
-              'البديل المقترح',
-              style: TextStyle(fontWeight: FontWeight.w800),
+            Text(
+              l10n.suggestedAlternative,
+              style: const TextStyle(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 5),
             Text(
@@ -424,6 +430,7 @@ class _PharmacyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = details.request;
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -462,7 +469,7 @@ class _PharmacyCard extends StatelessWidget {
                     onPressed: () =>
                         context.push('/user/pharmacies/${request.pharmacyId}'),
                     icon: const Icon(Icons.storefront_rounded),
-                    label: const Text('الصيدلية'),
+                    label: Text(l10n.thePharmacy),
                   ),
                 ),
                 if (details.pharmacyGoogleMapsUrl != null) ...[
@@ -474,7 +481,7 @@ class _PharmacyCard extends StatelessWidget {
                         mode: LaunchMode.externalApplication,
                       ),
                       icon: const Icon(Icons.navigation_rounded),
-                      label: const Text('الاتجاهات'),
+                      label: Text(l10n.directions),
                     ),
                   ),
                 ],
@@ -544,12 +551,12 @@ class _Row extends StatelessWidget {
   _ => (color: const Color(0xFFB47618), icon: Icons.schedule_rounded),
 };
 
-String _statusText(UserMedicineRequest request) =>
+String _statusText(AppLocalizations l10n, UserMedicineRequest request) =>
     switch (request.status.toLowerCase()) {
-      'available' => 'الدواء متوفر',
-      'unavailable' => 'الدواء غير متوفر',
-      'cancelled' => 'تم إلغاء الطلب',
-      _ => 'بانتظار رد الصيدلية',
+      'available' => l10n.medicineAvailable,
+      'unavailable' => l10n.medicineUnavailable,
+      'cancelled' => l10n.requestCancelled,
+      _ => l10n.waitingForPharmacyResponse,
     };
 
 String _dateTime(DateTime? value) => value == null

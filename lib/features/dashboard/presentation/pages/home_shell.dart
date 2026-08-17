@@ -35,7 +35,6 @@ class HomeShell extends ConsumerWidget {
         }
       },
       child: Scaffold(
-        extendBody: true,
         body: navigationShell,
         bottomNavigationBar: SafeArea(
           minimum: const EdgeInsets.fromLTRB(14, 0, 14, 12),

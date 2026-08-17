@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_request_models.dart';
 import '../../data/repositories/user_repository.dart';
 import '../controllers/user_providers.dart';
@@ -23,21 +24,22 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
   @override
   Widget build(BuildContext context) {
     final history = ref.watch(userSearchHistoryProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('سجل البحث'),
+        title: Text(l10n.searchHistoryTitle),
         actions: [
           if (history.valueOrNull?.isNotEmpty == true)
             TextButton.icon(
               onPressed: _clearing ? null : _confirmClear,
               icon: const Icon(Icons.delete_sweep_outlined),
-              label: Text(_clearing ? 'جاري المسح' : 'مسح الكل'),
+              label: Text(_clearing ? l10n.searchClearing : l10n.searchClearAll),
             ),
           const SizedBox(width: 8),
         ],
       ),
       body: history.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل سجل البحث...'),
+        loading: () => AppLoadingState(label: l10n.searchLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(userSearchHistoryProvider),
@@ -89,6 +91,7 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
   }
 
   Future<void> _confirmClear() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -97,20 +100,20 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
           color: context.appColors.danger,
           size: 38,
         ),
-        title: const Text('مسح سجل البحث؟'),
-        content: const Text(
-          'سيتم حذف جميع عمليات البحث المحفوظة في حسابك.',
+        title: Text(l10n.searchClearTitle),
+        content: Text(
+          l10n.searchClearConfirm,
           textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
-            child: const Text('مسح السجل'),
+            child: Text(l10n.searchClearAction),
           ),
         ],
       ),
@@ -135,7 +138,9 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          error is ApiException ? error.message : 'تعذر حذف سجل البحث حاليًا.',
+          error is ApiException
+              ? error.message
+              : AppLocalizations.of(context).searchClearFailed,
         ),
         backgroundColor: context.appColors.danger,
       ),
@@ -158,6 +163,7 @@ class _HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final medicine = _isMedicine(item.searchType);
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -188,7 +194,7 @@ class _HistoryCard extends StatelessWidget {
                   children: [
                     Text(
                       item.query.trim().isEmpty
-                          ? 'بحث عن صيدليات قريبة'
+                          ? l10n.searchNearbyPharmacy
                           : item.query,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -196,8 +202,8 @@ class _HistoryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '${item.resultCount} نتيجة · ${_date(item.searchedAtUtc)}'
-                      '${item.radiusInMeters == null ? '' : ' · ${_radius(item.radiusInMeters!)}'}',
+                      '${l10n.searchResultCount(item.resultCount)} · ${_date(item.searchedAtUtc)}'
+                      '${item.radiusInMeters == null ? '' : ' · ${_radius(l10n, item.radiusInMeters!)}'}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall,
@@ -207,7 +213,7 @@ class _HistoryCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: deleting ? null : onDelete,
-                tooltip: 'حذف',
+                tooltip: l10n.searchDelete,
                 icon: deleting
                     ? const SizedBox.square(
                         dimension: 18,
@@ -228,30 +234,34 @@ class _EmptyHistory extends StatelessWidget {
   const _EmptyHistory();
 
   @override
-  Widget build(BuildContext context) => ListView(
-    physics: const AlwaysScrollableScrollPhysics(),
-    padding: const EdgeInsets.all(32),
-    children: [
-      const SizedBox(height: 90),
-      Icon(Icons.history_rounded, color: context.appColors.textMuted, size: 48),
-      const SizedBox(height: 14),
-      Text(
-        'لا يوجد سجل بحث',
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      const SizedBox(height: 6),
-      Text(
-        'ستظهر عمليات البحث التي تجريها هنا.',
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyMedium,
-      ),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(32),
+      children: [
+        const SizedBox(height: 90),
+        Icon(Icons.history_rounded, color: context.appColors.textMuted, size: 48),
+        const SizedBox(height: 14),
+        Text(
+          l10n.searchEmptyTitle,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          l10n.searchEmptySubtitle,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
 }
 
 bool _isMedicine(String type) => type.toLowerCase().contains('medicine');
-String _radius(int meters) =>
-    meters < 1000 ? '$meters م' : '${meters ~/ 1000} كم';
+String _radius(AppLocalizations l10n, int meters) => meters < 1000
+    ? l10n.distanceMeters('$meters')
+    : l10n.distanceKm('${meters ~/ 1000}');
 String _date(DateTime? value) =>
     value == null ? '—' : '${value.year}/${value.month}/${value.day}';

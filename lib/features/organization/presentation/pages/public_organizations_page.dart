@@ -108,9 +108,7 @@ class _IntroCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [context.appColors.primary, context.appColors.primaryDark],
-      ),
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(24),
     ),
     child: Row(

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/repositories/auth_repository.dart';
 
 class ForgotPasswordPage extends ConsumerStatefulWidget {
@@ -88,7 +89,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
   String _errorText(Object error) => error is ApiException
       ? error.message
-      : 'تعذر إكمال العملية الآن. حاول مجددًا.';
+      : AppLocalizations.of(context).forgotOperationFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +98,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         leading: IconButton(
           onPressed: () => context.go('/login'),
           icon: const Icon(Icons.arrow_back_rounded),
-          tooltip: 'العودة',
+          tooltip: AppLocalizations.of(context).forgotBack,
         ),
       ),
       body: SafeArea(
@@ -162,15 +163,16 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     );
   }
 
-  Widget _emailStep() => Column(
+  Widget _emailStep() {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     key: const ValueKey('email'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       _header(
         icon: Icons.lock_reset_rounded,
-        title: 'استعادة الحساب',
-        subtitle:
-            'أدخل بريدك الإلكتروني وسنساعدك على تعيين كلمة مرور جديدة بأمان.',
+        title: l10n.forgotTitle,
+        subtitle: l10n.forgotSubtitle,
       ),
       const SizedBox(height: 30),
       Card(
@@ -182,7 +184,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppTextField(
-                  label: 'البريد الإلكتروني',
+                  label: l10n.forgotEmailLabel,
                   hint: 'name@example.com',
                   controller: _email,
                   icon: Icons.mail_outline_rounded,
@@ -198,7 +200,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   icon: _loading
                       ? _progress()
                       : const Icon(Icons.arrow_forward_rounded),
-                  label: Text(_loading ? 'جاري التحقق...' : 'متابعة'),
+                  label: Text(_loading ? l10n.forgotVerifying : l10n.forgotContinue),
                 ),
               ],
             ),
@@ -207,16 +209,18 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       ),
     ],
   );
+  }
 
-  Widget _resetStep() => Column(
+  Widget _resetStep() {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     key: const ValueKey('reset'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       _header(
         icon: Icons.mark_email_read_outlined,
-        title: 'تعيين كلمة مرور جديدة',
-        subtitle:
-            _message ?? 'أدخل الرمز المرسل إلى بريدك ثم اختر كلمة مرور جديدة.',
+        title: l10n.forgotSetNewTitle,
+        subtitle: _message ?? l10n.forgotResetSubtitle,
       ),
       const SizedBox(height: 24),
       Card(
@@ -228,17 +232,17 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppTextField(
-                  label: 'رمز الاستعادة',
+                  label: l10n.forgotTokenLabel,
                   controller: _token,
                   icon: Icons.key_rounded,
                   textInputAction: TextInputAction.next,
                   validator: (value) => (value ?? '').trim().isEmpty
-                      ? 'أدخل رمز الاستعادة.'
+                      ? l10n.forgotTokenRequired
                       : null,
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'كلمة المرور الجديدة',
+                  label: l10n.forgotNewPasswordLabel,
                   controller: _password,
                   icon: Icons.lock_outline_rounded,
                   obscureText: _hidePassword,
@@ -256,19 +260,19 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  label: 'تأكيد كلمة المرور',
+                  label: l10n.forgotConfirmPasswordLabel,
                   controller: _confirmPassword,
                   icon: Icons.verified_user_outlined,
                   obscureText: _hidePassword,
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _resetPassword(),
                   validator: (value) => value != _password.text
-                      ? 'كلمتا المرور غير متطابقتين.'
+                      ? l10n.forgotPasswordsMismatch
                       : null,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'استخدم 8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز.',
+                  l10n.forgotPasswordHint,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 if (_error != null) _errorBox(),
@@ -278,11 +282,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   icon: _loading
                       ? _progress()
                       : const Icon(Icons.check_rounded),
-                  label: Text(_loading ? 'جاري الحفظ...' : 'حفظ كلمة المرور'),
+                  label: Text(_loading ? l10n.forgotSaving : l10n.forgotSavePassword),
                 ),
                 TextButton(
                   onPressed: _loading ? null : _requestCode,
-                  child: const Text('إرسال رمز جديد'),
+                  child: Text(l10n.forgotSendNewCode),
                 ),
               ],
             ),
@@ -291,24 +295,28 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       ),
     ],
   );
+  }
 
-  Widget _successStep() => Column(
+  Widget _successStep() {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     key: const ValueKey('success'),
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       _header(
         icon: Icons.check_circle_outline_rounded,
-        title: 'تم تحديث كلمة المرور',
-        subtitle: 'يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.',
+        title: l10n.forgotSuccessTitle,
+        subtitle: l10n.forgotSuccessSubtitle,
       ),
       const SizedBox(height: 30),
       FilledButton.icon(
         onPressed: () => context.go('/login'),
         icon: const Icon(Icons.login_rounded),
-        label: const Text('العودة إلى تسجيل الدخول'),
+        label: Text(l10n.forgotBackToLogin),
       ),
     ],
   );
+  }
 
   Widget _errorBox() => Padding(
     padding: const EdgeInsets.only(top: 14),
@@ -331,7 +339,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     final email = value?.trim() ?? '';
     return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)
         ? null
-        : 'أدخل بريدًا إلكترونيًا صحيحًا.';
+        : AppLocalizations.of(context).forgotEmailInvalid;
   }
 
   String? _validatePassword(String? value) {
@@ -341,7 +349,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         !RegExp('[a-z]').hasMatch(password) ||
         !RegExp('[0-9]').hasMatch(password) ||
         !RegExp(r'[^A-Za-z0-9]').hasMatch(password)) {
-      return 'كلمة المرور لا تحقق المتطلبات.';
+      return AppLocalizations.of(context).forgotPasswordRequirements;
     }
     return null;
   }

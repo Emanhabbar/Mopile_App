@@ -7,6 +7,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_request_models.dart';
 import '../../data/repositories/user_repository.dart';
 import '../controllers/user_providers.dart';
@@ -52,11 +53,11 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final details = ref.watch(userPharmacyDetailsProvider(widget.pharmacyId));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل الصيدلية')),
+      appBar: AppBar(title: Text(l10n.pharmacyDetailsTitle)),
       body: details.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل بيانات الصيدلية...'),
+        loading: () => AppLoadingState(label: l10n.pharmacyDetailsLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () =>
@@ -76,8 +77,10 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
                 AppReveal(
                   delay: const Duration(milliseconds: 70),
                   child: _SectionTitle(
-                    title: 'الأدوية المتوفرة',
-                    subtitle: '${data.availableMedicinesCount} دواء متاح للطلب',
+                    title: l10n.availableMedicines,
+                    subtitle: l10n.medicinesAvailableCount(
+                      data.availableMedicinesCount,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -130,8 +133,8 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
                 ),
                 const SizedBox(height: 22),
                 _SectionTitle(
-                  title: 'ساعات العمل',
-                  subtitle: 'جدول الدوام الأسبوعي للصيدلية',
+                  title: l10n.workingHours,
+                  subtitle: l10n.workingHoursSubtitle,
                 ),
                 const SizedBox(height: 12),
                 AppReveal(
@@ -160,9 +163,10 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
   }
 
   Future<void> _submitRequest() async {
+    final l10n = AppLocalizations.of(context);
     final medicineId = _medicineId;
     if (medicineId == null) {
-      _message('اختر الدواء أولًا.', error: true);
+      _message(l10n.chooseMedicineFirst, error: true);
       return;
     }
     setState(() => _sending = true);
@@ -190,22 +194,22 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
             color: Color(0xFF167D5A),
             size: 42,
           ),
-          title: const Text('تم إرسال الطلب'),
+          title: Text(l10n.requestSentTitle),
           content: Text(
-            'رقم الطلب ${result.requestCode}\nيمكنك متابعة رد الصيدلية من صفحة طلباتي.',
+            l10n.requestSentContent(result.requestCode),
             textAlign: TextAlign.center,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إغلاق'),
+              child: Text(l10n.close),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(context);
                 context.push('/user/requests/${result.requestId}');
               },
-              child: const Text('عرض الطلب'),
+              child: Text(l10n.viewRequest),
             ),
           ],
         ),
@@ -218,8 +222,9 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
   }
 
   Future<void> _submitRating() async {
+    final l10n = AppLocalizations.of(context);
     if (_rating < 1) {
-      _message('اختر عدد النجوم أولًا.', error: true);
+      _message(l10n.chooseStarsFirst, error: true);
       return;
     }
     setState(() => _ratingSaving = true);
@@ -236,7 +241,7 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
       ref
         ..invalidate(userPharmacyDetailsProvider(widget.pharmacyId))
         ..invalidate(userDashboardProvider);
-      _message('شكرًا، تم حفظ تقييمك.');
+      _message(l10n.ratingSaved);
     } catch (error) {
       _message(_errorMessage(error), error: true);
     } finally {
@@ -256,8 +261,10 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
       );
   }
 
-  String _errorMessage(Object error) =>
-      error is ApiException ? error.message : 'تعذر إكمال العملية حاليًا.';
+String _errorMessage(Object error) =>
+    error is ApiException
+        ? error.message
+        : AppLocalizations.of(context).operationFailed;
 }
 
 class _PharmacyHero extends StatelessWidget {
@@ -267,18 +274,15 @@ class _PharmacyHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFF174B57), Color(0xFF0B3540)],
-        ),
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(27),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF174B57).withValues(alpha: 0.18),
+            color: context.appColors.primary.withValues(alpha: 0.18),
             blurRadius: 28,
             offset: const Offset(0, 13),
           ),
@@ -301,7 +305,7 @@ class _PharmacyHero extends StatelessWidget {
               if (pharmacy.hasDeliveryService)
                 _HeroPill(
                   icon: Icons.delivery_dining_rounded,
-                  text: 'توصيل متاح',
+                  text: l10n.deliveryAvailable,
                   color: context.appColors.secondary,
                 ),
             ],
@@ -343,7 +347,7 @@ class _PharmacyHero extends StatelessWidget {
               ),
               const SizedBox(width: 17),
               Text(
-                _distance(pharmacy.distanceMeters),
+                _distance(l10n, pharmacy.distanceMeters),
                 style: const TextStyle(color: Colors.white70),
               ),
             ],
@@ -356,7 +360,7 @@ class _PharmacyHero extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: () => launchUrl(Uri.parse('tel:$phone')),
                     icon: const Icon(Icons.phone_rounded),
-                    label: const Text('اتصال'),
+                    label: Text(l10n.call),
                     style: FilledButton.styleFrom(
                       backgroundColor: context.appColors.secondary,
                       foregroundColor: const Color(0xFF173D46),
@@ -374,7 +378,7 @@ class _PharmacyHero extends StatelessWidget {
                       mode: LaunchMode.externalApplication,
                     ),
                     icon: const Icon(Icons.navigation_rounded),
-                    label: const Text('الاتجاهات'),
+                    label: Text(l10n.directions),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: BorderSide(
@@ -404,13 +408,16 @@ class _MedicineChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(19),
         side: BorderSide(
-          color: selected ? context.appColors.primary : context.appColors.border,
+          color: selected
+              ? context.appColors.primary
+              : context.appColors.border,
           width: selected ? 1.5 : 1,
         ),
       ),
@@ -427,9 +434,9 @@ class _MedicineChoice extends StatelessWidget {
                   color: context.appColors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.medication_rounded,
-                  color: Color(0xFF216474),
+                  color: context.appColors.primary,
                 ),
               ),
               const SizedBox(width: 11),
@@ -462,27 +469,27 @@ class _MedicineChoice extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    _price(medicine.sellingPrice),
-                    style: const TextStyle(
-                      color: Color(0xFF216474),
+                    _price(l10n, medicine.sellingPrice),
+                    style: TextStyle(
+                      color: context.appColors.primary,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   if (medicine.requiresPrescription)
-                    const Text(
-                      'يتطلب وصفة',
-                      style: TextStyle(
+                    Text(
+                      l10n.requiresPrescription,
+                      style: const TextStyle(
                         color: Color(0xFFB47618),
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   if (selected)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
                       child: Icon(
                         Icons.check_circle_rounded,
-                        color: Color(0xFF216474),
+                        color: context.appColors.primary,
                         size: 18,
                       ),
                     ),
@@ -519,24 +526,25 @@ class _RequestForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _FormHeading(
+            _FormHeading(
               icon: Icons.inventory_2_outlined,
-              title: 'إرسال طلب دواء',
-              subtitle: 'ستراجع الصيدلية طلبك وترد عليه',
+              title: l10n.requestMedicineTitle,
+              subtitle: l10n.requestMedicineSubtitle,
             ),
             const SizedBox(height: 17),
             DropdownButtonFormField<String>(
               initialValue: selectedMedicineId,
               isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'الدواء',
-                prefixIcon: Icon(Icons.medication_outlined),
+              decoration: InputDecoration(
+                labelText: l10n.medicineLabel,
+                prefixIcon: const Icon(Icons.medication_outlined),
               ),
               items: medicines
                   .map(
@@ -551,9 +559,9 @@ class _RequestForm extends StatelessWidget {
             const SizedBox(height: 13),
             Row(
               children: [
-                const Text(
-                  'الكمية المطلوبة',
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                Text(
+                  l10n.quantityRequested,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
                 const Spacer(),
                 IconButton.filledTonal(
@@ -583,8 +591,8 @@ class _RequestForm extends StatelessWidget {
               maxLength: 1000,
               minLines: 3,
               maxLines: 5,
-              decoration: const InputDecoration(
-                labelText: 'ملاحظة للصيدلية (اختياري)',
+              decoration: InputDecoration(
+                labelText: l10n.noteToPharmacyOptional,
                 alignLabelWithHint: true,
               ),
             ),
@@ -601,7 +609,9 @@ class _RequestForm extends StatelessWidget {
                         ),
                       )
                     : const Icon(Icons.send_rounded),
-                label: Text(sending ? 'جاري الإرسال...' : 'إرسال الطلب'),
+                label: Text(
+                  sending ? l10n.sendingProgress : l10n.sendRequest,
+                ),
               ),
             ),
           ],
@@ -628,16 +638,17 @@ class _RatingForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _FormHeading(
+            _FormHeading(
               icon: Icons.star_outline_rounded,
-              title: 'قيّم تجربتك',
-              subtitle: 'شارك رأيك لمساعدة مستخدمين آخرين',
+              title: l10n.rateExperienceTitle,
+              subtitle: l10n.rateExperienceSubtitle,
             ),
             const SizedBox(height: 15),
             Row(
@@ -662,8 +673,8 @@ class _RatingForm extends StatelessWidget {
               maxLength: 1000,
               minLines: 2,
               maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'اكتب رأيك باختصار (اختياري)',
+              decoration: InputDecoration(
+                hintText: l10n.ratingHint,
               ),
             ),
             SizedBox(
@@ -671,7 +682,7 @@ class _RatingForm extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: rating < 1 || saving ? null : onSubmit,
                 icon: const Icon(Icons.star_rounded),
-                label: Text(saving ? 'جاري الحفظ...' : 'حفظ التقييم'),
+                label: Text(saving ? l10n.savingProgress : l10n.saveRating),
               ),
             ),
           ],
@@ -686,27 +697,27 @@ class _WorkingHours extends StatelessWidget {
 
   final List<PharmacyWorkingHour> hours;
 
-  static const _days = [
-    'الأحد',
-    'الاثنين',
-    'الثلاثاء',
-    'الأربعاء',
-    'الخميس',
-    'الجمعة',
-    'السبت',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final days = [
+      l10n.daySunday,
+      l10n.dayMonday,
+      l10n.dayTuesday,
+      l10n.dayWednesday,
+      l10n.dayThursday,
+      l10n.dayFriday,
+      l10n.daySaturday,
+    ];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: hours
               .map((hour) {
-                final day = hour.dayOfWeek >= 0 && hour.dayOfWeek < _days.length
-                    ? _days[hour.dayOfWeek]
-                    : 'يوم';
+                final day = hour.dayOfWeek >= 0 && hour.dayOfWeek < days.length
+                    ? days[hour.dayOfWeek]
+                    : l10n.dayFallback;
                 return ListTile(
                   dense: true,
                   title: Text(
@@ -715,7 +726,7 @@ class _WorkingHours extends StatelessWidget {
                   ),
                   trailing: Text(
                     hour.isClosed
-                        ? 'مغلق'
+                        ? l10n.closed
                         : '${_time(hour.openTime)} - ${_time(hour.closeTime)}',
                     style: TextStyle(
                       color: hour.isClosed
@@ -827,24 +838,29 @@ class _EmptyMedicines extends StatelessWidget {
   const _EmptyMedicines();
 
   @override
-  Widget build(BuildContext context) => const Card(
+  Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: EdgeInsets.all(28),
+      padding: const EdgeInsets.all(28),
       child: Column(
         children: [
-          Icon(Icons.medication_outlined, color: Color(0xFF668087), size: 34),
-          SizedBox(height: 10),
-          Text('لا توجد أدوية متاحة حاليًا'),
+          const Icon(
+            Icons.medication_outlined,
+            color: Color(0xFF668087),
+            size: 34,
+          ),
+          const SizedBox(height: 10),
+          Text(AppLocalizations.of(context).noMedicinesAvailable),
         ],
       ),
     ),
   );
 }
 
-String _price(double? value) =>
-    value == null ? 'السعر غير معلن' : '${value.toStringAsFixed(0)} ل.س';
-String _distance(double meters) => meters < 1000
-    ? '${meters.round()} م'
-    : '${(meters / 1000).toStringAsFixed(1)} كم';
+String _price(AppLocalizations l10n, double? value) => value == null
+    ? l10n.priceNotAnnounced
+    : l10n.currencySYP(value.toStringAsFixed(0));
+String _distance(AppLocalizations l10n, double meters) => meters < 1000
+    ? l10n.distanceMeters('${meters.round()}')
+    : l10n.distanceKm((meters / 1000).toStringAsFixed(1));
 String _time(String? value) =>
     value == null || value.length < 5 ? '--:--' : value.substring(0, 5);

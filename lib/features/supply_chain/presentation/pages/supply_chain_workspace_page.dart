@@ -144,7 +144,11 @@ class _WarehouseNavigation extends StatelessWidget {
     (label: 'التشغيلات', icon: Icons.inventory_2_outlined, count: null),
     (label: 'الطلبات', icon: Icons.receipt_long_outlined, count: null),
     (label: 'المندوبون', icon: Icons.delivery_dining_outlined, count: null),
-    (label: 'المالية', icon: Icons.account_balance_wallet_outlined, count: null),
+    (
+      label: 'المالية',
+      icon: Icons.account_balance_wallet_outlined,
+      count: null,
+    ),
   ];
 
   @override
@@ -169,12 +173,14 @@ class _WarehouseNavigation extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsetsDirectional.only(end: 8),
                 child: Material(
-                  color: selected ? context.appColors.primaryDeep : context.appColors.surface,
+                  color: selected
+                      ? context.appColors.primary
+                      : context.appColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(17),
                     side: BorderSide(
                       color: selected
-                          ? context.appColors.primaryDeep
+                          ? context.appColors.primary
                           : context.appColors.border,
                     ),
                   ),
@@ -192,13 +198,17 @@ class _WarehouseNavigation extends StatelessWidget {
                           Icon(
                             item.icon,
                             size: 19,
-                            color: selected ? Colors.white : context.appColors.primary,
+                            color: selected
+                                ? Colors.white
+                                : context.appColors.primary,
                           ),
                           const SizedBox(width: 7),
                           Text(
                             item.label,
                             style: TextStyle(
-                              color: selected ? Colors.white : context.appColors.text,
+                              color: selected
+                                  ? Colors.white
+                                  : context.appColors.text,
                               fontSize: 12.5,
                               fontWeight: FontWeight.w800,
                             ),
@@ -213,14 +223,20 @@ class _WarehouseNavigation extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? context.appColors.secondary.withValues(alpha: .3)
-                                    : context.appColors.primary.withValues(alpha: .1),
+                                    ? context.appColors.secondary.withValues(
+                                        alpha: .3,
+                                      )
+                                    : context.appColors.primary.withValues(
+                                        alpha: .1,
+                                      ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 '${item.count}',
                                 style: TextStyle(
-                                  color: selected ? Colors.white : context.appColors.primary,
+                                  color: selected
+                                      ? Colors.white
+                                      : context.appColors.primary,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -293,7 +309,7 @@ class _WarehouseDashboard extends ConsumerWidget {
                       'مخزون منخفض',
                       data.lowStockBatches,
                       Icons.trending_down_rounded,
-                      context.appColors.primaryDeep,
+                      context.appColors.primary,
                     ),
                   ),
                   AppReveal(
@@ -302,7 +318,7 @@ class _WarehouseDashboard extends ConsumerWidget {
                       'قرب الانتهاء',
                       data.expiringBatches,
                       Icons.event_busy_outlined,
-                      context.appColors.primaryDark,
+                      context.appColors.primary,
                     ),
                   ),
                   AppReveal(
@@ -372,6 +388,8 @@ class _BatchesTab extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _addBatch(context, ref),
+        backgroundColor: context.appColors.primary,
+        foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: const Text('تشغيلة'),
       ),
@@ -601,10 +619,10 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? colors.primaryDeep : colors.surface,
+            color: selected ? colors.primary : colors.surface,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: selected ? colors.primaryDeep : colors.border,
+              color: selected ? colors.primary : colors.border,
               width: selected ? 1.5 : 1,
             ),
           ),
@@ -1000,6 +1018,8 @@ class _RepresentativesTab extends ConsumerWidget {
         ),
     floatingActionButton: FloatingActionButton.extended(
       onPressed: () => _addRepresentative(context, ref),
+      backgroundColor: context.appColors.primary,
+      foregroundColor: Colors.white,
       icon: const Icon(Icons.person_add_alt),
       label: const Text('مندوب'),
     ),
@@ -1058,7 +1078,9 @@ class _RepresentativeCard extends ConsumerWidget {
                 ),
                 _Badge(
                   r.isOnShift ? 'ضمن الوردية' : 'خارج الوردية',
-                  r.isOnShift ? context.appColors.primary : context.appColors.textMuted,
+                  r.isOnShift
+                      ? context.appColors.primary
+                      : context.appColors.textMuted,
                 ),
               ],
             ),
@@ -1234,12 +1256,12 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
                       padding: const EdgeInsets.symmetric(vertical: 11),
                       decoration: BoxDecoration(
                         color: active
-                            ? context.appColors.primaryDeep
+                            ? context.appColors.primary
                             : context.appColors.surface,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: active
-                              ? context.appColors.primaryDeep
+                              ? context.appColors.primary
                               : context.appColors.border,
                         ),
                       ),
@@ -1256,7 +1278,9 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
                           Text(
                             items[index].$1,
                             style: TextStyle(
-                              color: active ? Colors.white : context.appColors.text,
+                              color: active
+                                  ? Colors.white
+                                  : context.appColors.text,
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                             ),
@@ -1383,10 +1407,14 @@ class _PharmacySupplyNavigation extends StatelessWidget {
             duration: const Duration(milliseconds: 220),
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              color: active ? context.appColors.primaryDeep : context.appColors.surfaceSoft,
+              color: active
+                  ? context.appColors.primary
+                  : context.appColors.surfaceSoft,
               borderRadius: BorderRadius.circular(17),
               border: Border.all(
-                color: active ? context.appColors.primaryDeep : context.appColors.border,
+                color: active
+                    ? context.appColors.primary
+                    : context.appColors.border,
               ),
             ),
             child: Row(
@@ -1394,7 +1422,7 @@ class _PharmacySupplyNavigation extends StatelessWidget {
                 Icon(
                   item.$2,
                   size: 19,
-                  color: active ? context.appColors.secondary : context.appColors.primary,
+                  color: active ? Colors.white : context.appColors.primary,
                 ),
                 const SizedBox(width: 7),
                 Text(
@@ -1533,10 +1561,7 @@ class _WarehouseCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(
-                Icons.arrow_back_rounded,
-                color: context.appColors.primary,
-              ),
+              Icon(Icons.arrow_back_rounded, color: context.appColors.primary),
             ],
           ),
         ),
@@ -1553,11 +1578,7 @@ class _WarehouseStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(
-        icon,
-        size: 13,
-        color: context.appColors.textMuted,
-      ),
+      Icon(icon, size: 13, color: context.appColors.textMuted),
       const SizedBox(width: 4),
       Text(
         label,
@@ -1748,14 +1769,10 @@ class _SuggestionCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: colors.primaryDark.withValues(alpha: .08),
+                color: context.appColors.primary.withValues(alpha: .08),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(
-                Icons.auto_graph,
-                color: colors.primaryDark,
-                size: 26,
-              ),
+              child: Icon(Icons.auto_graph, color: colors.primary, size: 26),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -1822,11 +1839,7 @@ class _SuggestionStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      Icon(
-        icon,
-        size: 13,
-        color: context.appColors.textMuted,
-      ),
+      Icon(icon, size: 13, color: context.appColors.textMuted),
       const SizedBox(width: 4),
       Text(
         label,
@@ -1935,15 +1948,11 @@ class _DeliveryHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: AlignmentDirectional.topStart,
-        end: AlignmentDirectional.bottomEnd,
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(28),
       boxShadow: [
         BoxShadow(
-          color: context.appColors.primaryDeep.withValues(alpha: .16),
+          color: context.appColors.primary.withValues(alpha: .18),
           blurRadius: 24,
           offset: const Offset(0, 12),
         ),
@@ -2149,7 +2158,10 @@ class _DeliveryCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.task_alt_rounded, color: context.appColors.success),
+                  Icon(
+                    Icons.task_alt_rounded,
+                    color: context.appColors.success,
+                  ),
                   SizedBox(width: 7),
                   Text(
                     'تم تسليم الشحنة بنجاح',
@@ -2204,7 +2216,9 @@ class _DeliveryProgress extends StatelessWidget {
                   Expanded(
                     child: Container(
                       height: 2,
-                      color: reached ? context.appColors.primary : context.appColors.border,
+                      color: reached
+                          ? context.appColors.primary
+                          : context.appColors.border,
                     ),
                   ),
                 AnimatedContainer(
@@ -2215,7 +2229,9 @@ class _DeliveryProgress extends StatelessWidget {
                     color: reached ? context.appColors.primary : Colors.white,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: reached ? context.appColors.primary : context.appColors.border,
+                      color: reached
+                          ? context.appColors.primary
+                          : context.appColors.border,
                       width: 2,
                     ),
                   ),
@@ -2238,7 +2254,9 @@ class _DeliveryProgress extends StatelessWidget {
             Text(
               labels[index],
               style: TextStyle(
-                color: reached ? context.appColors.primary : context.appColors.textMuted,
+                color: reached
+                    ? context.appColors.primary
+                    : context.appColors.textMuted,
                 fontSize: 8,
                 fontWeight: reached ? FontWeight.w800 : FontWeight.w500,
               ),
@@ -2718,7 +2736,10 @@ class _BatchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              _Badge(_health(batch.health), _healthColor(context.appColors, batch.health)),
+              _Badge(
+                _health(batch.health),
+                _healthColor(context.appColors, batch.health),
+              ),
             ],
           ),
           const Divider(height: 22),
@@ -2767,15 +2788,11 @@ class _Hero extends StatelessWidget {
     height: 178,
     clipBehavior: Clip.antiAlias,
     decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: AlignmentDirectional.topStart,
-        end: AlignmentDirectional.bottomEnd,
-        colors: [context.appColors.primaryDeep, context.appColors.primary],
-      ),
+      color: context.appColors.primary,
       borderRadius: BorderRadius.circular(28),
       boxShadow: [
         BoxShadow(
-          color: context.appColors.primaryDeep.withValues(alpha: .16),
+          color: context.appColors.primary.withValues(alpha: .18),
           blurRadius: 24,
           offset: const Offset(0, 12),
         ),
@@ -2821,7 +2838,7 @@ class _Hero extends StatelessWidget {
                     child: Text(
                       badge,
                       style: TextStyle(
-                        color: context.appColors.primaryDeep,
+                        color: context.appColors.primary,
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                       ),
@@ -2882,7 +2899,10 @@ class _Metric extends StatelessWidget {
             ),
             Text(
               label,
-              style: TextStyle(fontSize: 10, color: context.appColors.textMuted),
+              style: TextStyle(
+                fontSize: 10,
+                color: context.appColors.textMuted,
+              ),
             ),
           ],
         ),
@@ -2961,7 +2981,10 @@ class _CollectionHeader extends StatelessWidget {
               subtitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: context.appColors.textMuted, fontSize: 10),
+              style: TextStyle(
+                color: context.appColors.textMuted,
+                fontSize: 10,
+              ),
             ),
           ],
         ),
@@ -3085,8 +3108,8 @@ String _health(String s) => switch (s.toLowerCase()) {
 };
 Color _healthColor(AppColors colors, String s) => switch (s.toLowerCase()) {
   'healthy' => colors.primary,
-  'expired' => colors.primaryDark,
-  _ => colors.primaryDeep,
+  'expired' => colors.primary,
+  _ => colors.primary,
 };
 String _status(String s) => switch (s.toLowerCase()) {
   'submitted' => 'مرسل',
@@ -3109,8 +3132,8 @@ String _status(String s) => switch (s.toLowerCase()) {
 };
 Color _statusColor(AppColors colors, String s) => switch (s.toLowerCase()) {
   'delivered' || 'paid' || 'approved' => colors.primary,
-  'rejected' || 'failed' || 'overdue' => colors.primaryDark,
-  'submitted' || 'requested' || 'unpaid' => colors.primaryDeep,
+  'rejected' || 'failed' || 'overdue' => colors.primary,
+  'submitted' || 'requested' || 'unpaid' => colors.primary,
   _ => colors.primary,
 };
 String _nextLabel(String s) => switch (s) {

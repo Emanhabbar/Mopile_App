@@ -435,12 +435,12 @@ class _AdminSectionNavigation extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsetsDirectional.only(end: 8),
                 child: Material(
-                  color: selected ? context.appColors.primaryDeep : context.appColors.surface,
+                  color: selected ? context.appColors.primary : context.appColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(17),
                     side: BorderSide(
                       color: selected
-                          ? context.appColors.primaryDeep
+                          ? context.appColors.primary
                           : context.appColors.border,
                     ),
                   ),
@@ -1069,17 +1069,10 @@ class _AdminHero extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            context.appColors.primaryDeep,
-            context.appColors.primaryDark,
-          ],
-        ),
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: context.appColors.primary.withValues(alpha: 0.15),
+          color: context.appColors.primaryDark.withValues(alpha: 0.35),
         ),
       ),
       child: Padding(
@@ -1857,7 +1850,7 @@ class _RoleSelector extends StatelessWidget {
           child: _RoleButton(
             label: 'الكل',
             icon: Icons.apps_rounded,
-            color: colors.text,
+            color: colors.primary,
             isSelected: selectedRole == null,
             onTap: () => onRoleSelected(null),
           ),
@@ -1877,7 +1870,7 @@ class _RoleSelector extends StatelessWidget {
           child: _RoleButton(
             label: 'المنظمات',
             icon: Icons.apartment_outlined,
-            color: colors.primaryDark,
+            color: colors.primary,
             isSelected: selectedRole == 'organizations',
             onTap: () => onRoleSelected('organizations'),
           ),
@@ -2697,10 +2690,10 @@ class _RoleFilter extends StatelessWidget {
         color: selected ? Colors.white : context.appColors.text,
         fontWeight: FontWeight.w800,
       ),
-      selectedColor: context.appColors.primaryDeep,
+      selectedColor: context.appColors.primary,
       backgroundColor: context.appColors.surface,
       side: BorderSide(
-        color: selected ? context.appColors.primaryDeep : context.appColors.border,
+        color: selected ? context.appColors.primary : context.appColors.border,
       ),
     ),
   );

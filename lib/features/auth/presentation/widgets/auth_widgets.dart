@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 class AuthDivider extends StatelessWidget {
   const AuthDivider({required this.text, super.key});
@@ -95,6 +96,7 @@ class AuthFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
 
     return Wrap(
       alignment: WrapAlignment.center,
@@ -102,7 +104,7 @@ class AuthFooter extends StatelessWidget {
       runSpacing: 4,
       children: [
         Text(
-          'ليس لديك حساب بعد؟',
+          l10n.noAccountYet,
           style: TextStyle(
             color: colors.textMuted,
             fontSize: 14,
@@ -120,9 +122,9 @@ class AuthFooter extends StatelessWidget {
               vertical: 4,
             ),
           ),
-          child: const Text(
-            'إنشاء حساب',
-            style: TextStyle(
+          child: Text(
+            l10n.createAccount,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),

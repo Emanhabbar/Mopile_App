@@ -10,6 +10,8 @@ import '../../../../core/errors/api_exception.dart';
 
 import '../../../../core/widgets/app_text_field.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
+
 import '../widgets/auth_widgets.dart';
 
 import '../controllers/auth_controller.dart';
@@ -34,7 +36,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
 
-  static const String _logoPath = 'assets/brand/newlogo.png';
+  String get _logoPath =>
+      Theme.of(context).brightness == Brightness.dark
+          ? 'assets/brand/newlogodark.png'
+          : 'assets/brand/newlogo.png';
 
   @override
   void initState() {
@@ -79,7 +84,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
     final String? error = authState.hasError
         ? authState.error is ApiException
             ? (authState.error! as ApiException).message
-            : 'تعذر تسجيل الدخول. تحقق من البيانات وحاول مجددًا.'
+            : AppLocalizations.of(context).loginFailed
         : null;
 
     return Directionality(
@@ -89,11 +94,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
         body: SafeArea(
           child: Column(
             children: [
-              _TopBar(
-                onBack: () {
-                  if (context.canPop()) context.pop();
-                },
-              ),
               Expanded(
                 child: Center(
                   child: FadeTransition(
@@ -130,6 +130,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
     required String? error,
   }) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -155,7 +156,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
         // ── Title ──
         Text(
-          'تسجيل الدخول',
+          l10n.loginTitle,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: colors.text,
@@ -167,7 +168,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
         // ── Subtitle ──
         Text(
-          'أدخل بيانات حسابك للوصول إلى خدماتك.',
+          l10n.loginSubtitle,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colors.textMuted,
@@ -179,7 +180,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
         // ── Email ──
         AppTextField(
-          label: 'البريد الإلكتروني',
+          label: l10n.loginEmailLabel,
           hint: 'name@example.com',
           controller: _emailController,
           focusNode: _emailFocusNode,
@@ -193,7 +194,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
             final isValid = RegExp(
               r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
             ).hasMatch(email);
-            if (!isValid) return 'أدخل بريدًا إلكترونيًا صحيحًا.';
+            if (!isValid) return l10n.loginEmailInvalid;
             return null;
           },
         ),
@@ -202,7 +203,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
         // ── Password ──
         AppTextField(
-          label: 'كلمة المرور',
+          label: l10n.loginPasswordLabel,
           hint: '••••••••',
           controller: _passwordController,
           focusNode: _passwordFocusNode,
@@ -223,11 +224,11 @@ class _LoginPageState extends ConsumerState<LoginPage>
               size: 20,
             ),
             tooltip: _obscurePassword
-                ? 'إظهار كلمة المرور'
-                : 'إخفاء كلمة المرور',
+                ? l10n.loginShowPassword
+                : l10n.loginHidePassword,
           ),
           validator: (value) {
-            if ((value ?? '').isEmpty) return 'أدخل كلمة المرور.';
+            if ((value ?? '').isEmpty) return l10n.loginPasswordRequired;
             return null;
           },
         ),
@@ -248,9 +249,9 @@ class _LoginPageState extends ConsumerState<LoginPage>
                 vertical: 12,
               ),
             ),
-            child: const Text(
-              'نسيت كلمة المرور؟',
-              style: TextStyle(
+            child: Text(
+              l10n.loginForgotPassword,
+              style: const TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w600,
               ),
@@ -283,10 +284,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
-                      'تسجيل الدخول',
-                      key: ValueKey('text'),
-                      style: TextStyle(
+                  : Text(
+                      l10n.loginTitle,
+                      key: const ValueKey('text'),
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -298,7 +299,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
         const SizedBox(height: 24),
 
         // ── Divider ──
-        const AuthDivider(text: 'أو'),
+        AuthDivider(text: l10n.orDivider),
 
         const SizedBox(height: 24),
 
@@ -317,17 +318,17 @@ class _LoginPageState extends ConsumerState<LoginPage>
         Text.rich(
           TextSpan(
             children: [
-              const TextSpan(text: 'بالمتابعة، أنت توافق على '),
+              TextSpan(text: l10n.loginTermsPrefix),
               TextSpan(
-                text: 'شروط الاستخدام',
+                text: l10n.termsOfUse,
                 style: TextStyle(
                   color: colors.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const TextSpan(text: ' و'),
+              TextSpan(text: l10n.andWord),
               TextSpan(
-                text: 'سياسة الخصوصية',
+                text: l10n.privacyPolicy,
                 style: TextStyle(
                   color: colors.primary,
                   fontWeight: FontWeight.w600,
@@ -345,32 +346,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
           ),
         ),
       ],
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onBack});
-
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        child: IconButton(
-          onPressed: onBack,
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: colors.text,
-            size: 24,
-          ),
-        ),
-      ),
     );
   }
 }

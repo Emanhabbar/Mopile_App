@@ -10,6 +10,7 @@ import '../../../../core/errors/api_exception.dart';
 import '../../../../core/location/device_location_service.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_discovery_models.dart';
 import '../../data/repositories/user_repository.dart';
 import '../controllers/user_providers.dart';
@@ -32,22 +33,22 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
   @override
   Widget build(BuildContext context) {
     final discovery = ref.watch(userLocationDiscoveryProvider(_parameters));
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الصيدليات القريبة'),
+        title: Text(l10n.nearbyPharmacies),
         actions: [
           IconButton(
             onPressed: _updatingLocation ? null : _useDeviceLocation,
-            tooltip: 'تحديث موقعي',
+            tooltip: l10n.updateMyLocation,
             icon: const Icon(Icons.my_location_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: discovery.when(
-        loading: () =>
-            const AppLoadingState(label: 'نحدد الصيدليات الأقرب إليك...'),
+        loading: () => AppLoadingState(label: l10n.locatingPharmacies),
         error: (error, _) {
           if (_isMissingLocation(error)) {
             return ListView(
@@ -164,6 +165,7 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
   }
 
   Future<void> _useDeviceLocation() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _updatingLocation = true);
     try {
       final location = await ref
@@ -178,13 +180,14 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
         ),
       );
     } catch (error) {
-      _showMessage(_messageFor(error), error: true);
+      _showMessage(_messageFor(error, l10n), error: true);
     } finally {
       if (mounted) setState(() => _updatingLocation = false);
     }
   }
 
   Future<void> _showManualLocation() async {
+    final l10n = AppLocalizations.of(context);
     final latitude = TextEditingController();
     final longitude = TextEditingController();
     final request = await showModalBottomSheet<UserLocationUpdate>(
@@ -201,7 +204,7 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
     try {
       await _saveLocation(request);
     } catch (error) {
-      _showMessage(_messageFor(error), error: true);
+      _showMessage(_messageFor(error, l10n), error: true);
     } finally {
       if (mounted) setState(() => _updatingLocation = false);
     }
@@ -215,7 +218,7 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
       ..invalidate(userNearestPharmaciesProvider)
       ..invalidate(userDashboardProvider)
       ..invalidate(userProfileProvider);
-    _showMessage('تم تحديث موقعك وعرض النتائج الأقرب.');
+    _showMessage(AppLocalizations.of(context).locationUpdated);
   }
 
   void _showMessage(String message, {bool error = false}) {
@@ -230,8 +233,10 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
       );
   }
 
-  String _messageFor(Object error) =>
-      error is ApiException ? error.message : 'تعذر تحديث الموقع حاليًا.';
+String _messageFor(Object error) =>
+    error is ApiException
+        ? error.message
+        : AppLocalizations.of(context).locationUpdateFailed;
 }
 
 class _LocationHeader extends StatelessWidget {
@@ -252,10 +257,10 @@ class _LocationHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: context.appColors.primary.withValues(alpha: 0.15),
+          color: context.appColors.primaryDark.withValues(alpha: 0.35),
         ),
       ),
       child: Column(
@@ -1335,13 +1340,12 @@ class _ManualLocationSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final key = GlobalKey<FormState>();
+    // الـ BottomNav المخصص بارتفاع 76px + SafeArea ~12px.
+    // نضيف padding سفلية كافية عشان محتوى النموذج يظهر فوق الشريط.
+    final bottomPadding =
+        MediaQuery.viewInsetsOf(context).bottom + 88 + 24;
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        20,
-        20,
-        20,
-        MediaQuery.viewInsetsOf(context).bottom + 24,
-      ),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, bottomPadding),
       child: Form(
         key: key,
         child: Column(

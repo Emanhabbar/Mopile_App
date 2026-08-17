@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -68,6 +69,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
           final title = _phase(value, 0.43, 0.72);
           final subtitle = _phase(value, 0.58, 0.82);
           final progress = _phase(value, 0.68, 0.96, Curves.easeInOut);
+          final l10n = AppLocalizations.of(context);
 
           return Stack(
             fit: StackFit.expand,
@@ -91,7 +93,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       ),
                       const Spacer(),
                       Semantics(
-                        label: 'شعار تطبيق دوائي',
+                        label: AppLocalizations.of(context).splashAppLogoLabel,
                         image: true,
                         child: _LogoReveal(progress: logo),
                       ),
@@ -101,7 +103,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                         child: Transform.translate(
                           offset: Offset(0, 15 * (1 - subtitle)),
                           child: Text(
-                            'دواؤك أقرب، ورعايتك أسهل',
+                            l10n.splashTagline,
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme
@@ -120,7 +122,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       Opacity(
                         opacity: progress,
                         child: Text(
-                          'نجهّز تجربتك',
+                          l10n.splashPreparing,
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall
@@ -160,7 +162,7 @@ class _TopCaption extends StatelessWidget {
         ),
         const SizedBox(width: 9),
         Text(
-          'رعاية دوائية أقرب إليك',
+          AppLocalizations.of(context).splashTopCaption,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Colors.white.withValues(alpha: 0.65),
             fontWeight: FontWeight.w700,
@@ -207,7 +209,7 @@ class _AnimatedBrandTitle extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         Text(
-          'دوائي',
+          AppLocalizations.of(context).appTitle,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
             color: context.appColors.primary,
             fontSize: 42,
@@ -279,8 +281,8 @@ class _LoadingTrack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'جاري تجهيز التطبيق',
-      value: '${(progress * 100).round()} بالمئة',
+      label: AppLocalizations.of(context).splashLoadingLabel,
+      value: AppLocalizations.of(context).splashPercent((progress * 100).round()),
       child: SizedBox(
         width: 148,
         height: 4,

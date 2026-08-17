@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/constants/app_roles.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../controllers/auth_controller.dart';
 
 class RegistrationSuccessPage extends ConsumerWidget {
@@ -12,17 +12,8 @@ class RegistrationSuccessPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).valueOrNull?.user;
-    final role = user?.primaryRole ?? AppRole.user;
     final colors = context.appColors;
-
-    final message = switch (role) {
-      AppRole.pharmacy =>
-        'تم استلام بيانات الصيدلية بنجاح. يمكنك الآن متابعة حسابك واستكمال معلومات الصيدلية.',
-      AppRole.organization =>
-        'تم استلام بيانات المنظمة بنجاح. يمكنك الآن متابعة الحساب واستكمال بيانات التحقق.',
-      _ =>
-        'أصبح حسابك جاهزًا. يمكنك الآن الوصول إلى خدمات دوائي ومتابعة احتياجاتك بسهولة.',
-    };
+    final l10n = AppLocalizations.of(context);
 
     final rawName = user?.fullName;
     final firstName = rawName != null && rawName.trim().isNotEmpty
@@ -62,7 +53,7 @@ class RegistrationSuccessPage extends ConsumerWidget {
                     // ── Welcome name ──
                     if (firstName != null && firstName.isNotEmpty) ...[
                       Text(
-                        'مرحبًا $firstName',
+                        l10n.welcomeName(firstName),
                         style: Theme.of(context)
                             .textTheme
                             .bodyLarge
@@ -76,7 +67,7 @@ class RegistrationSuccessPage extends ConsumerWidget {
 
                     // ── Title ──
                     Text(
-                      'تم إنشاء حسابك',
+                      l10n.accountCreatedTitle,
                       textAlign: TextAlign.center,
                       style: Theme.of(context)
                           .textTheme
@@ -86,22 +77,6 @@ class RegistrationSuccessPage extends ConsumerWidget {
                             fontSize: 26,
                           ),
                     ),
-
-                    // const SizedBox(height: 10),
-
-                    // ── Message ──
-                    // Text(
-                    //   message,
-                    //   textAlign: TextAlign.center,
-                    //   style: Theme.of(context)
-                    //       .textTheme
-                    //       .bodyMedium
-                    //       ?.copyWith(
-                    //         color: colors.textMuted,
-                    //         fontSize: 14,
-                    //         height: 1.6,
-                    //       ),
-                    // ),
 
                     const SizedBox(height: 32),
 
@@ -118,28 +93,15 @@ class RegistrationSuccessPage extends ConsumerWidget {
                               .state = false;
                           context.go('/home');
                         },
-                        child: const Text(
-                          'الانتقال إلى الرئيسية',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.goToHome,
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
                     ),
-
-                    // const SizedBox(height: 16),
-
-                    // // ── Tagline ──
-                    // Text(
-                    //   'أهلًا بك في دوائي',
-                    //   textAlign: TextAlign.center,
-                    //   style: TextStyle(
-                    //     color: colors.textMuted,
-                    //     fontSize: 13,
-                    //     fontWeight: FontWeight.w600,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

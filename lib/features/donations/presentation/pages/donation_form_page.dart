@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../medicines/presentation/controllers/medicines_providers.dart';
 import '../../data/models/donation_models.dart';
 import '../../data/repositories/donations_repository.dart';
@@ -23,13 +24,13 @@ class DonationFormPage extends ConsumerStatefulWidget {
 class _DonationFormPageState extends ConsumerState<DonationFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _medicineSearch = TextEditingController();
+  final _package = TextEditingController(text: '1');
   final _notes = TextEditingController();
   String _searchTerm = '';
   String? _medicineId;
   String? _reviewingPharmacyId;
   String? _organizationId;
   String? _campaignId;
-  int _packageCount = 1;
   DateTime? _date;
   bool _isSealed = true;
   bool _saving = false;
@@ -39,6 +40,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
   @override
   void dispose() {
     _medicineSearch.dispose();
+    _package.dispose();
     _notes.dispose();
     super.dispose();
   }
@@ -65,257 +67,252 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
       ),
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-          children: [
-            AppReveal(child: _DonationFormHero(isOffer: _isOffer)),
-            const SizedBox(height: 22),
-            const _FormSectionTitle(
-              number: '01',
-              title: 'اختيار الدواء',
-              subtitle: 'ابحث في دليل الأدوية وحدد الصنف المطلوب',
-            ),
-            const SizedBox(height: 10),
-            Row(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _medicineSearch,
-                    textInputAction: TextInputAction.search,
-                    decoration: const InputDecoration(
-                      hintText: 'ابحث باسم الدواء',
-                      prefixIcon: Icon(Icons.search_rounded),
-                    ),
-                    onSubmitted: _searchMedicines,
+                AppReveal(child: _DonationFormHero(isOffer: _isOffer)),
+                const SizedBox(height: 22),
+                const _FormSectionTitle(
+                  number: '01',
+                  title: 'اختيار الدواء',
+                  subtitle: 'ابحث في دليل الأدوية وحدد الصنف المطلوب',
+                ),
+                const SizedBox(height: 10),
+                AppTextField(
+                  label: 'البحث عن دواء',
+                  hint: 'ابحث باسم الدواء ثم اختر من النتائج',
+                  controller: _medicineSearch,
+                  icon: Icons.search_rounded,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: _searchMedicines,
+                  suffixIcon: IconButton.filled(
+                    onPressed: () => _searchMedicines(_medicineSearch.text),
+                    icon: const Icon(Icons.search_rounded),
+                    tooltip: 'بحث',
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton.filled(
-                  onPressed: () => _searchMedicines(_medicineSearch.text),
-                  icon: const Icon(Icons.search_rounded),
+                const SizedBox(height: 10),
+                medicines.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, _) => const Text('تعذر تحميل دليل الأدوية.'),
+                  data: (page) => _FormDropdown<String>(
+                    label: 'الدواء',
+                    hint: 'اختر الدواء من الدليل',
+                    icon: Icons.medication_outlined,
+                    initialValue:
+                        page.items.any((item) => item.id == _medicineId)
+                        ? _medicineId
+                        : null,
+                    items: page.items
+                        .map(
+                          (medicine) => DropdownMenuItem(
+                            value: medicine.id,
+                            child: Text(
+                              medicine.scientificName == null
+                                  ? medicine.name
+                                  : '${medicine.name} · ${medicine.scientificName}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(growable: false),
+                    onChanged: (value) => setState(() => _medicineId = value),
+                    validator: (value) =>
+                        value == null ? 'اختر الدواء من الدليل.' : null,
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            medicines.when(
-              loading: () => const LinearProgressIndicator(),
-              error: (_, _) => const Text('تعذر تحميل دليل الأدوية.'),
-              data: (page) => DropdownButtonFormField<String>(
-                initialValue: page.items.any((item) => item.id == _medicineId)
-                    ? _medicineId
-                    : null,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'الدواء',
-                  prefixIcon: Icon(Icons.medication_outlined),
+                const SizedBox(height: 16),
+                if (_isOffer) ...[
+                  const _FormSectionTitle(
+                    number: '02',
+                    title: 'صيدلية التحقق والاستلام',
+                    subtitle: 'ستتأكد الصيدلية من سلامة العبوات قبل تسليمها',
+                  ),
+                  const SizedBox(height: 10),
+                  verificationPharmacies.when(
+                    loading: () => const LinearProgressIndicator(),
+                    error: (_, _) =>
+                        const Text('تعذر تحميل صيدليات التحقق المعتمدة.'),
+                    data: (items) => _FormDropdown<String>(
+                      label: 'صيدلية التحقق',
+                      hint: 'اختر الصيدلية المعتمدة',
+                      icon: Icons.verified_outlined,
+                      initialValue: _reviewingPharmacyId,
+                      items: items
+                          .map(
+                            (pharmacy) => DropdownMenuItem(
+                              value: pharmacy.pharmacyId,
+                              child: Text(
+                                '${pharmacy.pharmacyName} · ${pharmacy.area}',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(growable: false),
+                      onChanged: (value) =>
+                          setState(() => _reviewingPharmacyId = value),
+                      validator: (value) => value == null
+                          ? 'اختر الصيدلية التي ستتحقق من التبرع.'
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                _FormSectionTitle(
+                  number: _isOffer ? '03' : '02',
+                  title: 'الجهة والتفاصيل',
+                  subtitle: _isOffer
+                      ? 'حدد الجهة المستفيدة وبيانات العبوات'
+                      : 'حدد الجهة المستهدفة واحتياجك الدوائي',
                 ),
-                items: page.items
-                    .map(
-                      (medicine) => DropdownMenuItem(
-                        value: medicine.id,
-                        child: Text(
-                          medicine.scientificName == null
-                              ? medicine.name
-                              : '${medicine.name} · ${medicine.scientificName}',
-                          overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 10),
+                organizations.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, _) => const Text('تعذر تحميل المنظمات.'),
+                  data: (items) => _FormDropdown<String>(
+                    label: 'المنظمة',
+                    hint: _isOffer
+                        ? 'اختر الجهة المستفيدة'
+                        : 'اختر المنظمة المستهدفة',
+                    icon: Icons.apartment_rounded,
+                    initialValue: _organizationId,
+                    items: [
+                      if (_isOffer)
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('بدون منظمة محددة'),
+                        ),
+                      ...items.map(
+                        (organization) => DropdownMenuItem(
+                          value: organization.organizationId,
+                          child: Text(organization.organizationName),
                         ),
                       ),
-                    )
-                    .toList(growable: false),
-                onChanged: (value) => setState(() => _medicineId = value),
-                validator: (value) =>
-                    value == null ? 'اختر الدواء من الدليل.' : null,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (_isOffer) ...[
-              const _FormSectionTitle(
-                number: '02',
-                title: 'صيدلية التحقق والاستلام',
-                subtitle: 'ستتأكد الصيدلية من سلامة العبوات قبل تسليمها',
-              ),
-              const SizedBox(height: 10),
-              verificationPharmacies.when(
-                loading: () => const LinearProgressIndicator(),
-                error: (_, _) =>
-                    const Text('تعذر تحميل صيدليات التحقق المعتمدة.'),
-                data: (items) => DropdownButtonFormField<String>(
-                  initialValue: _reviewingPharmacyId,
-                  isExpanded: true,
-                  decoration: const InputDecoration(
-                    labelText: 'صيدلية التحقق',
-                    prefixIcon: Icon(Icons.verified_outlined),
+                    ],
+                    onChanged: (value) => setState(() {
+                      _organizationId = value;
+                      _campaignId = null;
+                    }),
+                    validator: (value) => !_isOffer && value == null
+                        ? 'اختر المنظمة المستهدفة.'
+                        : null,
                   ),
-                  items: items
-                      .map(
-                        (pharmacy) => DropdownMenuItem(
-                          value: pharmacy.pharmacyId,
-                          child: Text(
-                            '${pharmacy.pharmacyName} · ${pharmacy.area}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(growable: false),
-                  onChanged: (value) =>
-                      setState(() => _reviewingPharmacyId = value),
-                  validator: (value) => value == null
-                      ? 'اختر الصيدلية التي ستتحقق من التبرع.'
-                      : null,
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
-            _FormSectionTitle(
-              number: _isOffer ? '03' : '02',
-              title: 'الجهة والتفاصيل',
-              subtitle: _isOffer
-                  ? 'حدد الجهة المستفيدة وبيانات العبوات'
-                  : 'حدد الجهة المستهدفة واحتياجك الدوائي',
-            ),
-            const SizedBox(height: 10),
-            organizations.when(
-              loading: () => const LinearProgressIndicator(),
-              error: (_, _) => const Text('تعذر تحميل المنظمات.'),
-              data: (items) => DropdownButtonFormField<String>(
-                initialValue: _organizationId,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'المنظمة',
-                  prefixIcon: Icon(Icons.apartment_rounded),
-                ),
-                items: [
-                  if (_isOffer)
-                    const DropdownMenuItem<String>(
+                const SizedBox(height: 14),
+                _FormDropdown<String?>(
+                  label: 'الحملة (اختياري)',
+                  hint: 'بدون حملة محددة',
+                  icon: Icons.campaign_outlined,
+                  initialValue: _campaignId,
+                  enabled: _organizationId != null,
+                  items: [
+                    const DropdownMenuItem<String?>(
                       value: null,
-                      child: Text('بدون منظمة محددة'),
+                      child: Text('بدون حملة محددة'),
                     ),
-                  ...items.map(
-                    (organization) => DropdownMenuItem(
-                      value: organization.organizationId,
-                      child: Text(organization.organizationName),
+                    ...campaignItems.map(
+                      (campaign) => DropdownMenuItem<String?>(
+                        value: campaign.campaignId,
+                        child: Text(campaign.title),
+                      ),
                     ),
+                  ],
+                  onChanged: (value) => setState(() => _campaignId = value),
+                ),
+                const SizedBox(height: 14),
+                AppTextField(
+                  label: _isOffer
+                      ? 'عدد العبوات المتبرع بها'
+                      : 'عدد العبوات المطلوبة',
+                  hint: 'أدخل كمية بين 1 و1000',
+                  controller: _package,
+                  icon: Icons.numbers_rounded,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    final count = int.tryParse(value ?? '');
+                    return count == null || count < 1 || count > 1000
+                        ? 'أدخل عددًا بين 1 و1000.'
+                        : null;
+                  },
+                ),
+                const SizedBox(height: 14),
+                ListTile(
+                  tileColor: context.appColors.surfaceSoft,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 2,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: BorderSide.none,
+                  ),
+                  leading: const Icon(Icons.event_outlined),
+                  title: Text(
+                    _isOffer ? 'تاريخ انتهاء الدواء' : 'مطلوب قبل تاريخ',
+                  ),
+                  subtitle: Text(
+                    _date == null
+                        ? 'اختياري'
+                        : '${_date!.year}/${_date!.month}/${_date!.day}',
+                  ),
+                  trailing: _date == null
+                      ? const Icon(Icons.chevron_left_rounded)
+                      : IconButton(
+                          onPressed: () => setState(() => _date = null),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                  onTap: _pickDate,
+                ),
+                if (_isOffer) ...[
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('العبوات مغلقة ولم تُفتح'),
+                    subtitle: const Text(
+                      'تأكد من سلامة العبوة قبل تقديم العرض.',
+                    ),
+                    value: _isSealed,
+                    onChanged: (value) => setState(() => _isSealed = value),
                   ),
                 ],
-                onChanged: (value) => setState(() {
-                  _organizationId = value;
-                  _campaignId = null;
-                }),
-                validator: (value) => !_isOffer && value == null
-                    ? 'اختر المنظمة المستهدفة.'
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<String?>(
-              initialValue: _campaignId,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'الحملة (اختياري)',
-                prefixIcon: Icon(Icons.campaign_outlined),
-              ),
-              items: [
-                const DropdownMenuItem<String?>(
-                  value: null,
-                  child: Text('بدون حملة محددة'),
+                const SizedBox(height: 8),
+                AppTextField(
+                  label: 'ملاحظات (اختياري)',
+                  hint: 'أضف أي تفاصيل إضافية',
+                  controller: _notes,
+                  minLines: 3,
+                  maxLines: 5,
                 ),
-                ...campaignItems.map(
-                  (campaign) => DropdownMenuItem<String?>(
-                    value: campaign.campaignId,
-                    child: Text(campaign.title),
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  onPressed: _saving ? null : _submit,
+                  icon: _saving
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Icon(
+                          _isOffer
+                              ? Icons.volunteer_activism_rounded
+                              : Icons.support_agent_rounded,
+                        ),
+                  label: Text(
+                    _saving
+                        ? 'جاري الإرسال...'
+                        : _isOffer
+                        ? 'إرسال عرض التبرع'
+                        : 'إرسال طلب المساعدة',
                   ),
                 ),
               ],
-              onChanged: _organizationId == null
-                  ? null
-                  : (value) => setState(() => _campaignId = value),
             ),
-            const SizedBox(height: 14),
-            TextFormField(
-              initialValue: '1',
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: _isOffer
-                    ? 'عدد العبوات المتبرع بها'
-                    : 'عدد العبوات المطلوبة',
-                prefixIcon: const Icon(Icons.numbers_rounded),
-              ),
-              onChanged: (value) => _packageCount = int.tryParse(value) ?? 0,
-              validator: (value) {
-                final count = int.tryParse(value ?? '');
-                return count == null || count < 1 || count > 1000
-                    ? 'أدخل عددًا بين 1 و1000.'
-                    : null;
-              },
-            ),
-            const SizedBox(height: 14),
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: context.appColors.border),
-              ),
-              leading: const Icon(Icons.event_outlined),
-              title: Text(_isOffer ? 'تاريخ انتهاء الدواء' : 'مطلوب قبل تاريخ'),
-              subtitle: Text(
-                _date == null
-                    ? 'اختياري'
-                    : '${_date!.year}/${_date!.month}/${_date!.day}',
-              ),
-              trailing: _date == null
-                  ? const Icon(Icons.chevron_left_rounded)
-                  : IconButton(
-                      onPressed: () => setState(() => _date = null),
-                      icon: const Icon(Icons.close_rounded),
-                    ),
-              onTap: _pickDate,
-            ),
-            if (_isOffer) ...[
-              const SizedBox(height: 8),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('العبوات مغلقة ولم تُفتح'),
-                subtitle: const Text('تأكد من سلامة العبوة قبل تقديم العرض.'),
-                value: _isSealed,
-                onChanged: (value) => setState(() => _isSealed = value),
-              ),
-            ],
-            const SizedBox(height: 8),
-            TextField(
-              controller: _notes,
-              maxLength: 1000,
-              minLines: 3,
-              maxLines: 5,
-              decoration: const InputDecoration(
-                labelText: 'ملاحظات (اختياري)',
-                alignLabelWithHint: true,
-              ),
-            ),
-            const SizedBox(height: 8),
-            FilledButton.icon(
-              onPressed: _saving ? null : _submit,
-              icon: _saving
-                  ? const SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Icon(
-                      _isOffer
-                          ? Icons.volunteer_activism_rounded
-                          : Icons.support_agent_rounded,
-                    ),
-              label: Text(
-                _saving
-                    ? 'جاري الإرسال...'
-                    : _isOffer
-                    ? 'إرسال عرض التبرع'
-                    : 'إرسال طلب المساعدة',
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -353,6 +350,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
         (_isOffer && reviewingPharmacyId == null)) {
       return;
     }
+    final packageCount = int.tryParse(_package.text) ?? 0;
     setState(() => _saving = true);
     try {
       if (_isOffer) {
@@ -364,7 +362,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                 reviewingPharmacyId: reviewingPharmacyId!,
                 targetOrganizationId: organizationId,
                 campaignId: _campaignId,
-                packageCount: _packageCount,
+                packageCount: packageCount,
                 expiryDateUtc: _date,
                 isSealed: _isSealed,
                 notes: _notes.text,
@@ -379,7 +377,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                 medicineId: medicineId,
                 targetOrganizationId: organizationId!,
                 campaignId: _campaignId,
-                requestedPackageCount: _packageCount,
+                requestedPackageCount: packageCount,
                 neededBeforeUtc: _date,
                 notes: _notes.text,
               ),
@@ -422,7 +420,9 @@ class _DonationFormHero extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      color: isOffer ? context.appColors.surfaceWarm : context.appColors.surfaceSoft,
+      color: isOffer
+          ? context.appColors.surfaceWarm
+          : context.appColors.surfaceSoft,
       borderRadius: BorderRadius.circular(23),
       border: Border.all(
         color: isOffer
@@ -436,14 +436,16 @@ class _DonationFormHero extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: isOffer ? context.appColors.secondary : context.appColors.primary,
+            color: isOffer
+                ? context.appColors.secondary
+                : context.appColors.primary,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Icon(
             isOffer
                 ? Icons.volunteer_activism_rounded
                 : Icons.health_and_safety_outlined,
-            color: isOffer ? context.appColors.primaryDeep : Colors.white,
+            color: isOffer ? context.appColors.primary : Colors.white,
           ),
         ),
         const SizedBox(width: 12),
@@ -491,7 +493,7 @@ class _FormSectionTitle extends StatelessWidget {
         height: 36,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: context.appColors.primaryDeep,
+          color: context.appColors.primary,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -511,11 +513,135 @@ class _FormSectionTitle extends StatelessWidget {
             Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
             Text(
               subtitle,
-              style: TextStyle(color: context.appColors.textMuted, fontSize: 9.5),
+              style: TextStyle(
+                color: context.appColors.textMuted,
+                fontSize: 9.5,
+              ),
             ),
           ],
         ),
       ),
     ],
   );
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel({required this.label, required this.child});
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: TextStyle(
+          color: context.appColors.text,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          height: 1.3,
+        ),
+      ),
+      const SizedBox(height: 8),
+      child,
+    ],
+  );
+}
+
+class _FormDropdown<T> extends StatelessWidget {
+  const _FormDropdown({
+    required this.label,
+    required this.hint,
+    required this.icon,
+    required this.initialValue,
+    required this.items,
+    required this.onChanged,
+    super.key,
+    this.validator,
+    this.enabled = true,
+  });
+
+  final String label;
+  final String hint;
+  final IconData icon;
+  final T? initialValue;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?>? onChanged;
+  final String? Function(T?)? validator;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return _FieldLabel(
+      label: label,
+      child: DropdownButtonFormField<T>(
+        initialValue: initialValue,
+        isExpanded: true,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
+            color: colors.textMuted.withValues(alpha: 0.6),
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          filled: true,
+          fillColor: colors.surfaceSoft,
+          prefixIcon: Icon(icon, size: 21, color: colors.primary),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 46,
+            minHeight: 52,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 15,
+          ),
+          errorStyle: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: colors.danger,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: colors.primary.withValues(alpha: 0.4),
+              width: 1.2,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: colors.danger.withValues(alpha: 0.5),
+              width: 1,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: colors.danger.withValues(alpha: 0.7),
+              width: 1.2,
+            ),
+          ),
+        ),
+        items: items,
+        onChanged: enabled ? onChanged : null,
+        validator: validator,
+        style: TextStyle(
+          color: colors.text,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+        icon: Icon(Icons.keyboard_arrow_down_rounded, color: colors.textMuted),
+      ),
+    );
+  }
 }
