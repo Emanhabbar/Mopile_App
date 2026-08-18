@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/layout.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../controllers/organization_providers.dart';
 
@@ -12,9 +14,10 @@ class OrganizationHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(organizationDashboardProvider);
     return state.when(
-      loading: () => const AppLoadingState(label: 'نجهّز مساحة المنظمة...'),
+      loading: () => AppLoadingState(label: l10n.orgHomeLoading),
       error: (error, _) => AppErrorState(
         error: error,
         onRetry: () => ref.invalidate(organizationDashboardProvider),
@@ -23,62 +26,62 @@ class OrganizationHomePage extends ConsumerWidget {
         onRefresh: () => ref.refresh(organizationDashboardProvider.future),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 112),
+          padding: EdgeInsets.fromLTRB(20, 14, 20, kBottomNavReserved + 12),
           children: [
             RoleDashboardHero(
               title: data.organizationName,
-              subtitle: 'تابع أثر حملاتك واستجابتك لاحتياجات المستفيدين بوضوح.',
+              subtitle: l10n.orgHeroSubtitle,
               icon: Icons.volunteer_activism_rounded,
-              accent: const Color(0xFF286C64),
+              accent: context.appColors.primary,
               badge: data.isApproved
-                  ? 'منظمة معتمدة · ${_verificationLabel(data.verificationStatus)}'
-                  : 'الحساب بانتظار الاعتماد',
+                  ? l10n.verifiedBadge(_verificationLabel(l10n, data.verificationStatus))
+                  : l10n.accountPendingApproval,
             ),
             const SizedBox(height: 22),
-            const RoleSectionHeader(
-              title: 'أثر المنظمة',
-              subtitle: 'مؤشرات الحملات والطلبات الحالية',
+            RoleSectionHeader(
+              title: l10n.orgImpactSection,
+              subtitle: l10n.orgImpactSectionSubtitle,
             ),
             const SizedBox(height: 11),
             RoleMetricsGrid(
               items: [
                 RoleMetricData(
-                  label: 'إجمالي الحملات',
+                  label: l10n.totalCampaigns,
                   value: '${data.totalCampaignsCount}',
                   icon: Icons.campaign_rounded,
                   color: context.appColors.primary,
                 ),
                 RoleMetricData(
-                  label: 'حملات نشطة',
+                  label: l10n.activeCampaigns,
                   value: '${data.activeCampaignsCount}',
                   icon: Icons.track_changes_rounded,
                   color: context.appColors.primary,
                 ),
                 RoleMetricData(
-                  label: 'عروض بانتظارك',
+                  label: l10n.offersWaiting,
                   value: '${data.pendingDonationOffersCount}',
                   icon: Icons.inventory_2_outlined,
-                  color: context.appColors.primaryDeep,
+                  color: context.appColors.primary,
                 ),
                 RoleMetricData(
-                  label: 'طلبات مساعدة',
+                  label: l10n.assistanceRequests,
                   value: '${data.openAssistanceRequestsCount}',
                   icon: Icons.support_agent_rounded,
-                  color: context.appColors.primaryDark,
+                  color: context.appColors.primary,
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            const RoleSectionHeader(
-              title: 'إدارة العمل',
-              subtitle: 'كل مسار يفتح في قسمه مباشرة',
+            RoleSectionHeader(
+              title: l10n.workManagement,
+              subtitle: l10n.workManagementSubtitle,
             ),
             const SizedBox(height: 11),
             RoleActionsGrid(
               items: [
                 RoleActionData(
-                  title: 'الحملات',
-                  subtitle: 'إنشاء وتحديث حالة الحملات',
+                  title: l10n.campaignsLabel,
+                  subtitle: l10n.createUpdateCampaigns,
                   badge: data.activeCampaignsCount > 0
                       ? '${data.activeCampaignsCount}'
                       : null,
@@ -88,31 +91,31 @@ class OrganizationHomePage extends ConsumerWidget {
                       context.go('/organization/workspace?section=campaigns'),
                 ),
                 RoleActionData(
-                  title: 'عروض التبرع',
-                  subtitle: 'مراجعة الأدوية المعروضة',
+                  title: l10n.donationOffersTitle,
+                  subtitle: l10n.reviewOfferedMedicines,
                   badge: data.pendingDonationOffersCount > 0
                       ? '${data.pendingDonationOffersCount}'
                       : null,
                   icon: Icons.volunteer_activism_outlined,
-                  color: context.appColors.primaryDeep,
+                  color: context.appColors.primary,
                   onTap: () =>
                       context.go('/organization/workspace?section=donations'),
                 ),
                 RoleActionData(
-                  title: 'طلبات المساعدة',
-                  subtitle: 'متابعة الحالات والاستجابة لها',
+                  title: l10n.assistanceRequestsTitle,
+                  subtitle: l10n.followCasesAndRespond,
                   badge: data.openAssistanceRequestsCount > 0
                       ? '${data.openAssistanceRequestsCount}'
                       : null,
                   icon: Icons.support_agent_rounded,
-                  color: context.appColors.primaryDark,
+                  color: context.appColors.primary,
                   onTap: () => context.push(
                     '/organization/workspace?section=assistance',
                   ),
                 ),
                 RoleActionData(
-                  title: 'ملف المنظمة',
-                  subtitle: 'البيانات ووثائق التحقق',
+                  title: l10n.orgProfile,
+                  subtitle: l10n.dataAndVerificationDocs,
                   icon: Icons.verified_user_outlined,
                   color: context.appColors.primary,
                   onTap: () =>
@@ -122,10 +125,13 @@ class OrganizationHomePage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             RoleNoticeCard(
-              title: 'حالة التحقق',
+              title: l10n.verificationStatusTitle,
               message: data.verificationDocumentsCount > 0
-                  ? '${_verificationLabel(data.verificationStatus)} · ${data.verificationDocumentsCount} وثائق مرفوعة'
-                  : 'أكمل وثائق التحقق لتعزيز موثوقية المنظمة.',
+                  ? l10n.verificationDocsCount(
+                      _verificationLabel(l10n, data.verificationStatus),
+                      data.verificationDocumentsCount,
+                    )
+                  : l10n.completeVerificationDocs,
               icon: data.verificationDocumentsCount > 0
                   ? Icons.verified_outlined
                   : Icons.upload_file_outlined,
@@ -138,12 +144,12 @@ class OrganizationHomePage extends ConsumerWidget {
             if (data.recentCampaigns.isNotEmpty) ...[
               const SizedBox(height: 24),
               RoleSectionHeader(
-                title: 'أحدث الحملات',
-                subtitle: 'آخر المبادرات المضافة إلى حساب المنظمة',
+                title: l10n.recentCampaigns,
+                subtitle: l10n.recentCampaignsAddedSubtitle,
                 action: TextButton(
                   onPressed: () =>
                       context.go('/organization/workspace?section=campaigns'),
-                  child: const Text('عرض الكل'),
+                  child: Text(l10n.viewAll),
                 ),
               ),
               const SizedBox(height: 10),
@@ -155,7 +161,7 @@ class OrganizationHomePage extends ConsumerWidget {
                       child: RoleNoticeCard(
                         title: campaign.title,
                         message:
-                            '${_campaignStatus(campaign.status)}${campaign.area == null ? '' : ' · ${campaign.area}'}',
+                            '${_campaignStatus(l10n, campaign.status)}${campaign.area == null ? '' : ' · ${campaign.area}'}',
                         icon: campaign.isUrgent
                             ? Icons.priority_high_rounded
                             : Icons.campaign_outlined,
@@ -176,19 +182,21 @@ class OrganizationHomePage extends ConsumerWidget {
   }
 }
 
-String _verificationLabel(String status) => switch (status.toLowerCase()) {
-  'verified' || 'approved' => 'موثقة',
-  'pending' || 'underreview' => 'قيد المراجعة',
-  'needsupdate' => 'تحتاج تحديثاً',
-  'rejected' => 'غير معتمدة',
-  _ => 'حالة التحقق غير محددة',
-};
+String _verificationLabel(AppLocalizations l10n, String status) =>
+    switch (status.toLowerCase()) {
+      'verified' || 'approved' => l10n.verifiedShort,
+      'pending' || 'underreview' => l10n.underReviewShort,
+      'needsupdate' => l10n.needsUpdate,
+      'rejected' => l10n.notApproved,
+      _ => l10n.verificationStatusUnknown,
+    };
 
-String _campaignStatus(String status) => switch (status.toLowerCase()) {
-  'active' => 'نشطة',
-  'draft' => 'مسودة',
-  'paused' => 'متوقفة مؤقتاً',
-  'completed' => 'مكتملة',
-  'cancelled' => 'ملغاة',
-  _ => status,
-};
+String _campaignStatus(AppLocalizations l10n, String status) =>
+    switch (status.toLowerCase()) {
+      'active' => l10n.campaignActive,
+      'draft' => l10n.campaignDraft,
+      'paused' => l10n.campaignPaused,
+      'completed' => l10n.campaignCompleted,
+      'cancelled' => l10n.campaignCancelled,
+      _ => status,
+    };

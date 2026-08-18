@@ -53,7 +53,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         _token.text = result.developmentToken!;
       }
       setState(() {
-        _message = result.message;
+        _message = result.message.isEmpty ? null : result.message;
         _step = 1;
       });
     } catch (error) {
@@ -88,7 +88,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   }
 
   String _errorText(Object error) => error is ApiException
-      ? error.message
+      ? error.localize(AppLocalizations.of(context))
       : AppLocalizations.of(context).forgotOperationFailed;
 
   @override

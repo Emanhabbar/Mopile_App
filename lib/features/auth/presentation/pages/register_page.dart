@@ -219,7 +219,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     final errorMessage = authState.hasError
         ? authState.error is ApiException
-            ? (authState.error! as ApiException).message
+            ? (authState.error! as ApiException).localize(
+                AppLocalizations.of(context),
+              )
             : AppLocalizations.of(context).registerFailed
         : null;
 
@@ -978,7 +980,7 @@ class _BusinessStepState extends ConsumerState<_BusinessStep> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.message),
+            content: Text(e.localize(AppLocalizations.of(context))),
             backgroundColor: context.appColors.danger,
           ),
         );

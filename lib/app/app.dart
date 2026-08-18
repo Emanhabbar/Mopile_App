@@ -19,7 +19,7 @@ class PharmacyApp extends ConsumerWidget {
     final settings = ref.watch(settingsControllerProvider);
 
     return MaterialApp.router(
-      title: 'دوائي',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       locale: locale,

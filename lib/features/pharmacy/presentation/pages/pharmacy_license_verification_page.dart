@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -24,21 +25,22 @@ class _PharmacyLicenseVerificationPageState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(pharmacyLicenseVerificationProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('التحقق من ترخيص الصيدلية'),
+        title: Text(l10n.licenseVerificationTitle),
         actions: [
           IconButton(
             onPressed: () =>
                 ref.invalidate(pharmacyLicenseVerificationProvider),
-            tooltip: 'تحديث الحالة',
+            tooltip: l10n.refreshStatus,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري مراجعة الحالة...'),
+        loading: () => AppLoadingState(label: l10n.reviewingStatus),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(pharmacyLicenseVerificationProvider),
@@ -67,8 +69,8 @@ class _PharmacyLicenseVerificationPageState
                   : const Icon(Icons.upload_file_rounded),
               label: Text(
                 verification == null
-                    ? 'اختيار صورة الترخيص وإرسالها'
-                    : 'إرسال صورة أحدث للترخيص',
+                    ? l10n.selectLicenseImage
+                    : l10n.sendNewLicenseImage,
               ),
             ),
           ],
@@ -78,15 +80,16 @@ class _PharmacyLicenseVerificationPageState
   }
 
   Future<void> _selectAndUpload() async {
+    final l10n = AppLocalizations.of(context);
     const images = XTypeGroup(
-      label: 'صور الترخيص',
+      label: 'license images',
       extensions: ['jpg', 'jpeg', 'png', 'webp'],
     );
     final file = await openFile(acceptedTypeGroups: const [images]);
     if (file == null || !mounted) return;
     final size = await file.length();
     if (size > 8 * 1024 * 1024) {
-      _message('حجم الصورة يجب ألا يتجاوز 8 ميغابايت.', error: true);
+      _message(l10n.imageTooLarge, error: true);
       return;
     }
 
@@ -96,10 +99,10 @@ class _PharmacyLicenseVerificationPageState
           .read(pharmacyRepositoryProvider)
           .submitLicenseVerification(file);
       ref.invalidate(pharmacyLicenseVerificationProvider);
-      _message('تم إرسال الترخيص، ويمكنك متابعة نتيجة المراجعة من هنا.');
+      _message(l10n.licenseSubmitted);
     } catch (error) {
       _message(
-        error is ApiException ? error.message : 'تعذر إرسال صورة الترخيص.',
+        error is ApiException ? error.localize(l10n) : l10n.licenseSubmitFailed,
         error: true,
       );
     } finally {
@@ -124,7 +127,8 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final presentation = _statusPresentation(verification?.status);
+    final l10n = AppLocalizations.of(context);
+    final presentation = _statusPresentation(l10n, verification?.status);
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -157,8 +161,8 @@ class _Header extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             verification == null
-                ? 'أرسل صورة واضحة من الترخيص لبدء المراجعة.'
-                : 'آخر ملف: ${verification!.originalFileName}',
+                ? l10n.sendLicenseIntro
+                : l10n.lastFileLabel(verification!.originalFileName),
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
@@ -173,17 +177,22 @@ class _Instructions extends StatelessWidget {
   final PharmacyLicenseVerification? verification;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('قبل الإرسال', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            l10n.beforeSendingTitle,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 12),
-          const _Tip('التقط الترخيص كاملاً دون قص الحواف.'),
-          const _Tip('تأكد من وضوح الاسم والرقم والأختام.'),
-          const _Tip('الصيغ المقبولة: JPG أو PNG أو WEBP.'),
+          _Tip(l10n.tipFullLicense),
+          _Tip(l10n.tipClearDetails),
+          _Tip(l10n.tipAcceptedFormats),
           if (verification?.failureReason != null ||
               verification?.rejectionReason != null) ...[
             const Divider(height: 24),
@@ -198,7 +207,8 @@ class _Instructions extends StatelessWidget {
         ],
       ),
     ),
-  );
+    );
+  }
 }
 
 class _Tip extends StatelessWidget {
@@ -226,31 +236,34 @@ class _VerificationDetails extends StatelessWidget {
   final PharmacyLicenseVerification verification;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'تفاصيل المراجعة',
+            l10n.reviewDetailsTitle,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          _row(context, 'الاسم المسجل', verification.registeredName),
+          _row(context, l10n.registeredNameLabel, verification.registeredName),
           if (verification.extractedName != null)
-            _row(context, 'الاسم في الترخيص', verification.extractedName!),
+            _row(context, l10n.licenseNameLabel, verification.extractedName!),
           if (verification.registryNumber != null)
-            _row(context, 'رقم السجل', verification.registryNumber!),
+            _row(context, l10n.registryNumberLabel, verification.registryNumber!),
           if (verification.documentSerialNumber != null)
-            _row(context, 'رقم الوثيقة', verification.documentSerialNumber!),
-          _row(context, 'عدد مرات الإرسال', '${verification.attemptCount}'),
+            _row(context, l10n.documentNumberLabel, verification.documentSerialNumber!),
+          _row(context, l10n.attemptCountLabel, '${verification.attemptCount}'),
           if (verification.manualReviewNote != null)
-            _row(context, 'ملاحظة المراجعة', verification.manualReviewNote!),
+            _row(context, l10n.manualReviewNoteLabel, verification.manualReviewNote!),
         ],
       ),
     ),
-  );
+    );
+  }
 
   Widget _row(BuildContext context, String label, String value) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
@@ -275,22 +288,22 @@ class _VerificationDetails extends StatelessWidget {
   );
 }
 
-(String, IconData) _statusPresentation(String? value) {
+(String, IconData) _statusPresentation(AppLocalizations l10n, String? value) {
   switch (value?.toLowerCase()) {
     case 'approved':
     case 'verified':
-      return ('تم التحقق من الترخيص', Icons.verified_rounded);
+      return (l10n.licenseStatusVerified, Icons.verified_rounded);
     case 'rejected':
-      return ('يحتاج الترخيص إلى إعادة إرسال', Icons.error_outline_rounded);
+      return (l10n.licenseStatusRejected, Icons.error_outline_rounded);
     case 'failed':
-      return ('تعذرت قراءة الترخيص', Icons.document_scanner_outlined);
+      return (l10n.licenseStatusFailed, Icons.document_scanner_outlined);
     case 'manualreview':
     case 'manual_review':
-      return ('قيد المراجعة', Icons.manage_search_rounded);
+      return (l10n.licenseStatusManualReview, Icons.manage_search_rounded);
     case 'pending':
     case 'processing':
-      return ('جاري مراجعة الترخيص', Icons.hourglass_top_rounded);
+      return (l10n.licenseStatusProcessing, Icons.hourglass_top_rounded);
     default:
-      return ('توثيق ترخيص الصيدلية', Icons.badge_outlined);
+      return (l10n.licenseStatusDefault, Icons.badge_outlined);
   }
 }

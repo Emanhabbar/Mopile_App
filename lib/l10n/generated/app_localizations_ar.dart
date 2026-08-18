@@ -1379,7 +1379,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get donations => 'التبرعات';
 
   @override
-  String get donationsSubtitle => 'قدّم دواءً أو اطلب مساعدة';
+  String get donationsSubtitle => 'دواء يصل إلى من يحتاجه';
 
   @override
   String get organizations => 'المنظمات';
@@ -1604,4 +1604,3717 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get noNearbyMessage =>
       'وسّع مسافة البحث أو حدّث موقعك ثم حاول مجددًا.';
+
+  @override
+  String get chatAssistantSubtitle => 'إرشاد سريع للوصول إلى خدمات دوائي';
+
+  @override
+  String get chatLoadingSessions => 'جاري تحميل المحادثات...';
+
+  @override
+  String get previousChats => 'المحادثات السابقة';
+
+  @override
+  String get newChat => 'محادثة جديدة';
+
+  @override
+  String get chatTitleOptional => 'عنوان المحادثة (اختياري)';
+
+  @override
+  String get start => 'بدء';
+
+  @override
+  String get startChatFailed => 'تعذر بدء المحادثة حاليًا.';
+
+  @override
+  String get howCanIHelp => 'كيف يمكنني مساعدتك؟';
+
+  @override
+  String get chatHeroSubtitle =>
+      'ابحث عن دواء، صيدلية قريبة، أو خدمة داخل التطبيق.';
+
+  @override
+  String get nearbyPharmacy => 'صيدلية قريبة';
+
+  @override
+  String get healthServicesHint => 'خدمات صحية';
+
+  @override
+  String get chatSessionTitle => 'محادثة دوائية';
+
+  @override
+  String messageCount(Object count) {
+    return '$count رسائل';
+  }
+
+  @override
+  String get noPreviousChats => 'لا توجد محادثات سابقة';
+
+  @override
+  String get notificationsTitle => 'الإشعارات';
+
+  @override
+  String get notificationsSubtitle => 'كل جديد في مكان واحد';
+
+  @override
+  String get markingAllRead => 'جاري التحديث...';
+
+  @override
+  String get markAllRead => 'قراءة الكل';
+
+  @override
+  String get notificationsLoading => 'جاري تحميل الإشعارات...';
+
+  @override
+  String get notifUpdateFailed => 'تعذر تحديث الإشعار.';
+
+  @override
+  String markedReadCount(Object count) {
+    return 'تم تعليم $count إشعارات كمقروءة.';
+  }
+
+  @override
+  String get notificationsUpdateFailed => 'تعذر تحديث الإشعارات.';
+
+  @override
+  String get notifStatTotal => 'الإجمالي';
+
+  @override
+  String get notifStatNew => 'جديدة';
+
+  @override
+  String get notifStatRead => 'مقروءة';
+
+  @override
+  String get unreadOnlyLabel => 'الجديدة فقط';
+
+  @override
+  String get notificationTypeHint => 'نوع الإشعار';
+
+  @override
+  String get allNotifications => 'جميع الإشعارات';
+
+  @override
+  String get notifTypePrescriptions => 'الوصفات';
+
+  @override
+  String get notifTypeRequests => 'الطلبات';
+
+  @override
+  String get notifTypeReminders => 'التذكيرات';
+
+  @override
+  String get notifTypeApprovals => 'الموافقات';
+
+  @override
+  String get notifTypeVerification => 'التحقق';
+
+  @override
+  String get notifTypeGeneral => 'عام';
+
+  @override
+  String get noNotifications => 'لا توجد إشعارات لعرضها';
+
+  @override
+  String get endedConversation => 'محادثة منتهية';
+
+  @override
+  String get readyToHelp => 'جاهز لمساعدتك';
+
+  @override
+  String get endConversation => 'إنهاء المحادثة';
+
+  @override
+  String get chatLoadingMessages => 'جاري تحميل الرسائل...';
+
+  @override
+  String get sendMessageFailed => 'تعذر إرسال الرسالة.';
+
+  @override
+  String get referencesTitle => 'مراجع دوائية مرتبطة بالإجابة';
+
+  @override
+  String get referenceFallback => 'بيانات دوائية مرجعية';
+
+  @override
+  String get conversationNotice =>
+      'اكتب سؤالك بوضوح لتحصل على نتيجة أدق، ولا تعتمد على المحادثة في الحالات الطارئة.';
+
+  @override
+  String get conversationEndedHint => 'تم إنهاء هذه المحادثة';
+
+  @override
+  String get typeYourMessage => 'اكتب رسالتك...';
+
+  @override
+  String get intelligenceTitle => 'المعلومات الدوائية الذكية';
+
+  @override
+  String get searchAlternativesTitle => 'البحث عن بدائل';
+
+  @override
+  String get medicineAlternativesHint => 'أدخل اسم الدواء للبحث عن بدائل';
+
+  @override
+  String get showAlternatives => 'عرض البدائل';
+
+  @override
+  String get noAlternativesFound => 'لم يتم العثور على بدائل مناسبة.';
+
+  @override
+  String get stockoutPredictionTitle => 'توقع نفاد المخزون';
+
+  @override
+  String get stockLabel => 'المخزون';
+
+  @override
+  String get soldLabel => 'المباع';
+
+  @override
+  String get averageDailyLabel => 'المتوسط اليومي';
+
+  @override
+  String get sales7DaysLabel => 'مبيعات 7 أيام';
+
+  @override
+  String get sales30DaysLabel => 'مبيعات 30 يومًا';
+
+  @override
+  String get analyzing => 'جاري التحليل...';
+
+  @override
+  String get analyzeStock => 'تحليل المخزون';
+
+  @override
+  String get enterMedicineFirst => 'أدخل اسم الدواء أولًا.';
+
+  @override
+  String get intelligenceUnavailable =>
+      'الخدمة الذكية غير متاحة حاليًا. حاول لاحقًا.';
+
+  @override
+  String get intelligenceIntro =>
+      'نتائج مساعدة لاتخاذ القرار، ويجب مراجعة المختص قبل استبدال أي دواء.';
+
+  @override
+  String predictionResult(String days, Object quantity) {
+    return 'متوقع النفاد خلال $days يوم\nالكمية المقترحة للطلب: $quantity';
+  }
+
+  @override
+  String get openNow => 'مفتوحة الآن';
+
+  @override
+  String get closedNow => 'مغلقة الآن';
+
+  @override
+  String ratingOf(String rating, Object count) {
+    return '$rating من $count تقييم';
+  }
+
+  @override
+  String get openDirections => 'فتح الاتجاهات';
+
+  @override
+  String get externalPharmacyNotice =>
+      'هذه الصيدلية معروضة من خدمة الخرائط وقد لا تكون مسجلة داخل منصة دوائي.';
+
+  @override
+  String distanceMetersFull(String value) {
+    return '$value متر';
+  }
+
+  @override
+  String get organizationsAndCampaignsTitle => 'المنظمات والحملات';
+
+  @override
+  String get activeCampaignsTitle => 'الحملات النشطة';
+
+  @override
+  String get activeCampaignsSubtitle => 'مبادرات دوائية متاحة للمساهمة';
+
+  @override
+  String get campaignsLoading => 'جاري تحميل الحملات...';
+
+  @override
+  String get noActiveCampaigns => 'لا توجد حملات نشطة حاليًا.';
+
+  @override
+  String get approvedOrganizationsTitle => 'المنظمات المعتمدة';
+
+  @override
+  String get approvedOrganizationsSubtitle => 'استعرض الجهات وحملاتها الحالية';
+
+  @override
+  String get organizationsLoading => 'جاري تحميل المنظمات...';
+
+  @override
+  String get noApprovedOrganizations => 'لا توجد منظمات معتمدة حاليًا.';
+
+  @override
+  String get medicineReachesWhoNeedsIt => 'دواء يصل لمن يحتاجه';
+
+  @override
+  String orgCampaignSummary(String orgs, String campaigns) {
+    return '$orgs منظمة • $campaigns حملة نشطة';
+  }
+
+  @override
+  String activeCampaignCount(Object count) {
+    return '$count حملة نشطة';
+  }
+
+  @override
+  String get urgent => 'عاجلة';
+
+  @override
+  String needLabel(String summary) {
+    return 'الاحتياج: $summary';
+  }
+
+  @override
+  String get organizationDetailsTitle => 'تفاصيل المنظمة';
+
+  @override
+  String get organizationLoading => 'جاري تحميل المنظمة...';
+
+  @override
+  String get approvedOrganizationLabel => 'منظمة معتمدة';
+
+  @override
+  String registrationNumber(Object number) {
+    return 'رقم التسجيل: $number';
+  }
+
+  @override
+  String requestedMedicinesLabel(String summary) {
+    return 'الأدوية المطلوبة: $summary';
+  }
+
+  @override
+  String get donateOffer => 'تقديم عرض تبرع';
+
+  @override
+  String get prescriptionStatusReserved => 'محجوزة';
+
+  @override
+  String get prescriptionStatusReady => 'جاهزة للاستلام';
+
+  @override
+  String get prescriptionStatusCollected => 'تم الاستلام';
+
+  @override
+  String get prescriptionStatusExpired => 'منتهية';
+
+  @override
+  String get prescriptionStatusCancelled => 'ملغاة';
+
+  @override
+  String get prescriptionStatusAnalyzed => 'تم التحليل';
+
+  @override
+  String get myPrescriptionsTitle => 'وصفاتي الطبية';
+
+  @override
+  String get prescriptionsLoading => 'جاري تحميل الوصفات...';
+
+  @override
+  String get previousPrescriptions => 'الوصفات السابقة';
+
+  @override
+  String get prescriptionFileTooLarge =>
+      'يجب ألا يتجاوز حجم الوصفة 10 ميغابايت.';
+
+  @override
+  String get prescriptionAnalyzeFailed => 'تعذر تحليل الوصفة حاليًا.';
+
+  @override
+  String get addNewPrescription => 'إضافة وصفة جديدة';
+
+  @override
+  String get uploadPrescriptionHint =>
+      'اختر صورة واضحة أو ملف PDF لوصفة مطبوعة، بحجم أقصى 10 ميغابايت.';
+
+  @override
+  String get choosePrescription => 'اختيار الوصفة';
+
+  @override
+  String get prescriptionFallbackTitle => 'وصفة طبية';
+
+  @override
+  String prescriptionItemsCount(Object count) {
+    return '$count أدوية';
+  }
+
+  @override
+  String get noPrescriptions => 'لم تتم إضافة أي وصفة بعد';
+
+  @override
+  String get prescriptionOrdersTitle => 'طلبات الوصفات';
+
+  @override
+  String get refreshOrders => 'تحديث الطلبات';
+
+  @override
+  String get ordersLoading => 'جاري تحميل الطلبات...';
+
+  @override
+  String matchPercentage(String percent) {
+    return 'تطابق $percent٪';
+  }
+
+  @override
+  String get confirmDeliveryTitle => 'تأكيد تسليم الوصفة';
+
+  @override
+  String get pickupCodeLabel => 'رمز الاستلام';
+
+  @override
+  String get pickupCodeHint => 'أدخل رمز الاستلام المكون من 8 أرقام';
+
+  @override
+  String get confirm => 'تأكيد';
+
+  @override
+  String get invalidPickupCode => 'أدخل رمز الاستلام المكون من 8 أرقام.';
+
+  @override
+  String get prescriptionCollectedMsg => 'تم تأكيد استلام الوصفة.';
+
+  @override
+  String get prescriptionReadyMsg => 'تم تحديث الطلب إلى جاهز للاستلام.';
+
+  @override
+  String get prescriptionStatusUpdateFailed => 'تعذر تحديث حالة الوصفة.';
+
+  @override
+  String get markReadyAction => 'تحديد كجاهزة للاستلام';
+
+  @override
+  String get confirmDeliveryWithCode => 'تأكيد التسليم بالرمز';
+
+  @override
+  String get pharmacyPrescriptionsTitle => 'وصفات الصيدلية';
+
+  @override
+  String get pharmacyPrescriptionsSubtitle =>
+      'جهّز الوصفة ثم أكّد تسليمها بالرمز';
+
+  @override
+  String get orderFactActive => 'نشطة';
+
+  @override
+  String get orderFactReady => 'جاهزة';
+
+  @override
+  String get noPharmacyOrders => 'لا توجد طلبات وصفات للصيدلية';
+
+  @override
+  String get prescriptionDetailsTitle => 'تفاصيل الوصفة';
+
+  @override
+  String get prescriptionDetailsLoading => 'جاري تحميل الوصفة...';
+
+  @override
+  String get medicinesTitle => 'الأدوية';
+
+  @override
+  String itemsCount(Object count) {
+    return '$count عناصر';
+  }
+
+  @override
+  String get availablePharmaciesTitle => 'الصيدليات المتاحة';
+
+  @override
+  String get availablePharmaciesSubtitle => 'اختر صيدلية لحجز الأدوية المتوفرة';
+
+  @override
+  String get noMatchingPharmacy => 'لا توجد صيدلية مطابقة حاليًا.';
+
+  @override
+  String get editReminders => 'تعديل التذكيرات';
+
+  @override
+  String get activateMedicineReminders => 'تفعيل تذكيرات الدواء';
+
+  @override
+  String get cancelPrescription => 'إلغاء الوصفة';
+
+  @override
+  String reservedAt(String name) {
+    return 'تم حجز الوصفة لدى $name.';
+  }
+
+  @override
+  String get reserveFailed => 'تعذر حجز الوصفة.';
+
+  @override
+  String get cancelPrescriptionTitle => 'إلغاء الوصفة؟';
+
+  @override
+  String get cancelPrescriptionConfirm =>
+      'سيتم إلغاء الحجز وإعادة الكميات إلى مخزون الصيدلية.';
+
+  @override
+  String get prescriptionCancelled => 'تم إلغاء الوصفة.';
+
+  @override
+  String get cancelFailed => 'تعذر إلغاء الوصفة.';
+
+  @override
+  String get remindersSaved => 'تم حفظ إعدادات التذكير.';
+
+  @override
+  String get remindersSaveFailed => 'تعذر حفظ التذكيرات.';
+
+  @override
+  String get importantWarnings => 'تنبيهات مهمة';
+
+  @override
+  String prescriptionMedicinesAvailable(Object available, Object total) {
+    return '$available/$total أدوية متوفرة';
+  }
+
+  @override
+  String get reserveFullPrescription => 'حجز الوصفة كاملة';
+
+  @override
+  String get reserveAvailableMedicines => 'حجز الأدوية المتوفرة';
+
+  @override
+  String get pickupCodeTitle => 'رمز استلام الوصفة';
+
+  @override
+  String get pickupCodeNote => 'قدّم هذا الرمز للصيدلية عند الاستلام.';
+
+  @override
+  String get reminderSettingsTitle => 'إعداد التذكيرات';
+
+  @override
+  String get dailyDoseReminder => 'تذكير الجرعات اليومية';
+
+  @override
+  String get refillReminder => 'تذكير إعادة التعبئة';
+
+  @override
+  String get reminderTime => 'وقت التذكير';
+
+  @override
+  String get treatmentDurationLabel => 'مدة العلاج بالأيام';
+
+  @override
+  String get refillAfterLabel => 'التعبئة بعد أيام';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get medicinesCatalogTitle => 'دليل الأدوية';
+
+  @override
+  String get addMedicine => 'إضافة دواء';
+
+  @override
+  String get catalogLoading => 'جاري تحميل دليل الأدوية...';
+
+  @override
+  String get catalogSubtitle => 'ابحث عن الأدوية واطلع على تفاصيلها';
+
+  @override
+  String get searchLabel => 'بحث';
+
+  @override
+  String get catalogSearchHint => 'ابحث باسم الدواء، الاسم العلمي أو الشركة';
+
+  @override
+  String get byPrescriptionTag => 'بوصفة طبية';
+
+  @override
+  String get loadingMore => 'جاري تحميل المزيد...';
+
+  @override
+  String get emptyCatalogTitle => 'دليل الأدوية فارغ';
+
+  @override
+  String get noSearchResultsTitle => 'لا توجد نتائج مطابقة';
+
+  @override
+  String get emptyCatalogNoSearch => 'ستظهر الأدوية المسجلة هنا.';
+
+  @override
+  String get noSearchResultsHint => 'جرّب اسمًا آخر أو جزءًا من الاسم العلمي.';
+
+  @override
+  String get medicineDetailsTitle => 'تفاصيل الدواء';
+
+  @override
+  String get medicineDetailsLoading => 'جاري تحميل بيانات الدواء...';
+
+  @override
+  String get withoutPrescription => 'بدون وصفة';
+
+  @override
+  String get pharmaInfoTitle => 'المعلومات الدوائية';
+
+  @override
+  String get arabicScientificNameLabel => 'الاسم العلمي بالعربية';
+
+  @override
+  String get englishScientificNameLabel => 'الاسم العلمي بالإنكليزية';
+
+  @override
+  String get englishNameLabel => 'الاسم الإنكليزي';
+
+  @override
+  String get barcodeLabel => 'الباركود';
+
+  @override
+  String get compositionLabel => 'التركيب';
+
+  @override
+  String get dosageFormLabel => 'الشكل الدوائي';
+
+  @override
+  String get capacityLabel => 'السعة أو التركيز';
+
+  @override
+  String get packageSizeLabel => 'حجم العبوة';
+
+  @override
+  String get manufacturingTitle => 'التصنيع والتوفر';
+
+  @override
+  String get manufacturerLabel => 'الشركة المصنعة';
+
+  @override
+  String get referenceQuantityLabel => 'الكمية المرجعية';
+
+  @override
+  String get sellingPriceLabel => 'سعر البيع';
+
+  @override
+  String get purchasePriceLabel => 'سعر الشراء';
+
+  @override
+  String get editArabicNames => 'تعديل الاسم العربي وأسماء البحث';
+
+  @override
+  String get medicineArabicDataTitle => 'البيانات العربية للدواء';
+
+  @override
+  String get arabicNameLabel => 'الاسم العربي';
+
+  @override
+  String get otherSearchNamesLabel => 'أسماء أخرى للبحث';
+
+  @override
+  String get aliasesSeparatorHint => 'افصل بين الأسماء بفاصلة';
+
+  @override
+  String get arabicDataUpdated => 'تم تحديث البيانات العربية للدواء.';
+
+  @override
+  String get dataSaveFailed => 'تعذر حفظ البيانات.';
+
+  @override
+  String get quickFormLabel => 'الشكل';
+
+  @override
+  String get descriptionTitle => 'الوصف';
+
+  @override
+  String get disclaimerText =>
+      'هذه البيانات تعريفية. التزم بتوجيهات الطبيب أو الصيدلي ولا تغيّر علاجك دون استشارة مختص.';
+
+  @override
+  String get createMedicineIntro =>
+      'أدخل بيانات الدواء بدقة. سيصبح الدواء متاحًا للصيدليات لإضافته إلى مخزونها بعد الحفظ.';
+
+  @override
+  String get basicDataTitle => 'البيانات الأساسية';
+
+  @override
+  String get englishTradeNameLabel => 'الاسم التجاري بالإنكليزية';
+
+  @override
+  String get englishTradeNameHint => 'مثال: Paracetamol 500';
+
+  @override
+  String get medicineNameRequired => 'اسم الدواء مطلوب.';
+
+  @override
+  String get arabicTradeNameLabel => 'الاسم التجاري بالعربية';
+
+  @override
+  String get arabicTradeNameHint => 'مثال: باراسيتامول 500';
+
+  @override
+  String get barcodeHint => 'أرقام أو أحرف أو شرطة';
+
+  @override
+  String get optionalHint => 'اختياري';
+
+  @override
+  String get categoryManufacturingTitle => 'التصنيف والتصنيع';
+
+  @override
+  String get capacityFieldLabel => 'السعة';
+
+  @override
+  String get capacityHint => '500 mg';
+
+  @override
+  String get packageSizeHint => 'مثال: 20 قرصًا';
+
+  @override
+  String get detailedInfoTitle => 'المعلومات التفصيلية';
+
+  @override
+  String get compositionHint => 'المواد الفعالة والتركيب';
+
+  @override
+  String get descriptionLabel => 'الوصف';
+
+  @override
+  String get descriptionHint => 'وصف مختصر ودقيق للدواء';
+
+  @override
+  String get saveMedicine => 'حفظ الدواء';
+
+  @override
+  String get medicineAdded => 'تمت إضافة الدواء بنجاح.';
+
+  @override
+  String get medicineAddFailed => 'تعذر إضافة الدواء حاليًا.';
+
+  @override
+  String get requiresPrescriptionSwitchTitle => 'يتطلب وصفة طبية';
+
+  @override
+  String get requiresPrescriptionSwitchSubtitle =>
+      'فعّل الخيار إذا كان صرف الدواء يحتاج وصفة';
+
+  @override
+  String maxLengthMessage(Object max) {
+    return 'الحد الأقصى $max حرفًا.';
+  }
+
+  @override
+  String get maxLength64 => 'الحد الأقصى 64 محرفًا.';
+
+  @override
+  String get barcodeInvalidChars =>
+      'استخدم الأرقام أو الأحرف الإنكليزية أو الشرطة فقط.';
+
+  @override
+  String get enterValidNumber => 'أدخل رقمًا صحيحًا.';
+
+  @override
+  String get valueNotNegative => 'لا يمكن أن تكون القيمة سالبة.';
+
+  @override
+  String get enterValidInteger => 'أدخل عددًا صحيحًا.';
+
+  @override
+  String get donationsTitle => 'التبرعات والمساعدة';
+
+  @override
+  String get donationOfferAction => 'عرض تبرع';
+
+  @override
+  String get assistanceRequestAction => 'طلب مساعدة';
+
+  @override
+  String get givingStartsWithStep => 'العطاء يبدأ بخطوة';
+
+  @override
+  String get donationHeroSubtitle =>
+      'قدّم دواءً صالحًا أو اطلب المساعدة عبر الجهات المشاركة.';
+
+  @override
+  String get donationOffersTab => 'عروض التبرع';
+
+  @override
+  String get assistanceRequestsTab => 'طلبات المساعدة';
+
+  @override
+  String get offersLoading => 'جاري تحميل عروضك...';
+
+  @override
+  String get noDonationOffers => 'لا توجد عروض تبرع موجهة للمنظمة.';
+
+  @override
+  String get noAssistanceRequests => 'لا توجد طلبات مساعدة حاليًا.';
+
+  @override
+  String get donationStatusApproved => 'مقبول';
+
+  @override
+  String get donationStatusReceived => 'تم الاستلام';
+
+  @override
+  String get donationStatusRejected => 'مرفوض';
+
+  @override
+  String get donationStatusFulfilled => 'تمت المساعدة';
+
+  @override
+  String get donationStatusCancelled => 'ملغى';
+
+  @override
+  String get donationStatusUnderReview => 'قيد المراجعة';
+
+  @override
+  String get donationStatusOpen => 'مفتوح';
+
+  @override
+  String get statusOpen => 'مفتوح';
+
+  @override
+  String packagesCount(Object count) {
+    return '$count عبوات';
+  }
+
+  @override
+  String get targetOrganization => 'منظمة';
+
+  @override
+  String campaignLabel(String title) {
+    return 'الحملة: $title';
+  }
+
+  @override
+  String organizationNoteLabel(String note) {
+    return 'ملاحظة المنظمة: $note';
+  }
+
+  @override
+  String neededBeforeLabel(String date) {
+    return 'مطلوب قبل $date';
+  }
+
+  @override
+  String organizationResponseLabel(String note) {
+    return 'رد المنظمة: $note';
+  }
+
+  @override
+  String get verifyDonationsTitle => 'التحقق من التبرعات';
+
+  @override
+  String get verifyDonationsSubtitle => 'سلامة الدواء قبل وصوله للمستفيد';
+
+  @override
+  String get donationOffersLoading => 'جاري تحميل عروض التبرع...';
+
+  @override
+  String get noDonationsToVerify => 'لا توجد تبرعات بانتظار التحقق.';
+
+  @override
+  String get reviewNoteLabel => 'ملاحظة الفحص (اختياري)';
+
+  @override
+  String get reviewNoteHint => 'أضف ملاحظات حول فحص التبرع';
+
+  @override
+  String get donationStatusUpdated => 'تم تحديث حالة التبرع بنجاح.';
+
+  @override
+  String get donationUpdateFailed => 'تعذر تحديث التبرع.';
+
+  @override
+  String get pharmacyReviewTitle => 'مراجعة دقيقة وآمنة';
+
+  @override
+  String get pharmacyReviewSubtitle =>
+      'افحص العبوات ثم حدّث حالتها حسب نتيجة التحقق.';
+
+  @override
+  String donorLabel(String name) {
+    return 'المتبرع: $name';
+  }
+
+  @override
+  String beneficiaryLabel(String name) {
+    return 'الجهة المستفيدة: $name';
+  }
+
+  @override
+  String expiryLabel(String date) {
+    return 'الانتهاء: $date';
+  }
+
+  @override
+  String get acceptAfterInspection => 'قبول بعد الفحص';
+
+  @override
+  String get reject => 'رفض';
+
+  @override
+  String get confirmReceivePackages => 'تأكيد استلام العبوات';
+
+  @override
+  String get statusPendingInspection => 'بانتظار الفحص';
+
+  @override
+  String get actionApproveDonation => 'اعتماد التبرع';
+
+  @override
+  String get actionRejectDonation => 'رفض التبرع';
+
+  @override
+  String get actionConfirmReceipt => 'تأكيد الاستلام';
+
+  @override
+  String get actionUpdateDonation => 'تحديث التبرع';
+
+  @override
+  String get offerDonationTitle => 'تقديم عرض تبرع';
+
+  @override
+  String get assistanceRequestPageTitle => 'طلب مساعدة دوائية';
+
+  @override
+  String get chooseMedicineSection => 'اختيار الدواء';
+
+  @override
+  String get chooseMedicineSectionSubtitle =>
+      'ابحث في دليل الأدوية وحدد الصنف المطلوب';
+
+  @override
+  String get medicineSearchLabel => 'البحث عن دواء';
+
+  @override
+  String get medicineSearchHint => 'ابحث باسم الدواء ثم اختر من النتائج';
+
+  @override
+  String get catalogLoadFailed => 'تعذر تحميل دليل الأدوية.';
+
+  @override
+  String get medicineDropdownLabel => 'الدواء';
+
+  @override
+  String get medicineDropdownHint => 'اختر الدواء من الدليل';
+
+  @override
+  String get chooseMedicineFromCatalog => 'اختر الدواء من الدليل.';
+
+  @override
+  String get verificationPharmacySection => 'صيدلية التحقق والاستلام';
+
+  @override
+  String get verificationPharmacySectionSubtitle =>
+      'ستتأكد الصيدلية من سلامة العبوات قبل تسليمها';
+
+  @override
+  String get verificationPharmaciesLoadFailed =>
+      'تعذر تحميل صيدليات التحقق المعتمدة.';
+
+  @override
+  String get verificationPharmacyLabel => 'صيدلية التحقق';
+
+  @override
+  String get verificationPharmacyHint => 'اختر الصيدلية المعتمدة';
+
+  @override
+  String get chooseVerificationPharmacy =>
+      'اختر الصيدلية التي ستتحقق من التبرع.';
+
+  @override
+  String get organizationSection => 'الجهة والتفاصيل';
+
+  @override
+  String get organizationSectionOfferSubtitle =>
+      'حدد الجهة المستفيدة وبيانات العبوات';
+
+  @override
+  String get organizationSectionRequestSubtitle =>
+      'حدد الجهة المستهدفة واحتياجك الدوائي';
+
+  @override
+  String get organizationsLoadFailed => 'تعذر تحميل المنظمات.';
+
+  @override
+  String get organizationDropdownLabel => 'المنظمة';
+
+  @override
+  String get organizationDropdownOfferHint => 'اختر الجهة المستفيدة';
+
+  @override
+  String get organizationDropdownRequestHint => 'اختر المنظمة المستهدفة';
+
+  @override
+  String get noSpecificOrganization => 'بدون منظمة محددة';
+
+  @override
+  String get chooseTargetOrganization => 'اختر المنظمة المستهدفة.';
+
+  @override
+  String get campaignOptionalLabel => 'الحملة (اختياري)';
+
+  @override
+  String get noSpecificCampaign => 'بدون حملة محددة';
+
+  @override
+  String get donatedPackagesLabel => 'عدد العبوات المتبرع بها';
+
+  @override
+  String get requestedPackagesLabel => 'عدد العبوات المطلوبة';
+
+  @override
+  String get packageCountHint => 'أدخل كمية بين 1 و1000';
+
+  @override
+  String get packageCountInvalid => 'أدخل عددًا بين 1 و1000.';
+
+  @override
+  String get medicineExpiryDate => 'تاريخ انتهاء الدواء';
+
+  @override
+  String get neededBeforeDate => 'مطلوب قبل تاريخ';
+
+  @override
+  String get sealedPackagesTitle => 'العبوات مغلقة ولم تُفتح';
+
+  @override
+  String get sealedPackagesSubtitle => 'تأكد من سلامة العبوة قبل تقديم العرض.';
+
+  @override
+  String get notesOptionalLabel => 'ملاحظات (اختياري)';
+
+  @override
+  String get notesHint => 'أضف أي تفاصيل إضافية';
+
+  @override
+  String get offerSubmitted => 'تم إرسال العرض إلى صيدلية التحقق بنجاح.';
+
+  @override
+  String get assistanceSubmitted => 'تم إرسال طلب المساعدة إلى المنظمة.';
+
+  @override
+  String get submitFailed => 'تعذر إرسال البيانات حاليًا.';
+
+  @override
+  String get donationOfferHeroTitle => 'عرض تبرع دوائي';
+
+  @override
+  String get donationOfferHeroSubtitle =>
+      'أدخل بيانات دقيقة لتسهيل التحقق والاستلام.';
+
+  @override
+  String get assistanceHeroTitle => 'طلب مساعدة دوائية';
+
+  @override
+  String get assistanceHeroSubtitle =>
+      'أدخل احتياجك واختر المنظمة المناسبة للطلب.';
+
+  @override
+  String get scanMedicineBarcode => 'مسح باركود الدواء';
+
+  @override
+  String get toggleFlash => 'تشغيل الإضاءة';
+
+  @override
+  String get cameraError =>
+      'تعذر تشغيل الكاميرا. اسمح للتطبيق باستخدامها أو أدخل الباركود يدوياً.';
+
+  @override
+  String get placeBarcodeInFrame => 'ضع الرمز داخل الإطار وثبّت الهاتف للحظة';
+
+  @override
+  String get enterBarcodeManually => 'إدخال الباركود يدوياً';
+
+  @override
+  String get enterBarcodeTitle => 'إدخال الباركود';
+
+  @override
+  String get barcodeNumberLabel => 'رقم الباركود';
+
+  @override
+  String get use => 'استخدام';
+
+  @override
+  String get medicineRequestsTitle => 'طلبات الأدوية';
+
+  @override
+  String get searchRequestField => 'ابحث بالدواء أو اسم المستخدم أو الهاتف';
+
+  @override
+  String get requestsOverviewTitle => 'متابعة الطلبات';
+
+  @override
+  String pendingNeedReply(Object count) {
+    return '$count طلب يحتاج إلى ردك الآن';
+  }
+
+  @override
+  String get noPendingRequests => 'لا توجد طلبات معلّقة ضمن هذه القائمة';
+
+  @override
+  String get overviewAvailable => 'متوفر';
+
+  @override
+  String get overviewOrders => 'الطلبات';
+
+  @override
+  String quantityRequestedValue(Object count) {
+    return 'الكمية $count';
+  }
+
+  @override
+  String get replyNow => 'الرد الآن';
+
+  @override
+  String get requestStatusWaitingReply => 'بانتظار الرد';
+
+  @override
+  String get noMatchingRequests => 'لا توجد طلبات مطابقة';
+
+  @override
+  String get noMatchingRequestsSubtitle =>
+      'ستظهر هنا طلبات الأدوية الجديدة الواردة من المستخدمين.';
+
+  @override
+  String get statusWaitingYou => 'بانتظارك';
+
+  @override
+  String get workingHoursTitle => 'ساعات العمل';
+
+  @override
+  String get saveTooltip => 'حفظ';
+
+  @override
+  String get restoreSavedHours => 'استعادة الساعات المحفوظة';
+
+  @override
+  String get workingHoursLoading => 'جاري تحميل ساعات العمل...';
+
+  @override
+  String get overnightHint =>
+      'للدوام بعد منتصف الليل اختر وقت إغلاق أسبق من وقت الفتح، وسيُحفظ لليوم التالي تلقائيًا.';
+
+  @override
+  String get pharmacyClosed => 'الصيدلية مغلقة';
+
+  @override
+  String get overnightShift => 'دوام ممتد لليوم التالي';
+
+  @override
+  String get timeFrom => 'من';
+
+  @override
+  String get timeTo => 'إلى';
+
+  @override
+  String get endsNextDay => 'ينتهي الدوام في اليوم التالي';
+
+  @override
+  String get openingTimeHelp => 'وقت بدء الدوام';
+
+  @override
+  String get closingTimeHelp => 'وقت انتهاء الدوام';
+
+  @override
+  String get timesMustDiffer => 'وقت الفتح والإغلاق يجب أن يكونا مختلفين.';
+
+  @override
+  String get workingHoursSaved => 'تم حفظ ساعات العمل.';
+
+  @override
+  String get workingHoursSaveFailed => 'تعذر حفظ ساعات العمل.';
+
+  @override
+  String get scheduleTitle => 'جدول الصيدلية';
+
+  @override
+  String get scheduleSubtitle => 'حدّد أوقات استقبال طلبات المستخدمين';
+
+  @override
+  String get workDays => 'أيام عمل';
+
+  @override
+  String get overnightLabel => 'ليلي';
+
+  @override
+  String get refreshRequest => 'تحديث الطلب';
+
+  @override
+  String get openingRequest => 'جاري فتح الطلب...';
+
+  @override
+  String get confirmingProgress => 'جاري التأكيد...';
+
+  @override
+  String get confirmUserPickup => 'تأكيد استلام المستخدم للدواء';
+
+  @override
+  String get respondToRequest => 'الرد على الطلب';
+
+  @override
+  String get replyWillReachUser => 'سيصل اختيارك وملاحظتك إلى المستخدم';
+
+  @override
+  String get suggestAlternativeHint => 'يمكنك اقتراح بديل متوفر بدلًا منه';
+
+  @override
+  String get availableAlternativeLabel => 'بديل متاح (اختياري)';
+
+  @override
+  String get noteToUserOptional => 'ملاحظة للمستخدم (اختياري)';
+
+  @override
+  String get sendReply => 'إرسال الرد';
+
+  @override
+  String get replySent => 'تم إرسال الرد إلى المستخدم.';
+
+  @override
+  String get sendReplyFailed => 'تعذر إرسال الرد.';
+
+  @override
+  String get pickupConfirmed => 'تم تأكيد استلام المستخدم للدواء.';
+
+  @override
+  String get confirmPickupFailed => 'تعذر تأكيد استلام الدواء.';
+
+  @override
+  String get medicineDataTitle => 'بيانات الدواء';
+
+  @override
+  String get scientificNameLabel => 'الاسم العلمي';
+
+  @override
+  String get notRegistered => 'غير مسجل';
+
+  @override
+  String get formConcentrationLabel => 'الشكل والتركيز';
+
+  @override
+  String userNoteLabel(String note) {
+    return 'ملاحظة المستخدم: $note';
+  }
+
+  @override
+  String get userDataTitle => 'بيانات المستخدم';
+
+  @override
+  String get nameLabel => 'الاسم';
+
+  @override
+  String get emailLabel => 'البريد';
+
+  @override
+  String get requestProcessed => 'تمت معالجة هذا الطلب';
+
+  @override
+  String get licenseVerificationTitle => 'التحقق من ترخيص الصيدلية';
+
+  @override
+  String get refreshStatus => 'تحديث الحالة';
+
+  @override
+  String get reviewingStatus => 'جاري مراجعة الحالة...';
+
+  @override
+  String get selectLicenseImage => 'اختيار صورة الترخيص وإرسالها';
+
+  @override
+  String get sendNewLicenseImage => 'إرسال صورة أحدث للترخيص';
+
+  @override
+  String get imageTooLarge => 'حجم الصورة يجب ألا يتجاوز 8 ميغابايت.';
+
+  @override
+  String get licenseSubmitted =>
+      'تم إرسال الترخيص، ويمكنك متابعة نتيجة المراجعة من هنا.';
+
+  @override
+  String get licenseSubmitFailed => 'تعذر إرسال صورة الترخيص.';
+
+  @override
+  String get sendLicenseIntro => 'أرسل صورة واضحة من الترخيص لبدء المراجعة.';
+
+  @override
+  String lastFileLabel(String name) {
+    return 'آخر ملف: $name';
+  }
+
+  @override
+  String get beforeSendingTitle => 'قبل الإرسال';
+
+  @override
+  String get tipFullLicense => 'التقط الترخيص كاملاً دون قص الحواف.';
+
+  @override
+  String get tipClearDetails => 'تأكد من وضوح الاسم والرقم والأختام.';
+
+  @override
+  String get tipAcceptedFormats => 'الصيغ المقبولة: JPG أو PNG أو WEBP.';
+
+  @override
+  String get reviewDetailsTitle => 'تفاصيل المراجعة';
+
+  @override
+  String get registeredNameLabel => 'الاسم المسجل';
+
+  @override
+  String get licenseNameLabel => 'الاسم في الترخيص';
+
+  @override
+  String get registryNumberLabel => 'رقم السجل';
+
+  @override
+  String get documentNumberLabel => 'رقم الوثيقة';
+
+  @override
+  String get attemptCountLabel => 'عدد مرات الإرسال';
+
+  @override
+  String get manualReviewNoteLabel => 'ملاحظة المراجعة';
+
+  @override
+  String get licenseStatusVerified => 'تم التحقق من الترخيص';
+
+  @override
+  String get licenseStatusRejected => 'يحتاج الترخيص إلى إعادة إرسال';
+
+  @override
+  String get licenseStatusFailed => 'تعذرت قراءة الترخيص';
+
+  @override
+  String get licenseStatusManualReview => 'قيد المراجعة';
+
+  @override
+  String get licenseStatusProcessing => 'جاري مراجعة الترخيص';
+
+  @override
+  String get licenseStatusDefault => 'توثيق ترخيص الصيدلية';
+
+  @override
+  String get prepareMedicinesTitle => 'تجهيز الأدوية المختارة';
+
+  @override
+  String get prepareMedicinesSubtitle =>
+      'أدخل سعر كل دواء، ثم راجع باقي بيانات المخزون.';
+
+  @override
+  String get applyCommonSettings => 'تطبيق إعدادات مشتركة على الجميع';
+
+  @override
+  String pricesProgress(Object completed, Object total) {
+    return '$completed/$total أسعار';
+  }
+
+  @override
+  String addMedicinesToStock(Object count) {
+    return 'إضافة $count أدوية إلى المخزون';
+  }
+
+  @override
+  String get removeFromList => 'إزالة من القائمة';
+
+  @override
+  String get concentrationLabel => 'التركيز';
+
+  @override
+  String get formLabel => 'الشكل';
+
+  @override
+  String get packageLabel => 'العبوة';
+
+  @override
+  String get sellingPriceFieldLabel => 'سعر البيع لهذا الدواء *';
+
+  @override
+  String get priceHint => 'مثال: 8500';
+
+  @override
+  String get currencySuffix => 'ل.س';
+
+  @override
+  String get enterPositivePrice => 'أدخل سعرًا أكبر من صفر.';
+
+  @override
+  String get invalidValue => 'قيمة غير صحيحة';
+
+  @override
+  String get enterQuantity => 'أدخل كمية';
+
+  @override
+  String get thresholdLabel => 'حد التنبيه';
+
+  @override
+  String get expiryDateLabel => 'تاريخ الصلاحية';
+
+  @override
+  String get removeDate => 'إزالة التاريخ';
+
+  @override
+  String get availableForOrder => 'متاح للطلب';
+
+  @override
+  String get showPriceToUser => 'إظهار السعر للمستخدم';
+
+  @override
+  String get priceHiddenHint =>
+      'يمكن الاحتفاظ بالسعر داخليًا وإخفاؤه عند الحاجة';
+
+  @override
+  String get commonSettingsTitle => 'إعدادات مشتركة';
+
+  @override
+  String get commonSettingsDesc =>
+      'ستُطبق هذه القيم على جميع الأدوية، بينما يبقى السعر مستقلًا لكل دواء.';
+
+  @override
+  String get lowStockThresholdLabel => 'حد المخزون المنخفض';
+
+  @override
+  String get applyToAll => 'تطبيق على الجميع';
+
+  @override
+  String get pharmacyDataTitle => 'بيانات الصيدلية';
+
+  @override
+  String get refreshData => 'تحديث البيانات';
+
+  @override
+  String get pharmacyProfileLoading => 'جاري تحميل ملف الصيدلية...';
+
+  @override
+  String get generalDataTitle => 'البيانات العامة';
+
+  @override
+  String get generalDataSubtitle =>
+      'المعلومات التي تظهر للمستخدم عند فتح الصيدلية';
+
+  @override
+  String get pharmacyNameLabel => 'اسم الصيدلية';
+
+  @override
+  String get cityLabel => 'المدينة';
+
+  @override
+  String get areaLabel => 'المنطقة';
+
+  @override
+  String get detailedAddressLabel => 'العنوان التفصيلي';
+
+  @override
+  String get pharmacyDescriptionLabel => 'وصف الصيدلية';
+
+  @override
+  String get deliveryServiceTitle => 'خدمة توصيل الأدوية';
+
+  @override
+  String get deliveryServiceSubtitle => 'أخبر المستخدمين بتوفر التوصيل';
+
+  @override
+  String get saveProfile => 'حفظ الملف';
+
+  @override
+  String get pharmacyLocationTitle => 'موقع الصيدلية';
+
+  @override
+  String get pharmacyLocationSubtitle =>
+      'موقع دقيق يساعد المستخدم في العثور عليك بسهولة';
+
+  @override
+  String get automaticLocation => 'تحديد تلقائي';
+
+  @override
+  String get useDeviceLocation => 'استخدم موقع هذا الجهاز';
+
+  @override
+  String get orEnterCoordinates => 'أو أدخل الإحداثيات يدويًا';
+
+  @override
+  String get saveCoordinates => 'حفظ الإحداثيات';
+
+  @override
+  String get matchRegisteredPlace => 'مطابقة الموقع مع المكان المسجل';
+
+  @override
+  String get completeProfileFields =>
+      'أكمل اسم الصيدلية والمدينة والمنطقة والعنوان.';
+
+  @override
+  String get pharmacyProfileSaved => 'تم حفظ بيانات الصيدلية.';
+
+  @override
+  String get invalidLatitude => 'أدخل خط عرض صحيحًا بين -90 و90.';
+
+  @override
+  String get invalidLongitude => 'أدخل خط طول صحيحًا بين -180 و180.';
+
+  @override
+  String get locationSaved => 'تم حفظ الموقع.';
+
+  @override
+  String get chooseCorrectPlace => 'اختر المكان الصحيح';
+
+  @override
+  String get noMatchingPlace =>
+      'لم يتم العثور على مكان مطابق بالقرب من الإحداثيات.';
+
+  @override
+  String get matchRegisteredPlaceSuccess =>
+      'تم ربط موقع الصيدلية بالمكان المسجل.';
+
+  @override
+  String get approvedAccount => 'حساب معتمد';
+
+  @override
+  String get pendingApproval => 'بانتظار الاعتماد';
+
+  @override
+  String get locationSavedBadge => 'الموقع محفوظ';
+
+  @override
+  String get locationIncomplete => 'الموقع غير مكتمل';
+
+  @override
+  String get inventoryTitle => 'مخزون الأدوية';
+
+  @override
+  String get scanBarcode => 'مسح باركود';
+
+  @override
+  String get arabicLabel => 'عربي';
+
+  @override
+  String get showArabicNamesTooltip => 'إظهار الأسماء العربية';
+
+  @override
+  String get refreshInventoryTooltip => 'تحديث المخزون';
+
+  @override
+  String get searchByMedicineOrScientificName =>
+      'ابحث باسم الدواء أو الاسم العلمي';
+
+  @override
+  String get inventoryLoading => 'جاري تحميل المخزون...';
+
+  @override
+  String inventoryBatchAdded(Object count) {
+    return 'تمت إضافة $count أدوية إلى المخزون.';
+  }
+
+  @override
+  String get manualMedicineCreated => 'تم إنشاء الدواء وإضافته إلى المخزون.';
+
+  @override
+  String get inventoryItemAdded => 'تمت إضافة الدواء.';
+
+  @override
+  String get inventoryItemUpdated => 'تم تحديث الصنف.';
+
+  @override
+  String get inventoryItemDeleted => 'تم حذف الصنف.';
+
+  @override
+  String get deleteItemTitle => 'حذف الصنف؟';
+
+  @override
+  String deleteItemConfirm(Object name) {
+    return 'سيتم حذف $name من مخزون الصيدلية.';
+  }
+
+  @override
+  String get inventoryManagement => 'إدارة المخزون';
+
+  @override
+  String inventoryOverviewSummary(Object count, Object available) {
+    return '$count صنف · $available متاح للطلب';
+  }
+
+  @override
+  String get availableLabel => 'متوفر';
+
+  @override
+  String get lowLabel => 'منخفض';
+
+  @override
+  String get outOfStockLabel => 'نافد';
+
+  @override
+  String get itemOptions => 'خيارات الصنف';
+
+  @override
+  String get editLabel => 'تعديل';
+
+  @override
+  String get quantityLabel => 'الكمية';
+
+  @override
+  String get hiddenLabel => 'مخفي';
+
+  @override
+  String get statusLabel => 'الحالة';
+
+  @override
+  String concentrationChip(Object value) {
+    return 'التركيز: $value';
+  }
+
+  @override
+  String dosageFormChip(Object value) {
+    return 'الشكل: $value';
+  }
+
+  @override
+  String get notAvailable => 'غير متاح';
+
+  @override
+  String expiresOn(Object date) {
+    return 'ينتهي $date';
+  }
+
+  @override
+  String get lowStockLabel => 'مخزون منخفض';
+
+  @override
+  String get addToInventoryTitle => 'إضافة إلى المخزون';
+
+  @override
+  String get addToInventorySubtitle => 'اختر الطريقة الأنسب لإدخال الدواء.';
+
+  @override
+  String get chooseFromCatalog => 'اختيار من دليل الأدوية';
+
+  @override
+  String get chooseFromCatalogSubtitle =>
+      'اختر دواءً واحدًا أو عدة أدوية دفعة واحدة';
+
+  @override
+  String get scanPackageBarcode => 'مسح باركود العبوة';
+
+  @override
+  String get scanPackageBarcodeSubtitle => 'اعثر على الدواء مباشرة بالكاميرا';
+
+  @override
+  String get addMedicineManually => 'إضافة دواء يدويًا';
+
+  @override
+  String get addMedicineManuallySubtitle =>
+      'استخدمها عندما لا تجد الدواء في الدليل';
+
+  @override
+  String get newMedicineDataTitle => 'بيانات الدواء الجديد';
+
+  @override
+  String get newMedicineDataSubtitle =>
+      'اكتب البيانات كما تظهر على عبوة الدواء لتسهيل العثور عليه.';
+
+  @override
+  String get medicineNameEnglishLabel => 'اسم الدواء بالإنكليزية *';
+
+  @override
+  String get medicineNameArabicLabel => 'اسم الدواء بالعربية';
+
+  @override
+  String get scanWithCamera => 'مسح بالكاميرا';
+
+  @override
+  String get scientificNameEnglishLabel => 'الاسم العلمي بالإنكليزية';
+
+  @override
+  String get scientificNameArabicLabel => 'الاسم العلمي بالعربية';
+
+  @override
+  String get concentrationOrCapacityLabel => 'التركيز أو السعة';
+
+  @override
+  String get continueToInventoryData => 'متابعة إلى بيانات المخزون';
+
+  @override
+  String get additionalDescriptionLabel => 'وصف إضافي';
+
+  @override
+  String get catalogSelectionTitle => 'اختيار أدوية من الدليل';
+
+  @override
+  String get catalogSelectionSubtitle =>
+      'يمكنك اختيار دواء واحد أو عدة أدوية وإضافتها دفعة واحدة.';
+
+  @override
+  String get showArabicName => 'إظهار الاسم العربي';
+
+  @override
+  String selectedMedicinesCount(Object count) {
+    return 'تم اختيار $count دواء';
+  }
+
+  @override
+  String get catalogOpening => 'جاري فتح دليل الأدوية...';
+
+  @override
+  String get noMatchingMedicines => 'لا توجد أدوية مطابقة لبحثك.';
+
+  @override
+  String get selectAtLeastOneMedicine => 'اختر دواءً واحدًا على الأقل';
+
+  @override
+  String continueWithSelectedCount(Object count) {
+    return 'متابعة مع $count دواء';
+  }
+
+  @override
+  String get reloadMore => 'إعادة تحميل المزيد';
+
+  @override
+  String get scrollForMore => 'مرّر للأسفل لعرض المزيد';
+
+  @override
+  String shownCountOfTotal(Object loaded, Object total) {
+    return 'تم عرض $loaded من $total دواء';
+  }
+
+  @override
+  String get enterInventoryAvailability =>
+      'أدخل بيانات توفر الدواء داخل صيدليتك.';
+
+  @override
+  String get updateInventoryData =>
+      'حدّث الكمية والسعر وحالة العرض للمستخدمين.';
+
+  @override
+  String get priceInSyrianPounds => 'السعر بالليرة السورية';
+
+  @override
+  String priceValue(Object value) {
+    return '$value ل.س';
+  }
+
+  @override
+  String get invalidNumbersError =>
+      'أدخل أرقامًا صحيحة؛ لا يمكن أن تكون الكمية أو السعر أو حد المخزون أقل من صفر.';
+
+  @override
+  String get saveItem => 'حفظ الصنف';
+
+  @override
+  String get noMatchingItems => 'لا توجد أصناف مطابقة';
+
+  @override
+  String get noMatchingItemsSubtitle =>
+      'غيّر البحث أو أضف دواءً جديدًا من دليل الأدوية.';
+
+  @override
+  String get allLabel => 'الكل';
+
+  @override
+  String get dashboardPreparingPharmacy => 'نجهّز مركز تشغيل الصيدلية...';
+
+  @override
+  String get pharmacyOperationsSection => 'تشغيل الصيدلية';
+
+  @override
+  String get pharmacyOperationsSectionSubtitle => 'اختصارات لأهم مهامك اليومية';
+
+  @override
+  String get quickOverviewSection => 'نظرة سريعة';
+
+  @override
+  String get quickOverviewSectionSubtitle => 'مؤشرات المخزون والطلبات الحالية';
+
+  @override
+  String get inventoryAlertsSection => 'تنبيهات المخزون';
+
+  @override
+  String get inventoryAlertsSectionSubtitle =>
+      'الأصناف التي تحتاج تدخلك قريبًا';
+
+  @override
+  String get viewAll => 'عرض الكل';
+
+  @override
+  String get verifyPharmacyLicense => 'التحقق من ترخيص الصيدلية';
+
+  @override
+  String get managePrescriptions => 'إدارة الوصفات الطبية';
+
+  @override
+  String get donationsLabel => 'التبرعات';
+
+  @override
+  String get analyzeInventory => 'تحليل المخزون';
+
+  @override
+  String get inventoryLabel => 'المخزون';
+
+  @override
+  String get manageItems => 'إدارة الأصناف';
+
+  @override
+  String lowStockCount(Object count) {
+    return '$count منخفض';
+  }
+
+  @override
+  String get ordersLabel => 'الطلبات';
+
+  @override
+  String get followReplies => 'متابعة الردود';
+
+  @override
+  String pendingRequestsBadge(Object count) {
+    return '$count بانتظارك';
+  }
+
+  @override
+  String get organizeHours => 'تنظيم الدوام';
+
+  @override
+  String get pharmacyProfile => 'ملف الصيدلية';
+
+  @override
+  String get locationAndData => 'الموقع والبيانات';
+
+  @override
+  String get inventoryItemsLabel => 'أصناف المخزون';
+
+  @override
+  String get addPharmacyLocation => 'أضف موقع الصيدلية لتظهر للمستخدمين';
+
+  @override
+  String get newLabel => 'جديد';
+
+  @override
+  String get activeRequests => 'طلبات نشطة';
+
+  @override
+  String get approvePharmacyAccount => 'اعتماد حساب الصيدلية';
+
+  @override
+  String get completedLabel => 'مكتمل';
+
+  @override
+  String get pendingReview => 'بانتظار المراجعة';
+
+  @override
+  String get locationSet => 'تم تحديده';
+
+  @override
+  String get requiredToAppear => 'مطلوب للظهور للمستخدمين';
+
+  @override
+  String get hoursConfigured => 'تم إعدادها';
+
+  @override
+  String get setWorkingHours => 'حدد أوقات الدوام';
+
+  @override
+  String inventoryItemsCountValue(Object count) {
+    return '$count صنف';
+  }
+
+  @override
+  String get addFirstMedicine => 'أضف أول دواء';
+
+  @override
+  String get pharmacyReadiness => 'جاهزية الصيدلية';
+
+  @override
+  String profileCompletionValue(Object percent) {
+    return '$percent٪ من الملف مكتمل';
+  }
+
+  @override
+  String inventoryAlertLowStock(Object quantity, Object threshold) {
+    return 'الكمية $quantity · الحد الأدنى $threshold';
+  }
+
+  @override
+  String inventoryAlertExpiry(Object days) {
+    return 'متبقي $days يومًا على الانتهاء';
+  }
+
+  @override
+  String get inventoryHealthy => 'المخزون مستقر ولا توجد تنبيهات عاجلة';
+
+  @override
+  String profileCompletionLabel(Object value) {
+    return 'اكتمال الملف $value٪';
+  }
+
+  @override
+  String get organizationManagement => 'إدارة المنظمة';
+
+  @override
+  String get orgManagementSubtitle => 'المبادرات والتبرعات والمستفيدون';
+
+  @override
+  String get refreshDataTooltip => 'تحديث البيانات';
+
+  @override
+  String get moreLabel => 'المزيد';
+
+  @override
+  String get editOrganizationData => 'تعديل بيانات المنظمة';
+
+  @override
+  String get uploadVerificationDocument => 'رفع وثيقة تحقق';
+
+  @override
+  String get newCampaign => 'حملة جديدة';
+
+  @override
+  String get addCampaignInfoSubtitle => 'أضف معلومات واضحة تساعد المتبرعين.';
+
+  @override
+  String get campaignTitleField => 'عنوان الحملة';
+
+  @override
+  String get campaignDescriptionField => 'وصف الحملة';
+
+  @override
+  String get requestedMedicinesField => 'الأدوية المطلوبة (اختياري)';
+
+  @override
+  String get urgentCampaign => 'حملة عاجلة';
+
+  @override
+  String get urgentCampaignSubtitle => 'تظهر بأولوية بصرية أعلى.';
+
+  @override
+  String get acceptPublicDonations => 'استقبال تبرعات عامة';
+
+  @override
+  String get acceptPublicDonationsSubtitle =>
+      'يمكن للمستخدمين دعم الحملة مباشرة.';
+
+  @override
+  String get startDateLabel => 'تاريخ البداية';
+
+  @override
+  String get endDateLabel => 'تاريخ النهاية';
+
+  @override
+  String get createCampaign => 'إنشاء الحملة';
+
+  @override
+  String get organizationData => 'بيانات المنظمة';
+
+  @override
+  String get organizationNameField => 'اسم المنظمة';
+
+  @override
+  String get registrationNumberField => 'رقم التسجيل';
+
+  @override
+  String get addressLabel => 'العنوان';
+
+  @override
+  String get organizationDescriptionField => 'وصف المنظمة';
+
+  @override
+  String get chooseFile => 'اختيار ملف';
+
+  @override
+  String get documentSizeLimit => 'حجم الوثيقة يجب ألا يتجاوز 10 ميغابايت.';
+
+  @override
+  String get documentTypeTitle => 'نوع الوثيقة';
+
+  @override
+  String get updateSaved => 'تم حفظ التحديث.';
+
+  @override
+  String get summaryLabel => 'الملخص';
+
+  @override
+  String get campaignsLabel => 'الحملات';
+
+  @override
+  String get assistanceLabel => 'المساعدة';
+
+  @override
+  String get profileLabel => 'الملف';
+
+  @override
+  String get quickAccess => 'وصول سريع';
+
+  @override
+  String get whatDoYouWantToDo => 'ما الذي تريد إنجازه؟';
+
+  @override
+  String get orgOperationsReady => 'أهم عمليات المنظمة جاهزة من مكان واحد.';
+
+  @override
+  String get uploadDocument => 'رفع وثيقة';
+
+  @override
+  String get editProfileLabel => 'تعديل الملف';
+
+  @override
+  String get currentImpact => 'الأثر الحالي';
+
+  @override
+  String get workSummary => 'ملخص العمل';
+
+  @override
+  String get workSummarySubtitle => 'قراءة سريعة لحركة المبادرات والطلبات.';
+
+  @override
+  String get allCampaigns => 'جميع الحملات';
+
+  @override
+  String get activeCampaigns => 'الحملات النشطة';
+
+  @override
+  String get pendingOffers => 'عروض تنتظر';
+
+  @override
+  String get openRequests => 'طلبات مفتوحة';
+
+  @override
+  String get latestUpdates => 'آخر التحديثات';
+
+  @override
+  String get recentCampaigns => 'الحملات الأخيرة';
+
+  @override
+  String get recentCampaignsSubtitle =>
+      'آخر المبادرات التي عملت عليها المنظمة.';
+
+  @override
+  String get startFirstCampaign => 'ابدأ بإنشاء أول حملة للمنظمة.';
+
+  @override
+  String get manageInitiatives => 'إدارة المبادرات';
+
+  @override
+  String get orgCampaigns => 'حملات المنظمة';
+
+  @override
+  String get orgCampaignsSubtitle => 'أنشئ الحملة وحدد حالتها وفق تقدم العمل.';
+
+  @override
+  String get createCampaignTooltip => 'إنشاء حملة';
+
+  @override
+  String get noCampaignsYet => 'لا توجد حملات بعد. أنشئ أول مبادرة الآن.';
+
+  @override
+  String get givingNetwork => 'شبكة العطاء';
+
+  @override
+  String get donationOffersTitle => 'عروض التبرع';
+
+  @override
+  String get donationOffersSubtitle =>
+      'راجع العروض التي اجتازت التحقق وتابع استلامها.';
+
+  @override
+  String get beneficiaryCare => 'رعاية المستفيدين';
+
+  @override
+  String get assistanceRequestsTitle => 'طلبات المساعدة';
+
+  @override
+  String get assistanceRequestsSubtitle =>
+      'تابع الحالات من الطلب الأول حتى اكتمال المساعدة.';
+
+  @override
+  String get reliableData => 'بيانات موثوقة';
+
+  @override
+  String get orgProfile => 'ملف المنظمة';
+
+  @override
+  String get orgProfileSubtitle =>
+      'حافظ على دقة بيانات التواصل ووثائق الاعتماد.';
+
+  @override
+  String get documentsLabel => 'المستندات';
+
+  @override
+  String get accreditationDocs => 'وثائق الاعتماد';
+
+  @override
+  String uploadedDocsCount(Object count) {
+    return '$count ملفات مرفوعة للمراجعة.';
+  }
+
+  @override
+  String get noAccreditationDocs => 'لم تُرفع وثائق اعتماد بعد.';
+
+  @override
+  String get createNewCampaign => 'إنشاء حملة جديدة';
+
+  @override
+  String get activateCampaign => 'تفعيل الحملة';
+
+  @override
+  String get closeCampaign => 'إغلاق الحملة';
+
+  @override
+  String get cancelCampaign => 'إلغاء الحملة';
+
+  @override
+  String get urgentLabel => 'عاجلة';
+
+  @override
+  String get acceptsDonationsLabel => 'تستقبل التبرعات';
+
+  @override
+  String campaignEndsOn(Object date) {
+    return 'تنتهي في $date';
+  }
+
+  @override
+  String offerPackages(Object count, Object name) {
+    return '$count عبوات · $name';
+  }
+
+  @override
+  String verifiedViaPharmacy(Object name) {
+    return 'تم التحقق عبر $name';
+  }
+
+  @override
+  String validUntil(Object date) {
+    return 'الصلاحية حتى $date';
+  }
+
+  @override
+  String get acceptOffer => 'قبول العرض';
+
+  @override
+  String get confirmDonationReceived => 'تأكيد استلام التبرع';
+
+  @override
+  String requestPackages(Object count, Object name) {
+    return '$count عبوات · $name';
+  }
+
+  @override
+  String neededBefore(Object date) {
+    return 'مطلوب قبل $date';
+  }
+
+  @override
+  String get startReview => 'بدء المراجعة';
+
+  @override
+  String get assistanceCompleted => 'تمت المساعدة';
+
+  @override
+  String get cannotFulfill => 'تعذر التلبية';
+
+  @override
+  String get contactLabel => 'التواصل';
+
+  @override
+  String get aboutLabel => 'نبذة';
+
+  @override
+  String get optionalLabel => 'اختياري';
+
+  @override
+  String documentsUploaded(Object count) {
+    return '$count وثائق مرفوعة';
+  }
+
+  @override
+  String get orgVerified => 'تم التحقق من المنظمة';
+
+  @override
+  String get orgVerificationRejected => 'تم رفض التحقق';
+
+  @override
+  String get orgVerificationUnderReview => 'التحقق قيد المراجعة';
+
+  @override
+  String get orgVerificationIncomplete => 'التحقق غير مكتمل';
+
+  @override
+  String get verifiedShort => 'موثقة';
+
+  @override
+  String get rejectedShort => 'مرفوضة';
+
+  @override
+  String get underReviewShort => 'قيد المراجعة';
+
+  @override
+  String get incompleteShort => 'غير مكتملة';
+
+  @override
+  String get campaignActive => 'نشطة';
+
+  @override
+  String get campaignClosed => 'مغلقة';
+
+  @override
+  String get campaignCancelled => 'ملغاة';
+
+  @override
+  String get campaignDraft => 'مسودة';
+
+  @override
+  String get docRegistrationCertificate => 'شهادة التسجيل';
+
+  @override
+  String get docOperatingLicense => 'ترخيص العمل';
+
+  @override
+  String get docManagerIdentity => 'هوية المدير';
+
+  @override
+  String get docTaxOrLegal => 'وثيقة قانونية';
+
+  @override
+  String get docOther => 'أخرى';
+
+  @override
+  String get docLicensedDocument => 'وثيقة الترخيص';
+
+  @override
+  String get docIdentityDocument => 'إثبات الهوية';
+
+  @override
+  String get docAccreditation => 'وثيقة اعتماد';
+
+  @override
+  String get orgHomeLoading => 'نجهّز مساحة المنظمة...';
+
+  @override
+  String get orgHeroSubtitle =>
+      'تابع أثر حملاتك واستجابتك لاحتياجات المستفيدين بوضوح.';
+
+  @override
+  String verifiedBadge(Object label) {
+    return 'منظمة معتمدة · $label';
+  }
+
+  @override
+  String get accountPendingApproval => 'الحساب بانتظار الاعتماد';
+
+  @override
+  String get orgImpactSection => 'أثر المنظمة';
+
+  @override
+  String get orgImpactSectionSubtitle => 'مؤشرات الحملات والطلبات الحالية';
+
+  @override
+  String get totalCampaigns => 'إجمالي الحملات';
+
+  @override
+  String get offersWaiting => 'عروض بانتظارك';
+
+  @override
+  String get assistanceRequests => 'طلبات مساعدة';
+
+  @override
+  String get workManagement => 'إدارة العمل';
+
+  @override
+  String get workManagementSubtitle => 'كل مسار يفتح في قسمه مباشرة';
+
+  @override
+  String get createUpdateCampaigns => 'إنشاء وتحديث حالة الحملات';
+
+  @override
+  String get reviewOfferedMedicines => 'مراجعة الأدوية المعروضة';
+
+  @override
+  String get followCasesAndRespond => 'متابعة الحالات والاستجابة لها';
+
+  @override
+  String get dataAndVerificationDocs => 'البيانات ووثائق التحقق';
+
+  @override
+  String get verificationStatusTitle => 'حالة التحقق';
+
+  @override
+  String verificationDocsCount(Object label, Object count) {
+    return '$label · $count وثائق مرفوعة';
+  }
+
+  @override
+  String get completeVerificationDocs =>
+      'أكمل وثائق التحقق لتعزيز موثوقية المنظمة.';
+
+  @override
+  String get recentCampaignsAddedSubtitle =>
+      'آخر المبادرات المضافة إلى حساب المنظمة';
+
+  @override
+  String get needsUpdate => 'تحتاج تحديثاً';
+
+  @override
+  String get notApproved => 'غير معتمدة';
+
+  @override
+  String get verificationStatusUnknown => 'حالة التحقق غير محددة';
+
+  @override
+  String get campaignPaused => 'متوقفة مؤقتاً';
+
+  @override
+  String get campaignCompleted => 'مكتملة';
+
+  @override
+  String get supplyWarehouseTitle => 'إدارة المستودع';
+
+  @override
+  String get supplyWarehouseSubtitle => 'مركز الإمداد والتوزيع';
+
+  @override
+  String get supplySummaryLabel => 'الملخص';
+
+  @override
+  String get supplyBatchesLabel => 'التشغيلات';
+
+  @override
+  String get supplyOrdersLabel => 'الطلبات';
+
+  @override
+  String get supplyRepresentativesLabel => 'المندوبون';
+
+  @override
+  String get supplyFinanceLabel => 'المالية';
+
+  @override
+  String get supplyLoadingWarehouse => 'جاري تحميل المستودع...';
+
+  @override
+  String get supplyWarehouseOpsTitle => 'مركز تشغيل المستودع';
+
+  @override
+  String supplyInventoryValue(Object money) {
+    return 'قيمة المخزون $money ل.س';
+  }
+
+  @override
+  String supplyNewOrdersCount(Object count) {
+    return '$count طلب جديد';
+  }
+
+  @override
+  String get supplyTodayIndicators => 'مؤشرات اليوم';
+
+  @override
+  String get supplyTodayIndicatorsSubtitle =>
+      'قراءة سريعة لحالة التشغيل والمخزون';
+
+  @override
+  String get supplyActiveBatches => 'تشغيلات نشطة';
+
+  @override
+  String get supplyLowStock => 'مخزون منخفض';
+
+  @override
+  String get supplyExpiringSoon => 'قرب الانتهاء';
+
+  @override
+  String get supplyActiveDeliveries => 'شحنات نشطة';
+
+  @override
+  String get supplyNeedsAttention => 'تحتاج إلى انتباه';
+
+  @override
+  String get supplyNeedsAttentionSubtitle =>
+      'تشغيلات منخفضة أو قريبة من الانتهاء';
+
+  @override
+  String get supplyNoBatches => 'لا توجد تشغيلات دوائية بعد.';
+
+  @override
+  String get supplyBatchesStockTitle => 'مخزون التشغيلات';
+
+  @override
+  String get supplyBatchesStockSubtitle =>
+      'تتبّع الكميات والأسعار وتواريخ الانتهاء';
+
+  @override
+  String get supplyBatchLabel => 'تشغيلة';
+
+  @override
+  String get supplyAddBatch => 'إضافة تشغيلة';
+
+  @override
+  String get supplyBatchNumber => 'رقم التشغيلة';
+
+  @override
+  String get supplyPurchasePrice => 'سعر الشراء';
+
+  @override
+  String get supplyWholesalePrice => 'سعر الجملة';
+
+  @override
+  String get supplyStorageLocation => 'موضع التخزين';
+
+  @override
+  String get supplyBatchAdded => 'تمت إضافة التشغيلة.';
+
+  @override
+  String get supplyLoadingOrders => 'جاري تحميل الطلبات...';
+
+  @override
+  String get supplyPharmacyOrdersTitle => 'طلبات الصيدليات';
+
+  @override
+  String get supplyMyOrders => 'طلباتي';
+
+  @override
+  String get supplyPharmacyOrdersSubtitle =>
+      'معالجة الطلب من الاستلام حتى التسليم';
+
+  @override
+  String get supplyMyOrdersSubtitle => 'متابعة حالة طلبات التوريد والشحن';
+
+  @override
+  String get supplyNewOrdersFilter => 'جديدة';
+
+  @override
+  String get supplyActiveOrdersFilter => 'قيد التنفيذ';
+
+  @override
+  String get supplyNoOrdersInCategory => 'لا توجد طلبات ضمن هذا التصنيف.';
+
+  @override
+  String supplyOrderItemsTotal(Object count, Object amount) {
+    return '$count أصناف · $amount ل.س';
+  }
+
+  @override
+  String supplyShipmentInfo(Object code, Object status) {
+    return 'الشحنة: $code · $status';
+  }
+
+  @override
+  String get supplyAccept => 'قبول';
+
+  @override
+  String get supplyStartPreparing => 'بدء التجهيز';
+
+  @override
+  String get supplyReadyForDispatch => 'جاهز للشحن';
+
+  @override
+  String get supplyAssignRepresentative => 'إسناد لمندوب';
+
+  @override
+  String get supplyConfirmReceipt => 'تأكيد استلام الشحنة';
+
+  @override
+  String get supplyReturnItem => 'طلب إرجاع صنف';
+
+  @override
+  String get supplyOrderUpdated => 'تم تحديث الطلب.';
+
+  @override
+  String get supplyAssignShipment => 'إسناد الشحنة';
+
+  @override
+  String get supplyRepresentativeLabel => 'المندوب';
+
+  @override
+  String get supplyPackagesCount => 'عدد الطرود';
+
+  @override
+  String get supplyAssign => 'إسناد';
+
+  @override
+  String get supplyShipmentAssigned => 'تم إسناد الشحنة للمندوب.';
+
+  @override
+  String get supplyReceiptCode => 'رمز الاستلام';
+
+  @override
+  String get supplyReceiptNote => 'ملاحظة الاستلام';
+
+  @override
+  String get supplyReceiptConfirmed => 'تم تأكيد استلام الشحنة.';
+
+  @override
+  String get supplyItemLabel => 'الصنف';
+
+  @override
+  String get supplyReturnReason => 'سبب الإرجاع';
+
+  @override
+  String get supplyReturnSent => 'تم إرسال طلب الإرجاع.';
+
+  @override
+  String get supplyNoRepresentatives => 'لا يوجد مندوبون.';
+
+  @override
+  String get supplyDeliveryTeam => 'فريق التوصيل';
+
+  @override
+  String supplyTeamSummary(Object available, Object tasks) {
+    return '$available متاح الآن · $tasks مهمة نشطة';
+  }
+
+  @override
+  String get supplyNoVehicle => 'دون مركبة';
+
+  @override
+  String get supplyOnShift => 'ضمن الوردية';
+
+  @override
+  String get supplyOffShift => 'خارج الوردية';
+
+  @override
+  String get supplyActiveShort => 'نشطة';
+
+  @override
+  String get supplyCompletedShort => 'مكتملة';
+
+  @override
+  String get supplyAddRepresentative => 'إضافة مندوب';
+
+  @override
+  String get supplyEmployeeCode => 'رمز الموظف';
+
+  @override
+  String get supplyVehiclePlate => 'لوحة المركبة';
+
+  @override
+  String get supplyCreate => 'إنشاء';
+
+  @override
+  String get supplyRepresentativeCreated => 'تم إنشاء حساب المندوب.';
+
+  @override
+  String get supplyInvoicesLabel => 'الفواتير';
+
+  @override
+  String get supplyReturnsLabel => 'المرتجعات';
+
+  @override
+  String get supplyRecallsLabel => 'السحب';
+
+  @override
+  String get supplyFinanceTitle => 'المالية والرقابة';
+
+  @override
+  String get supplyFinanceSubtitle =>
+      'الفواتير والتحصيل والمرتجعات وسحب التشغيلات';
+
+  @override
+  String get supplyPharmacySupplyTitle => 'توريد الصيدلية';
+
+  @override
+  String get supplyWarehousesLabel => 'المستودعات';
+
+  @override
+  String get supplyStockNeeds => 'احتياج المخزون';
+
+  @override
+  String get supplyNoWarehouses => 'لا توجد مستودعات متاحة.';
+
+  @override
+  String get supplyAvailableWarehouses => 'المستودعات المتاحة';
+
+  @override
+  String get supplyAvailableWarehousesSubtitle =>
+      'تصفح المستودعات واطلب الأدوية المطلوبة';
+
+  @override
+  String supplyAvailableMedicinesCount(Object count) {
+    return '$count دواء';
+  }
+
+  @override
+  String supplyDeliveryFee(Object fee) {
+    return 'توصيل $fee ل.س';
+  }
+
+  @override
+  String get supplySelectQuantities => 'حدد الكميات المطلوبة ثم أرسل الطلب.';
+
+  @override
+  String supplyCatalogItem(Object price, Object qty) {
+    return '$price ل.س · متاح $qty';
+  }
+
+  @override
+  String get supplySending => 'جاري الإرسال...';
+
+  @override
+  String get supplySupplyOrderSent => 'تم إرسال طلب التوريد.';
+
+  @override
+  String get supplyStockAdequate => 'المخزون ضمن الحدود المناسبة.';
+
+  @override
+  String get supplyStockNeedsSubtitle => 'الأدوية التي تحتاج إلى إعادة توريد';
+
+  @override
+  String supplyCurrentQty(Object qty) {
+    return 'الحالي $qty';
+  }
+
+  @override
+  String supplySuggestedQty(Object qty) {
+    return 'المقترح $qty';
+  }
+
+  @override
+  String get supplyDeliveryTasks => 'مهام التوصيل';
+
+  @override
+  String get supplyTodaySchedule => 'جدولك الميداني اليوم';
+
+  @override
+  String get supplyRefreshTasks => 'تحديث المهام';
+
+  @override
+  String get supplyLoadingTasks => 'جاري تجهيز مهامك...';
+
+  @override
+  String get supplyAssignedShipments => 'الشحنات المسندة';
+
+  @override
+  String get supplyNoTasksNow => 'لا توجد مهمة جديدة في الوقت الحالي';
+
+  @override
+  String get supplyUpdateTaskStatus => 'حدّث حالة المهمة عند كل مرحلة';
+
+  @override
+  String get supplySafeJourney => 'رحلة آمنة ومنظمة';
+
+  @override
+  String get supplySafeJourneySubtitle =>
+      'راجع العنوان وحدّث حالة الشحنة أثناء التوصيل';
+
+  @override
+  String get supplyTasksLabel => 'المهام';
+
+  @override
+  String supplyDeliveryItems(Object code, Object count) {
+    return '$code · $count أصناف';
+  }
+
+  @override
+  String get supplyDeliveredSuccess => 'تم تسليم الشحنة بنجاح';
+
+  @override
+  String get supplyStepPickup => 'استلام';
+
+  @override
+  String get supplyStepLoading => 'تحميل';
+
+  @override
+  String get supplyStepOnWay => 'بالطريق';
+
+  @override
+  String get supplyStepArrival => 'وصول';
+
+  @override
+  String get supplyStepDelivered => 'تسليم';
+
+  @override
+  String get supplyNoData => 'لا توجد بيانات.';
+
+  @override
+  String supplyInvoiceRemaining(Object name, Object amount) {
+    return '$name · متبقي $amount ل.س';
+  }
+
+  @override
+  String supplyInvoiceSummary(Object total, Object paid) {
+    return 'الإجمالي $total ل.س · المدفوع $paid ل.س';
+  }
+
+  @override
+  String get supplyEditInvoiceTerms => 'تعديل شروط الفاتورة';
+
+  @override
+  String get supplyRecordPayment => 'تسجيل دفعة';
+
+  @override
+  String get supplyAmountLabel => 'المبلغ';
+
+  @override
+  String get supplyPaymentMethod => 'طريقة الدفع';
+
+  @override
+  String get supplyCashOnDelivery => 'نقدي عند التسليم';
+
+  @override
+  String get supplyBankTransfer => 'تحويل بنكي';
+
+  @override
+  String get supplyCredit => 'آجل';
+
+  @override
+  String get supplyReferenceOptional => 'رقم المرجع (اختياري)';
+
+  @override
+  String get supplyPaymentRecorded => 'تم تسجيل الدفعة.';
+
+  @override
+  String get supplyEditInvoice => 'تعديل الفاتورة';
+
+  @override
+  String get supplyDiscountLabel => 'الحسم';
+
+  @override
+  String get supplyTaxLabel => 'الضريبة';
+
+  @override
+  String get supplyWarehouseNote => 'ملاحظة المستودع';
+
+  @override
+  String get supplyDueDate => 'تاريخ الاستحقاق';
+
+  @override
+  String get supplyInvoiceUpdated => 'تم تحديث الفاتورة.';
+
+  @override
+  String supplyReturnDetails(Object qty, Object reason) {
+    return '$qty عبوات · $reason';
+  }
+
+  @override
+  String get supplyAcceptReturn => 'قبول المرتجع';
+
+  @override
+  String get supplyRejectReturn => 'رفض المرتجع';
+
+  @override
+  String get supplyCollectedFromPharmacy => 'تم الاستلام من الصيدلية';
+
+  @override
+  String get supplyCompleteReturn => 'إكمال المرتجع';
+
+  @override
+  String get supplyReturnUpdated => 'تم تحديث المرتجع.';
+
+  @override
+  String get supplyCreateRecallAlert => 'إنشاء تنبيه سحب';
+
+  @override
+  String get supplyRecallBatch => 'سحب تشغيلة دوائية';
+
+  @override
+  String get supplySeverityLabel => 'درجة الخطورة';
+
+  @override
+  String get supplySeverityLow => 'منخفضة';
+
+  @override
+  String get supplySeverityMedium => 'متوسطة';
+
+  @override
+  String get supplySeverityHigh => 'عالية';
+
+  @override
+  String get supplySeverityCritical => 'حرجة';
+
+  @override
+  String get supplyRecallReason => 'سبب السحب';
+
+  @override
+  String get supplyCreateAlertButton => 'إنشاء التنبيه';
+
+  @override
+  String get supplyRecallAlertCreated => 'تم إنشاء تنبيه السحب.';
+
+  @override
+  String supplyBatchNumberLabel(Object number) {
+    return 'رقم التشغيلة $number';
+  }
+
+  @override
+  String get supplyAvailableShort => 'المتاح';
+
+  @override
+  String get supplyExpiryShort => 'الانتهاء';
+
+  @override
+  String get supplyHealthHealthy => 'سليم';
+
+  @override
+  String get supplyHealthLow => 'منخفض';
+
+  @override
+  String get supplyHealthExpiring => 'قرب الانتهاء';
+
+  @override
+  String get supplyHealthExpired => 'منتهي';
+
+  @override
+  String get supplyStatusSubmitted => 'مرسل';
+
+  @override
+  String get supplyStatusAccepted => 'مقبول';
+
+  @override
+  String get supplyStatusPreparing => 'قيد التجهيز';
+
+  @override
+  String get supplyStatusReadyForDispatch => 'جاهز للشحن';
+
+  @override
+  String get supplyStatusAssigned => 'مسند';
+
+  @override
+  String get supplyStatusLoading => 'تحميل';
+
+  @override
+  String get supplyStatusOutForDelivery => 'في الطريق';
+
+  @override
+  String get supplyStatusArrived => 'وصل';
+
+  @override
+  String get supplyStatusDelivered => 'تم التسليم';
+
+  @override
+  String get supplyStatusRejected => 'مرفوض';
+
+  @override
+  String get supplyStatusPaid => 'مدفوع';
+
+  @override
+  String get supplyStatusPartiallyPaid => 'مدفوع جزئيًا';
+
+  @override
+  String get supplyStatusUnpaid => 'غير مدفوع';
+
+  @override
+  String get supplyStatusRequested => 'مطلوب';
+
+  @override
+  String get supplyStatusApproved => 'مقبول';
+
+  @override
+  String get supplyStatusActive => 'نشط';
+
+  @override
+  String get supplyNextLoading => 'بدء التحميل';
+
+  @override
+  String get supplyNextOutForDelivery => 'بدء التوصيل';
+
+  @override
+  String get supplyNextArrived => 'تأكيد الوصول';
+
+  @override
+  String get supplyNextDelivered => 'تأكيد التسليم';
+
+  @override
+  String get supplyNextUpdate => 'تحديث';
+
+  @override
+  String get adminCenterTitle => 'مركز الإدارة';
+
+  @override
+  String get adminCenterSubtitle => 'إدارة منصة دوائي ومتابعة عملياتها';
+
+  @override
+  String get adminRefreshTooltip => 'تحديث';
+
+  @override
+  String get adminLocationServiceTooltip => 'خدمة مواقع الصيدليات';
+
+  @override
+  String adminCannotApprovePharmacy(Object status) {
+    return 'لا يمكن الموافقة على الصيدلية. حالة الترخيص: $status. يجب أن يكون الترخيص موثقاً أولاً.';
+  }
+
+  @override
+  String adminLicenseCheckFailed(Object error) {
+    return 'تعذر التحقق من حالة الترخيص: $error';
+  }
+
+  @override
+  String get adminOrgReviewApproved => 'تمت مراجعة وثائق المنظمة واعتمادها.';
+
+  @override
+  String get adminOrgReviewNeedsUpdate => 'يرجى تحديث وثائق التحقق المطلوبة.';
+
+  @override
+  String get adminDeactivateAccount => 'إيقاف الحساب';
+
+  @override
+  String get adminDeactivateReason => 'سبب الإيقاف';
+
+  @override
+  String get adminDeactivateReasonHint =>
+      'اكتب سببًا واضحًا لا يقل عن 10 أحرف.';
+
+  @override
+  String get adminLocationServiceTitle => 'خدمة مواقع الصيدليات';
+
+  @override
+  String get adminLocationServiceHealthy => 'الخدمة تعمل بصورة طبيعية.';
+
+  @override
+  String get adminLocationServiceUnhealthy =>
+      'الخدمة لا تستجيب بالصورة المتوقعة.';
+
+  @override
+  String get adminCleanCache => 'تنظيف البيانات القديمة';
+
+  @override
+  String get adminSectionSummary => 'الملخص';
+
+  @override
+  String get adminSectionApprovals => 'الموافقات';
+
+  @override
+  String get adminSectionAccounts => 'الحسابات';
+
+  @override
+  String get adminSectionAds => 'الإعلانات';
+
+  @override
+  String get adminTickerNewContent => 'محتوى جديد';
+
+  @override
+  String get adminTickerEditContent => 'تعديل المحتوى';
+
+  @override
+  String get adminTickerAppearsHint =>
+      'سيظهر هذا المحتوى في الصفحة الرئيسية للمستخدمين.';
+
+  @override
+  String get adminAnnouncement => 'إعلان عام';
+
+  @override
+  String get adminDutyPharmacy => 'صيدلية مناوبة';
+
+  @override
+  String get adminDutyPharmacyLabel => 'الصيدلية المناوبة';
+
+  @override
+  String get adminChoosePharmacy => 'اختر الصيدلية';
+
+  @override
+  String get adminTitleLabel => 'العنوان';
+
+  @override
+  String get adminEnterTitleHint => 'أدخل عنوان المحتوى';
+
+  @override
+  String get adminVisibleTextLabel => 'النص الظاهر للمستخدم';
+
+  @override
+  String get adminEnterTextHint => 'أدخل النص المراد إظهاره';
+
+  @override
+  String get adminPublishContent => 'نشر المحتوى';
+
+  @override
+  String get adminVisibleNow => 'ظاهر حاليًا للمستخدمين';
+
+  @override
+  String get adminSavedUnpublished => 'محفوظ دون نشر';
+
+  @override
+  String get adminSaveContent => 'حفظ المحتوى';
+
+  @override
+  String get adminLoadingIndicators => 'جاري تحميل المؤشرات...';
+
+  @override
+  String get adminUsers => 'المستخدمون';
+
+  @override
+  String get adminActiveAccounts => 'حسابات نشطة';
+
+  @override
+  String get adminPharmacies => 'الصيدليات';
+
+  @override
+  String get adminPendingPharmacies => 'صيدليات معلقة';
+
+  @override
+  String get adminOrganizations => 'المنظمات';
+
+  @override
+  String get adminWarehouses => 'المستودعات';
+
+  @override
+  String get adminPendingWarehouses => 'مستودعات معلقة';
+
+  @override
+  String get adminOrganizationVerifications => 'تحقق منظمات';
+
+  @override
+  String get adminMedicineRequests => 'طلبات الأدوية';
+
+  @override
+  String get adminDonations => 'تبرعات';
+
+  @override
+  String get adminOverviewEyebrow => 'المشهد العام';
+
+  @override
+  String get adminPlatformIndicators => 'مؤشرات المنصة';
+
+  @override
+  String get adminOverviewSubtitle =>
+      'الأرقام الأساسية وحالات الاعتماد التي تتطلب المتابعة.';
+
+  @override
+  String get adminHeroPulse => 'نبض منصة دوائي';
+
+  @override
+  String get adminHeroSubtitle => 'نظرة موحدة على الحسابات والجهات والخدمات';
+
+  @override
+  String get adminNeedsDecision => 'تحتاج قرارًا';
+
+  @override
+  String get adminActiveAccount => 'حساب نشط';
+
+  @override
+  String get adminPharmacyPoints => 'نقاط دوائية';
+
+  @override
+  String get adminLicenseVerifiedMsg =>
+      'الترخيص موثق، يمكنك الموافقة على الصيدلية';
+
+  @override
+  String get adminLicenseManualReviewMsg =>
+      'الترخيص يحتاج إلى مراجعة يدوية. يجب أن يكون الترخيص موثقاً أولاً قبل الموافقة على الصيدلية.';
+
+  @override
+  String get adminLicenseProcessingMsg => 'الترخيص قيد المعالجة.';
+
+  @override
+  String get adminLicenseDetailsTitle => 'تفاصيل ترخيص الصيدلية';
+
+  @override
+  String get adminLicenseNameInDocument => 'الاسم في الوثيقة';
+
+  @override
+  String get adminMatchScore => 'درجة التطابق';
+
+  @override
+  String get adminRejectionReason => 'سبب الرفض';
+
+  @override
+  String get adminReadFailure => 'مشكلة القراءة';
+
+  @override
+  String get adminViewDocument => 'عرض الوثيقة';
+
+  @override
+  String get unexpectedError => 'حدث خطأ غير متوقع.';
+
+  @override
+  String get adminApprovalDecisions => 'قرارات الاعتماد';
+
+  @override
+  String get adminPendingYourReview => 'طلبات تحتاج مراجعتك';
+
+  @override
+  String get adminApprovalSubtitle =>
+      'تحقق من بيانات الجهة قبل منحها صلاحية العمل على المنصة.';
+
+  @override
+  String get adminNoPendingRequests => 'لا توجد طلبات معلقة ضمن هذا القسم.';
+
+  @override
+  String get adminApprovePharmacy => 'اعتماد الصيدلية';
+
+  @override
+  String get adminRejectPharmacy => 'رفض الصيدلية';
+
+  @override
+  String get adminOwner => 'المالك';
+
+  @override
+  String adminVerificationDocsSubtitle(Object name, Object count) {
+    return '$name · $count وثائق';
+  }
+
+  @override
+  String get adminVerificationStatus => 'حالة التحقق';
+
+  @override
+  String get adminVerificationDocsLabel => 'الوثائق';
+
+  @override
+  String get adminApproveWarehouse => 'اعتماد المستودع';
+
+  @override
+  String get adminRejectWarehouse => 'رفض المستودع';
+
+  @override
+  String get adminMinOrderLimit => 'حد الطلب الأدنى';
+
+  @override
+  String get adminCurrencySuffix => 'ر.س';
+
+  @override
+  String get adminDeliveryFee => 'رسوم التوصيل';
+
+  @override
+  String get adminMedicineBatches => 'دفعات الأدوية';
+
+  @override
+  String get adminRepresentatives => 'المندوبين';
+
+  @override
+  String get adminAccountsGuide => 'دليل الحسابات';
+
+  @override
+  String get adminPlatformUsers => 'مستخدمو المنصة';
+
+  @override
+  String get adminAccountsSubtitle => 'ابحث عن الحسابات وراجع حالتها ودورها.';
+
+  @override
+  String get adminSearchByNameOrEmail => 'ابحث بالاسم أو البريد الإلكتروني';
+
+  @override
+  String get adminLoadingAccounts => 'جاري تحميل الحسابات...';
+
+  @override
+  String get adminNoResultsSubtitle => 'غيّر كلمات البحث أو اختر دورًا آخر.';
+
+  @override
+  String get adminLiveContent => 'المحتوى المباشر';
+
+  @override
+  String get adminHomeTicker => 'شريط الصفحة الرئيسية';
+
+  @override
+  String get adminTickerSubtitle =>
+      'أدر الإعلانات العامة والصيدليات المناوبة الظاهرة للمستخدمين.';
+
+  @override
+  String get adminAddAd => 'إضافة إعلان';
+
+  @override
+  String get adminLoading => 'جاري التحميل...';
+
+  @override
+  String get adminNoPublishedContent => 'لا يوجد محتوى منشور';
+
+  @override
+  String get adminNoContentSubtitle =>
+      'أضف إعلانًا أو صيدلية مناوبة لتظهر في الرئيسية.';
+
+  @override
+  String get adminReviewLicense => 'مراجعة الترخيص';
+
+  @override
+  String get adminApprove => 'اعتماد';
+
+  @override
+  String get adminWriteReasonHint => 'اكتب سبب القرار (10 أحرف على الأقل)';
+
+  @override
+  String get adminReasonExample =>
+      'مثال: تمت مراجعة البيانات والوثائق والاعتماد مطابق للمعايير المطلوبة.';
+
+  @override
+  String get adminActive => 'نشط';
+
+  @override
+  String get adminSuspended => 'موقوف';
+
+  @override
+  String get adminRole => 'الدور';
+
+  @override
+  String get adminLocation => 'الموقع';
+
+  @override
+  String get adminAccreditationNumber => 'رقم الاعتماد';
+
+  @override
+  String get adminSuspendedAccount => 'حساب موقوف';
+
+  @override
+  String get adminAdditionalInfo => 'معلومات إضافية';
+
+  @override
+  String get adminPublished => 'منشور';
+
+  @override
+  String get adminStopped => 'متوقف';
+
+  @override
+  String get adminRoleAdmin => 'إدارة';
+
+  @override
+  String get adminRolePharmacy => 'صيدلية';
+
+  @override
+  String get adminRoleOrganization => 'منظمة';
+
+  @override
+  String get adminRoleWarehouse => 'مستودع';
+
+  @override
+  String get adminRoleRepresentative => 'مندوب';
+
+  @override
+  String get adminRoleUser => 'مستخدم';
+
+  @override
+  String get warehouseHeroTitle => 'توريد منظم من المخزون للتسليم';
+
+  @override
+  String get warehouseHeroSubtitle =>
+      'راقب التشغيلات والطلبات والشحنات قبل أن تتحول إلى تأخير.';
+
+  @override
+  String warehousePendingOrders(Object count) {
+    return '$count طلبات توريد بانتظارك';
+  }
+
+  @override
+  String get warehouseOrdersUpToDate => 'الطلبات محدثة';
+
+  @override
+  String get warehouseOpsStatus => 'حالة التشغيل';
+
+  @override
+  String get warehouseOpsStatusSubtitle => 'مؤشرات حية من مخزون المستودع';
+
+  @override
+  String get warehouseInventoryValueTitle => 'قيمة المخزون الحالية';
+
+  @override
+  String warehouseInventoryValueMessage(Object money) {
+    return '$money ل.س ضمن التشغيلات النشطة';
+  }
+
+  @override
+  String get warehouseQuickOps => 'تشغيل سريع';
+
+  @override
+  String get warehouseQuickOpsSubtitle => 'اختصارات لأهم أعمال المستودع';
+
+  @override
+  String get warehouseManage => 'إدارة المستودع';
+
+  @override
+  String get warehouseManageSubtitle => 'التشغيلات والمخزون';
+
+  @override
+  String get warehouseSupplyOrders => 'طلبات التوريد';
+
+  @override
+  String get warehouseSupplyOrdersSubtitle => 'قبول وتجهيز وإسناد الطلبات';
+
+  @override
+  String get warehouseShipping => 'الشحن والتوصيل';
+
+  @override
+  String get warehouseShippingSubtitle => 'المندوبون وحالة الشحنات';
+
+  @override
+  String get warehouseInventoryAnalysis => 'تحليل المخزون';
+
+  @override
+  String get warehouseInventoryAnalysisSubtitle =>
+      'توقع النفاد ودعم قرار التوريد';
+
+  @override
+  String get warehouseAlertsTitle => 'تنبيهات المخزون';
+
+  @override
+  String get warehouseAlertsSubtitle => 'التشغيلات التي تحتاج تدخلاً قريباً';
+
+  @override
+  String warehouseBatchAlert(Object batchNumber, Object qty) {
+    return 'تشغيلة $batchNumber · $qty عبوات متاحة';
+  }
+
+  @override
+  String get warehouseRecentOrders => 'أحدث الطلبات';
+
+  @override
+  String get warehouseRecentOrdersSubtitle =>
+      'آخر طلبات التوريد الواردة للمستودع';
+
+  @override
+  String warehouseOrderSummary(Object code, Object status, Object amount) {
+    return '$code · $status · $amount ل.س';
+  }
+
+  @override
+  String get warehouseCurrencySuffix => 'ل.س';
+
+  @override
+  String get representativeLoadingSchedule => 'نجهّز جدول التوصيل...';
+
+  @override
+  String get representativeReadyForNextTask => 'جاهز لمهمتك القادمة';
+
+  @override
+  String representativeCurrentTaskTo(Object pharmacyName) {
+    return 'مهمتك الحالية إلى $pharmacyName';
+  }
+
+  @override
+  String get representativeNoTaskSubtitle =>
+      'ستظهر هنا أي شحنة جديدة يسندها المستودع إليك.';
+
+  @override
+  String representativeTaskLocation(Object area, Object city, Object status) {
+    return '$area، $city · $status';
+  }
+
+  @override
+  String get representativeNoActiveTask => 'لا توجد مهمة نشطة';
+
+  @override
+  String representativeActiveTasksCount(Object count) {
+    return '$count مهام نشطة';
+  }
+
+  @override
+  String get representativeTripsSummary => 'ملخص الرحلات';
+
+  @override
+  String get representativeTripsSummarySubtitle =>
+      'حالة الشحنات المسندة إلى حسابك';
+
+  @override
+  String get representativeTotalTasks => 'إجمالي المهام';
+
+  @override
+  String get representativeActiveTasks => 'مهام نشطة';
+
+  @override
+  String get representativeFailedTasks => 'متعثرة';
+
+  @override
+  String get representativeQuickAccess => 'وصول سريع';
+
+  @override
+  String get representativeQuickAccessSubtitle => 'اختصارات لمهام المندوب';
+
+  @override
+  String get representativeDeliveryTasksSubtitle =>
+      'العناوين وتحديث حالة الشحنة';
+
+  @override
+  String get representativeNotificationsSubtitle =>
+      'التكليفات وآخر تحديثات المستودع';
+
+  @override
+  String get representativeActiveTasksTitle => 'المهام النشطة';
+
+  @override
+  String get representativeNoActionRequired => 'لا توجد رحلة تتطلب إجراء الآن';
+
+  @override
+  String get representativeStartOldest =>
+      'ابدأ بالأقدم وحدّث الحالة عند كل مرحلة';
+
+  @override
+  String get representativeAvailableForNewTask => 'أنت متاح لمهمة جديدة';
+
+  @override
+  String get representativeAvailableForNewTaskSubtitle =>
+      'عند إسناد شحنة ستصلك عبر الإشعارات وتظهر في هذه الصفحة.';
+
+  @override
+  String representativeDeliveryCardSummary(
+    Object code,
+    Object area,
+    Object city,
+    Object status,
+  ) {
+    return '$code · $area، $city · $status';
+  }
+
+  @override
+  String get representativeStatusFailed => 'تعذر التسليم';
+
+  @override
+  String get representativeStatusReturned => 'أُعيدت للمستودع';
+
+  @override
+  String get adminHeroTitle => 'منصة واضحة تحت إدارتك';
+
+  @override
+  String get adminHeroDescription =>
+      'تابع الاعتمادات والحسابات ونشاط المنصة من نقطة واحدة.';
+
+  @override
+  String adminPendingReviewCount(Object count) {
+    return '$count عناصر بانتظار المراجعة';
+  }
+
+  @override
+  String get adminReviewsUpToDate => 'جميع المراجعات محدثة';
+
+  @override
+  String get adminOverviewTitle => 'نظرة المنصة';
+
+  @override
+  String get adminOverviewLiveSubtitle => 'إحصاءات مباشرة من قاعدة البيانات';
+
+  @override
+  String get adminApprovedShort => 'معتمد';
+
+  @override
+  String get adminControlCenter => 'مركز التحكم';
+
+  @override
+  String get adminControlCenterSubtitle => 'انتقل مباشرة إلى العملية المطلوبة';
+
+  @override
+  String get adminApprovalsActionSubtitle => 'صيدليات ومنظمات ومستودعات';
+
+  @override
+  String get adminAccountsActionSubtitle => 'متابعة الحالة والصلاحية';
+
+  @override
+  String get adminPlatformBar => 'شريط المنصة';
+
+  @override
+  String get adminPlatformBarSubtitle => 'الإعلانات والصيدليات المناوبة';
+
+  @override
+  String get adminMedicineGuide => 'دليل الأدوية';
+
+  @override
+  String get adminMedicineGuideSubtitle => 'مراجعة وإضافة بيانات الدواء';
+
+  @override
+  String get adminOpenOperations => 'العمليات المفتوحة';
+
+  @override
+  String adminOpenOperationsMessage(
+    Object medicineRequests,
+    Object assistanceRequests,
+    Object donationOffers,
+  ) {
+    return '$medicineRequests طلب دواء معلق · $assistanceRequests طلب مساعدة مفتوح · $donationOffers عروض تبرع';
+  }
+
+  @override
+  String get adminAiServices => 'خدمات المعالجة الذكية';
+
+  @override
+  String get adminRefreshStatus => 'تحديث الحالة';
+
+  @override
+  String get adminAiHealthReadFailed => 'تعذر قراءة حالة الخدمات حالياً.';
+
+  @override
+  String get adminAiDrugSearch => 'البحث الدوائي';
+
+  @override
+  String get adminAiWorking => 'يعمل';
+
+  @override
+  String dashboardWelcome(Object name) {
+    return 'مرحبًا، $name';
+  }
+
+  @override
+  String get dashboardUserSubtitle => 'كل ما تحتاجه لصحتك ودوائك في مكان واحد.';
+
+  @override
+  String get dashboardPharmacySubtitle => 'تابع عمل الصيدلية والطلبات بسهولة.';
+
+  @override
+  String get dashboardOrganizationSubtitle =>
+      'أدر المبادرات وطلبات المساعدة بوضوح.';
+
+  @override
+  String get dashboardAdminSubtitle => 'راقب المنصة وأدر العمليات الأساسية.';
+
+  @override
+  String get dashboardWarehouseSubtitle =>
+      'أدر المخزون والطلبات والتوزيع من مكان واحد.';
+
+  @override
+  String get dashboardRepresentativeSubtitle =>
+      'تابع الشحنات المسندة إليك خطوة بخطوة.';
+
+  @override
+  String get dashboardBannerUser => 'صحتك تبدأ بخطوة';
+
+  @override
+  String get dashboardBannerPharmacy => 'خدمة أسرع للمستخدمين';
+
+  @override
+  String get dashboardBannerOrganization => 'أثر يصل لمن يحتاجه';
+
+  @override
+  String get dashboardBannerAdmin => 'نظرة موحدة على المنصة';
+
+  @override
+  String get dashboardBannerWarehouse => 'توريد منظم وموثوق';
+
+  @override
+  String get dashboardBannerRepresentative => 'كل شحنة في موعدها';
+
+  @override
+  String get dashboardBannerDescUser =>
+      'ابحث عن الدواء واعثر على أقرب صيدلية بثقة.';
+
+  @override
+  String get dashboardBannerDescPharmacy =>
+      'حدّث المخزون وتابع الطلبات من لوحة واحدة.';
+
+  @override
+  String get dashboardBannerDescOrganization =>
+      'تابع الحملات والتبرعات وطلبات المساعدة.';
+
+  @override
+  String get dashboardBannerDescAdmin =>
+      'الموافقات والحسابات والإعلانات بين يديك.';
+
+  @override
+  String get dashboardBannerDescWarehouse =>
+      'تابع التشغيلات والطلبات والشحنات والمدفوعات.';
+
+  @override
+  String get dashboardBannerDescRepresentative =>
+      'حدّث حالة التوصيل حتى استلام الصيدلية.';
+
+  @override
+  String dashboardServicesCount(Object count) {
+    return '$count خدمات';
+  }
+
+  @override
+  String get homeShellSupply => 'التوريد';
+
+  @override
+  String get homeShellAdmin => 'الإدارة';
+
+  @override
+  String get homeShellMedicines => 'الأدوية';
+
+  @override
+  String get homeShellOrgManagement => 'إدارة المنظمة';
+
+  @override
+  String get homeShellWarehouse => 'المستودع';
+
+  @override
+  String get homeShellMyTasks => 'مهامي';
+
+  @override
+  String get modulesTitle => 'خدماتك';
+
+  @override
+  String get modulesSubtitle => 'كل ما تحتاجه في مكان واضح وسريع';
+
+  @override
+  String get moduleSearchMedicine => 'البحث عن دواء';
+
+  @override
+  String get moduleSearchMedicineDesc => 'ابحث في الصيدليات القريبة';
+
+  @override
+  String get moduleNearbyPharmacies => 'الصيدليات القريبة';
+
+  @override
+  String get moduleNearbyPharmaciesDesc => 'اعرض الأقرب والمسار إليها';
+
+  @override
+  String get moduleMyPrescriptions => 'وصفاتي';
+
+  @override
+  String get moduleMyPrescriptionsDesc => 'حلّل الوصفة وتابع الحجز';
+
+  @override
+  String get moduleMyRequests => 'طلباتي';
+
+  @override
+  String get moduleMyRequestsDesc => 'تابع طلبات توفر الأدوية';
+
+  @override
+  String get moduleMyHealthProfile => 'ملفي الصحي';
+
+  @override
+  String get moduleMyHealthProfileDesc => 'بياناتك الصحية والبطاقة';
+
+  @override
+  String get moduleDonationsDesc => 'عروض الدواء وطلبات المساعدة';
+
+  @override
+  String get moduleOrganizations => 'المنظمات';
+
+  @override
+  String get moduleOrganizationsDesc => 'الحملات والمنظمات المعتمدة';
+
+  @override
+  String get modulePharmacyAssistant => 'المساعد الدوائي';
+
+  @override
+  String get modulePharmacyAssistantDesc => 'مساعدة سريعة ومعلومات موثوقة';
+
+  @override
+  String get moduleMedicineAlternatives => 'البدائل الدوائية';
+
+  @override
+  String get moduleMedicineAlternativesDesc =>
+      'اعرض خيارات مشابهة ومعلومات المقارنة';
+
+  @override
+  String get moduleInventoryDesc => 'الكميات والأسعار والتوفر';
+
+  @override
+  String get moduleUserRequests => 'طلبات المستخدمين';
+
+  @override
+  String get moduleUserRequestsDesc => 'راجع الطلبات وأرسل الرد';
+
+  @override
+  String get modulePrescriptionOrders => 'طلبات الوصفات';
+
+  @override
+  String get modulePrescriptionOrdersDesc => 'جهّز الحجوزات وتابع حالتها';
+
+  @override
+  String get modulePharmacyLocation => 'موقع الصيدلية';
+
+  @override
+  String get modulePharmacyLocationDesc => 'الموقع والبيانات العامة';
+
+  @override
+  String get moduleWorkingHoursDesc => 'أوقات الدوام وحالة الفتح';
+
+  @override
+  String get moduleMedicineCatalog => 'دليل الأدوية';
+
+  @override
+  String get moduleMedicineCatalogDesc => 'اختر الأدوية لإضافتها للمخزون';
+
+  @override
+  String get moduleMedicineCatalogAdminDesc => 'إدارة بيانات الأدوية';
+
+  @override
+  String get moduleDonationVerification => 'التحقق من التبرعات';
+
+  @override
+  String get moduleDonationVerificationDesc => 'فحص العبوات واعتماد استلامها';
+
+  @override
+  String get moduleSupplyChain => 'توريد الصيدلية';
+
+  @override
+  String get moduleSupplyChainDesc => 'المستودعات والطلبات واحتياج المخزون';
+
+  @override
+  String get moduleInventoryAnalysis => 'تحليل المخزون';
+
+  @override
+  String get moduleInventoryAnalysisDesc =>
+      'بدائل الأدوية وتوقع الاحتياج القادم';
+
+  @override
+  String get moduleInventoryAnalysisWarehouseDesc =>
+      'توقع النفاد وتخطيط إعادة الطلب';
+
+  @override
+  String get moduleCampaignsDesc => 'أنشئ الحملات وتابع حالتها';
+
+  @override
+  String get moduleAssistanceDesc => 'تابع الطلبات وحدّث حالتها';
+
+  @override
+  String get moduleApprovals => 'الموافقات';
+
+  @override
+  String get moduleApprovalsDesc => 'الصيدليات والمنظمات المعلقة';
+
+  @override
+  String get moduleAccounts => 'الحسابات';
+
+  @override
+  String get moduleAccountsDesc => 'عرض الحسابات وإدارة حالتها';
+
+  @override
+  String get moduleHomeTicker => 'شريط الإعلانات';
+
+  @override
+  String get moduleHomeTickerDesc => 'الإعلانات والصيدليات المناوبة';
+
+  @override
+  String get moduleAnalysisServices => 'خدمات التحليل';
+
+  @override
+  String get moduleAnalysisServicesDesc => 'اختبار البدائل وتوقع نفاد المخزون';
+
+  @override
+  String get moduleWarehouseManagement => 'إدارة المستودع';
+
+  @override
+  String get moduleWarehouseManagementDesc =>
+      'المخزون والطلبات والشحنات والفواتير';
+
+  @override
+  String get moduleDeliveryTasks => 'مهام التوصيل';
+
+  @override
+  String get moduleDeliveryTasksDesc => 'تابع الشحنات المسندة وحدّث حالتها';
+
+  @override
+  String get errorTimeout => 'انتهت مهلة الاتصال، حاول مجددًا.';
+
+  @override
+  String get errorConnection =>
+      'تعذر الاتصال بالخادم. تحقق من الشبكة وتشغيل الخدمة.';
+
+  @override
+  String get errorGeneric => 'تعذر إكمال العملية حاليًا.';
+
+  @override
+  String get errorLocationRequired => 'حدد موقعك أولًا لعرض الصيدليات القريبة.';
+
+  @override
+  String get errorLocationCoordinates => 'يجب إدخال خط العرض وخط الطول معًا.';
+
+  @override
+  String get errorAwaitingApproval => 'حسابك بانتظار موافقة الإدارة.';
+
+  @override
+  String get errorAlreadyApproved => 'تم الاعتماد مسبقًا.';
+
+  @override
+  String get errorAlreadyRejected => 'تم رفض الطلب مسبقًا.';
+
+  @override
+  String get errorNotFound => 'العنصر غير موجود.';
+
+  @override
+  String get errorAlreadyTaken => 'القيمة مستخدمة مسبقًا.';
+
+  @override
+  String get errorLocationServiceDisabled =>
+      'خدمة الموقع متوقفة. فعّلها من إعدادات الجهاز ثم حاول مجددًا.';
+
+  @override
+  String get errorLocationPermissionDenied =>
+      'لم يتم السماح بالوصول إلى الموقع.';
+
+  @override
+  String get errorLocationPermissionForever =>
+      'إذن الموقع موقوف لهذا التطبيق. يمكنك تفعيله من إعدادات الجهاز.';
+
+  @override
+  String get errorLoginResponseIncomplete => 'استجابة تسجيل الدخول غير مكتملة.';
+
+  @override
+  String get errorSessionReadFailed => 'تعذر قراءة بيانات الجلسة.';
+
+  @override
+  String get errorRegisterResponseIncomplete =>
+      'استجابة إنشاء الحساب غير مكتملة.';
+
+  @override
+  String get errorNewAccountReadFailed => 'تعذر قراءة بيانات الحساب الجديد.';
+
+  @override
+  String get errorInvalidListResponse => 'استجابة القائمة من الخادم غير صالحة.';
+
+  @override
+  String get adminCacheCleared => 'تم تنظيف بيانات المواقع القديمة.';
 }

@@ -172,7 +172,7 @@ class ChatAiSource {
       ? arabicName.trim()
       : medicineName.trim().isNotEmpty
       ? medicineName.trim()
-      : 'مرجع دوائي';
+      : '';
 }
 
 class ChatAction {

@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
+import '../../../../core/constants/layout.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/data/models/auth_session.dart';
 import '../../data/role_modules.dart';
 import '../navigation/module_navigation.dart';
@@ -16,8 +18,9 @@ class DashboardOverviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final role = user.primaryRole;
-    final modules = modulesForRole(role);
+    final modules = modulesForRole(l10n, role);
     final width = MediaQuery.sizeOf(context).width;
     final columns = width >= 700 ? 3 : 2;
 
@@ -28,12 +31,12 @@ class DashboardOverviewPage extends StatelessWidget {
           sliver: SliverList.list(
             children: [
               Text(
-                'مرحبًا، ${user.fullName.split(' ').first}',
+                l10n.dashboardWelcome(user.fullName.split(' ').first),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 6),
               Text(
-                _subtitle(role),
+                _subtitle(l10n, role),
                 style: Theme.of(
                   context,
                 ).textTheme.bodyLarge?.copyWith(color: context.appColors.textMuted),
@@ -66,13 +69,13 @@ class DashboardOverviewPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _bannerTitle(role),
+                            _bannerTitle(l10n, role),
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(color: Colors.white),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            _bannerDescription(role),
+                            _bannerDescription(l10n, role),
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.84),
@@ -105,12 +108,12 @@ class DashboardOverviewPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'وصول سريع',
+                      l10n.quickAccessTitle,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                   Text(
-                    '${modules.length} خدمات',
+                    l10n.dashboardServicesCount(modules.length),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.appColors.primary,
                       fontWeight: FontWeight.w700,
@@ -123,7 +126,7 @@ class DashboardOverviewPage extends StatelessWidget {
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 112),
+          padding: EdgeInsets.fromLTRB(20, 0, 20, kBottomNavReserved),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate((context, index) {
               final module = modules[index];
@@ -145,30 +148,30 @@ class DashboardOverviewPage extends StatelessWidget {
     );
   }
 
-  String _subtitle(AppRole role) => switch (role) {
-    AppRole.user => 'كل ما تحتاجه لصحتك ودوائك في مكان واحد.',
-    AppRole.pharmacy => 'تابع عمل الصيدلية والطلبات بسهولة.',
-    AppRole.organization => 'أدر المبادرات وطلبات المساعدة بوضوح.',
-    AppRole.admin => 'راقب المنصة وأدر العمليات الأساسية.',
-    AppRole.warehouse => 'أدر المخزون والطلبات والتوزيع من مكان واحد.',
-    AppRole.representative => 'تابع الشحنات المسندة إليك خطوة بخطوة.',
+  String _subtitle(AppLocalizations l10n, AppRole role) => switch (role) {
+    AppRole.user => l10n.dashboardUserSubtitle,
+    AppRole.pharmacy => l10n.dashboardPharmacySubtitle,
+    AppRole.organization => l10n.dashboardOrganizationSubtitle,
+    AppRole.admin => l10n.dashboardAdminSubtitle,
+    AppRole.warehouse => l10n.dashboardWarehouseSubtitle,
+    AppRole.representative => l10n.dashboardRepresentativeSubtitle,
   };
 
-  String _bannerTitle(AppRole role) => switch (role) {
-    AppRole.user => 'صحتك تبدأ بخطوة',
-    AppRole.pharmacy => 'خدمة أسرع للمستخدمين',
-    AppRole.organization => 'أثر يصل لمن يحتاجه',
-    AppRole.admin => 'نظرة موحدة على المنصة',
-    AppRole.warehouse => 'توريد منظم وموثوق',
-    AppRole.representative => 'كل شحنة في موعدها',
+  String _bannerTitle(AppLocalizations l10n, AppRole role) => switch (role) {
+    AppRole.user => l10n.dashboardBannerUser,
+    AppRole.pharmacy => l10n.dashboardBannerPharmacy,
+    AppRole.organization => l10n.dashboardBannerOrganization,
+    AppRole.admin => l10n.dashboardBannerAdmin,
+    AppRole.warehouse => l10n.dashboardBannerWarehouse,
+    AppRole.representative => l10n.dashboardBannerRepresentative,
   };
 
-  String _bannerDescription(AppRole role) => switch (role) {
-    AppRole.user => 'ابحث عن الدواء واعثر على أقرب صيدلية بثقة.',
-    AppRole.pharmacy => 'حدّث المخزون وتابع الطلبات من لوحة واحدة.',
-    AppRole.organization => 'تابع الحملات والتبرعات وطلبات المساعدة.',
-    AppRole.admin => 'الموافقات والحسابات والإعلانات بين يديك.',
-    AppRole.warehouse => 'تابع التشغيلات والطلبات والشحنات والمدفوعات.',
-    AppRole.representative => 'حدّث حالة التوصيل حتى استلام الصيدلية.',
+  String _bannerDescription(AppLocalizations l10n, AppRole role) => switch (role) {
+    AppRole.user => l10n.dashboardBannerDescUser,
+    AppRole.pharmacy => l10n.dashboardBannerDescPharmacy,
+    AppRole.organization => l10n.dashboardBannerDescOrganization,
+    AppRole.admin => l10n.dashboardBannerDescAdmin,
+    AppRole.warehouse => l10n.dashboardBannerDescWarehouse,
+    AppRole.representative => l10n.dashboardBannerDescRepresentative,
   };
 }

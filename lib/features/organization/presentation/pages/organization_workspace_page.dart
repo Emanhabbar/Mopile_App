@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/layout.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../donations/data/models/donation_models.dart';
 import '../../../donations/presentation/pages/donations_page.dart';
 import '../../data/models/organization_models.dart';
@@ -44,6 +46,7 @@ class _OrganizationWorkspacePageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final dashboard = ref.watch(organizationDashboardProvider);
     final campaigns = ref.watch(organizationCampaignsProvider);
     final offers = ref.watch(organizationOffersProvider);
@@ -54,9 +57,9 @@ class _OrganizationWorkspacePageState
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('إدارة المنظمة'),
+            Text(l10n.organizationManagement),
             Text(
-              'المبادرات والتبرعات والمستفيدون',
+              l10n.orgManagementSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 12,
@@ -68,30 +71,30 @@ class _OrganizationWorkspacePageState
         actions: [
           IconButton(
             onPressed: _refresh,
-            tooltip: 'تحديث البيانات',
+            tooltip: l10n.refreshDataTooltip,
             icon: const Icon(Icons.refresh_rounded),
           ),
           PopupMenuButton<String>(
-            tooltip: 'المزيد',
+            tooltip: l10n.moreLabel,
             icon: const Icon(Icons.more_horiz_rounded),
             onSelected: (value) {
               if (value == 'profile') _loadAndEditProfile();
               if (value == 'document') _uploadDocument();
             },
-            itemBuilder: (_) => const [
+            itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'profile',
                 child: ListTile(
-                  leading: Icon(Icons.edit_outlined),
-                  title: Text('تعديل بيانات المنظمة'),
+                  leading: const Icon(Icons.edit_outlined),
+                  title: Text(l10n.editOrganizationData),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
               PopupMenuItem(
                 value: 'document',
                 child: ListTile(
-                  leading: Icon(Icons.upload_file_outlined),
-                  title: Text('رفع وثيقة تحقق'),
+                  leading: const Icon(Icons.upload_file_outlined),
+                  title: Text(l10n.uploadVerificationDocument),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
@@ -104,7 +107,7 @@ class _OrganizationWorkspacePageState
         onRefresh: _refresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+          padding: EdgeInsets.fromLTRB(20, 16, 20, kBottomNavReserved + 12),
           children: [
             AppReveal(
               child: dashboard.when(
@@ -189,6 +192,7 @@ class _OrganizationWorkspacePageState
   }
 
   Future<void> _createCampaign() async {
+    final l10n = AppLocalizations.of(context);
     final title = TextEditingController();
     final description = TextEditingController();
     final medicines = TextEditingController();
@@ -234,14 +238,14 @@ class _OrganizationWorkspacePageState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'حملة جديدة',
+                            l10n.newCampaign,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
                           Text(
-                            'أضف معلومات واضحة تساعد المتبرعين.',
+                            l10n.addCampaignInfoSubtitle,
                             style: TextStyle(
                               color: context.appColors.textMuted,
                               fontSize: 12,
@@ -253,21 +257,25 @@ class _OrganizationWorkspacePageState
                   ],
                 ),
                 const SizedBox(height: 18),
-                _Field(controller: title, label: 'عنوان الحملة'),
-                _Field(controller: description, label: 'وصف الحملة', lines: 3),
+                _Field(controller: title, label: l10n.campaignTitleField),
+                _Field(
+                  controller: description,
+                  label: l10n.campaignDescriptionField,
+                  lines: 3,
+                ),
                 _Field(
                   controller: medicines,
-                  label: 'الأدوية المطلوبة (اختياري)',
+                  label: l10n.requestedMedicinesField,
                   lines: 2,
                 ),
                 Row(
                   children: [
                     Expanded(
-                      child: _Field(controller: city, label: 'المدينة'),
+                      child: _Field(controller: city, label: l10n.cityLabel),
                     ),
                     const SizedBox(width: 9),
                     Expanded(
-                      child: _Field(controller: area, label: 'المنطقة'),
+                      child: _Field(controller: area, label: l10n.areaLabel),
                     ),
                   ],
                 ),
@@ -279,8 +287,8 @@ class _OrganizationWorkspacePageState
                   child: Column(
                     children: [
                       SwitchListTile(
-                        title: const Text('حملة عاجلة'),
-                        subtitle: const Text('تظهر بأولوية بصرية أعلى.'),
+                        title: Text(l10n.urgentCampaign),
+                        subtitle: Text(l10n.urgentCampaignSubtitle),
                         secondary: const Icon(Icons.priority_high_rounded),
                         value: isUrgent,
                         onChanged: (value) =>
@@ -288,10 +296,8 @@ class _OrganizationWorkspacePageState
                       ),
                       const Divider(),
                       SwitchListTile(
-                        title: const Text('استقبال تبرعات عامة'),
-                        subtitle: const Text(
-                          'يمكن للمستخدمين دعم الحملة مباشرة.',
-                        ),
+                        title: Text(l10n.acceptPublicDonations),
+                        subtitle: Text(l10n.acceptPublicDonationsSubtitle),
                         secondary: const Icon(
                           Icons.volunteer_activism_outlined,
                         ),
@@ -307,7 +313,7 @@ class _OrganizationWorkspacePageState
                   children: [
                     Expanded(
                       child: _DateSelector(
-                        label: 'تاريخ البداية',
+                        label: l10n.startDateLabel,
                         value: startsAt,
                         onTap: () async {
                           final value = await _pickCampaignDate(
@@ -323,7 +329,7 @@ class _OrganizationWorkspacePageState
                     const SizedBox(width: 9),
                     Expanded(
                       child: _DateSelector(
-                        label: 'تاريخ النهاية',
+                        label: l10n.endDateLabel,
                         value: endsAt,
                         onTap: () async {
                           final value = await _pickCampaignDate(
@@ -344,7 +350,7 @@ class _OrganizationWorkspacePageState
                   child: FilledButton.icon(
                     onPressed: () => Navigator.pop(sheetContext, true),
                     icon: const Icon(Icons.arrow_forward_rounded),
-                    label: const Text('إنشاء الحملة'),
+                    label: Text(l10n.createCampaign),
                   ),
                 ),
                 const SizedBox(height: 80),
@@ -399,6 +405,7 @@ class _OrganizationWorkspacePageState
   }
 
   Future<void> _editProfile(OrganizationDashboard current) async {
+    final l10n = AppLocalizations.of(context);
     final name = TextEditingController(text: current.organizationName);
     final registration = TextEditingController(
       text: current.registrationNumber,
@@ -411,29 +418,33 @@ class _OrganizationWorkspacePageState
     final saved = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('بيانات المنظمة'),
+        title: Text(l10n.organizationData),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _Field(controller: name, label: 'اسم المنظمة'),
-              _Field(controller: registration, label: 'رقم التسجيل'),
-              _Field(controller: phone, label: 'رقم الهاتف'),
-              _Field(controller: city, label: 'المدينة'),
-              _Field(controller: area, label: 'المنطقة'),
-              _Field(controller: address, label: 'العنوان'),
-              _Field(controller: description, label: 'وصف المنظمة', lines: 3),
+              _Field(controller: name, label: l10n.organizationNameField),
+              _Field(controller: registration, label: l10n.registrationNumberField),
+              _Field(controller: phone, label: l10n.phoneLabel),
+              _Field(controller: city, label: l10n.cityLabel),
+              _Field(controller: area, label: l10n.areaLabel),
+              _Field(controller: address, label: l10n.addressLabel),
+              _Field(
+                controller: description,
+                label: l10n.organizationDescriptionField,
+                lines: 3,
+              ),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حفظ'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -476,7 +487,7 @@ class _OrganizationWorkspacePageState
       final profile = await ref.read(organizationProfileProvider.future);
       if (mounted) await _editProfile(profile);
     } catch (error) {
-      _message(_errorText(error), true);
+      _message(_errorText(AppLocalizations.of(context), error), true);
     } finally {
       if (mounted && _workingId == 'load-profile') {
         setState(() => _workingId = null);
@@ -485,18 +496,19 @@ class _OrganizationWorkspacePageState
   }
 
   Future<void> _uploadDocument() async {
-    const types = {
-      'RegistrationCertificate': 'شهادة التسجيل',
-      'OperatingLicense': 'ترخيص العمل',
-      'ManagerIdentityDocument': 'هوية المدير',
-      'TaxOrLegalDocument': 'وثيقة قانونية',
-      'Other': 'أخرى',
+    final l10n = AppLocalizations.of(context);
+    final types = {
+      'RegistrationCertificate': l10n.docRegistrationCertificate,
+      'OperatingLicense': l10n.docOperatingLicense,
+      'ManagerIdentityDocument': l10n.docManagerIdentity,
+      'TaxOrLegalDocument': l10n.docTaxOrLegal,
+      'Other': l10n.docOther,
     };
     String selected = 'RegistrationCertificate';
     final documentType = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('نوع الوثيقة'),
+        title: Text(l10n.documentTypeTitle),
         content: StatefulBuilder(
           builder: (context, setDialogState) => DropdownButtonFormField<String>(
             initialValue: selected,
@@ -515,7 +527,7 @@ class _OrganizationWorkspacePageState
         actions: [
           FilledButton(
             onPressed: () => Navigator.pop(context, selected),
-            child: const Text('اختيار ملف'),
+            child: Text(l10n.chooseFile),
           ),
         ],
       ),
@@ -528,7 +540,7 @@ class _OrganizationWorkspacePageState
     final file = await openFile(acceptedTypeGroups: const [group]);
     if (file == null) return;
     if (await file.length() > 10 * 1024 * 1024) {
-      _message('حجم الوثيقة يجب ألا يتجاوز 10 ميغابايت.', true);
+      _message(l10n.documentSizeLimit, true);
       return;
     }
     await _run('document', () async {
@@ -574,9 +586,9 @@ class _OrganizationWorkspacePageState
     setState(() => _workingId = id);
     try {
       await action();
-      _message('تم حفظ التحديث.', false);
+      _message(AppLocalizations.of(context).updateSaved, false);
     } catch (error) {
-      _message(_errorText(error), true);
+      _message(_errorText(AppLocalizations.of(context), error), true);
     } finally {
       if (mounted) setState(() => _workingId = null);
     }
@@ -619,20 +631,21 @@ class _SectionNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final items = <({String label, IconData icon, int? count})>[
-      (label: 'الملخص', icon: Icons.grid_view_rounded, count: null),
-      (label: 'الحملات', icon: Icons.campaign_outlined, count: null),
+      (label: l10n.summaryLabel, icon: Icons.grid_view_rounded, count: null),
+      (label: l10n.campaignsLabel, icon: Icons.campaign_outlined, count: null),
       (
-        label: 'التبرعات',
+        label: l10n.donationsLabel,
         icon: Icons.volunteer_activism_outlined,
         count: pendingOffers,
       ),
       (
-        label: 'المساعدة',
+        label: l10n.assistanceLabel,
         icon: Icons.health_and_safety_outlined,
         count: openRequests,
       ),
-      (label: 'الملف', icon: Icons.apartment_outlined, count: null),
+      (label: l10n.profileLabel, icon: Icons.apartment_outlined, count: null),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -646,12 +659,12 @@ class _SectionNavigation extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsetsDirectional.only(end: 8),
                 child: Material(
-                  color: selected ? context.appColors.primaryDeep : context.appColors.surface,
+                  color: selected ? context.appColors.primary : context.appColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(17),
                     side: BorderSide(
                       color: selected
-                          ? context.appColors.primaryDeep
+                          ? context.appColors.primary
                           : context.appColors.border,
                     ),
                   ),
@@ -736,13 +749,15 @@ class _OverviewSection extends StatelessWidget {
   final VoidCallback onEditProfile;
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const _SectionHeading(
-        eyebrow: 'وصول سريع',
-        title: 'ما الذي تريد إنجازه؟',
-        subtitle: 'أهم عمليات المنظمة جاهزة من مكان واحد.',
+      _SectionHeading(
+        eyebrow: l10n.quickAccess,
+        title: l10n.whatDoYouWantToDo,
+        subtitle: l10n.orgOperationsReady,
       ),
       const SizedBox(height: 12),
       Row(
@@ -750,7 +765,7 @@ class _OverviewSection extends StatelessWidget {
           Expanded(
             child: _QuickAction(
               icon: Icons.add_rounded,
-              label: 'حملة جديدة',
+              label: l10n.newCampaign,
               onTap: onCreateCampaign,
             ),
           ),
@@ -758,7 +773,7 @@ class _OverviewSection extends StatelessWidget {
           Expanded(
             child: _QuickAction(
               icon: Icons.upload_file_outlined,
-              label: 'رفع وثيقة',
+              label: l10n.uploadDocument,
               onTap: onUploadDocument,
             ),
           ),
@@ -766,7 +781,7 @@ class _OverviewSection extends StatelessWidget {
           Expanded(
             child: _QuickAction(
               icon: Icons.edit_outlined,
-              label: 'تعديل الملف',
+              label: l10n.editProfileLabel,
               onTap: onEditProfile,
             ),
           ),
@@ -784,15 +799,15 @@ class _OverviewSection extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 16),
-      const _SectionHeading(
-        eyebrow: 'الأثر الحالي',
-        title: 'ملخص العمل',
-        subtitle: 'قراءة سريعة لحركة المبادرات والطلبات.',
+      _SectionHeading(
+        eyebrow: l10n.currentImpact,
+        title: l10n.workSummary,
+        subtitle: l10n.workSummarySubtitle,
       ),
       const SizedBox(height: 12),
       dashboard.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (data) => GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -802,45 +817,45 @@ class _OverviewSection extends StatelessWidget {
           crossAxisSpacing: 10,
           children: [
             _ImpactMetric(
-              label: 'جميع الحملات',
+              label: l10n.allCampaigns,
               value: data.totalCampaignsCount,
               icon: Icons.campaign_outlined,
               color: context.appColors.primary,
             ),
             _ImpactMetric(
-              label: 'الحملات النشطة',
+              label: l10n.activeCampaigns,
               value: data.activeCampaignsCount,
               icon: Icons.bolt_rounded,
               color: context.appColors.primary,
             ),
             _ImpactMetric(
-              label: 'عروض تنتظر',
+              label: l10n.pendingOffers,
               value: data.pendingDonationOffersCount,
               icon: Icons.volunteer_activism_outlined,
-              color: context.appColors.primaryDeep,
+              color: context.appColors.primary,
             ),
             _ImpactMetric(
-              label: 'طلبات مفتوحة',
+              label: l10n.openRequests,
               value: data.openAssistanceRequestsCount,
               icon: Icons.favorite_outline_rounded,
-              color: context.appColors.primaryDark,
+              color: context.appColors.primary,
             ),
           ],
         ),
       ),
       const SizedBox(height: 2),
-      const _SectionHeading(
-        eyebrow: 'آخر التحديثات',
-        title: 'الحملات الأخيرة',
-        subtitle: 'آخر المبادرات التي عملت عليها المنظمة.',
+      _SectionHeading(
+        eyebrow: l10n.latestUpdates,
+        title: l10n.recentCampaigns,
+        subtitle: l10n.recentCampaignsSubtitle,
       ),
       const SizedBox(height: 10),
       campaigns.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (items) => items.isEmpty
-            ? const _Empty(
-                text: 'ابدأ بإنشاء أول حملة للمنظمة.',
+            ? _Empty(
+                text: l10n.startFirstCampaign,
                 icon: Icons.campaign_outlined,
               )
             : Column(
@@ -852,6 +867,7 @@ class _OverviewSection extends StatelessWidget {
       ),
     ],
   );
+  }
 }
 
 class _CampaignsSection extends StatelessWidget {
@@ -867,25 +883,27 @@ class _CampaignsSection extends StatelessWidget {
   final Future<void> Function(String, String) onUpdate;
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     children: [
       _SectionHeading(
-        eyebrow: 'إدارة المبادرات',
-        title: 'حملات المنظمة',
-        subtitle: 'أنشئ الحملة وحدد حالتها وفق تقدم العمل.',
+        eyebrow: l10n.manageInitiatives,
+        title: l10n.orgCampaigns,
+        subtitle: l10n.orgCampaignsSubtitle,
         action: IconButton.filled(
           onPressed: onCreate,
-          tooltip: 'إنشاء حملة',
+          tooltip: l10n.createCampaignTooltip,
           icon: const Icon(Icons.add_rounded),
         ),
       ),
       const SizedBox(height: 14),
       state.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (items) => items.isEmpty
-            ? const _Empty(
-                text: 'لا توجد حملات بعد. أنشئ أول مبادرة الآن.',
+            ? _Empty(
+                text: l10n.noCampaignsYet,
                 icon: Icons.campaign_outlined,
               )
             : Column(
@@ -912,6 +930,7 @@ class _CampaignsSection extends StatelessWidget {
       ),
     ],
   );
+  }
 }
 
 class _DonationOffersSection extends StatelessWidget {
@@ -925,20 +944,22 @@ class _DonationOffersSection extends StatelessWidget {
   final Future<void> Function(String, String) onReview;
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     children: [
-      const _SectionHeading(
-        eyebrow: 'شبكة العطاء',
-        title: 'عروض التبرع',
-        subtitle: 'راجع العروض التي اجتازت التحقق وتابع استلامها.',
+      _SectionHeading(
+        eyebrow: l10n.givingNetwork,
+        title: l10n.donationOffersTitle,
+        subtitle: l10n.donationOffersSubtitle,
       ),
       const SizedBox(height: 14),
       state.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (items) => items.isEmpty
-            ? const _Empty(
-                text: 'لا توجد عروض تبرع موجهة للمنظمة.',
+            ? _Empty(
+                text: l10n.noDonationOffers,
                 icon: Icons.volunteer_activism_outlined,
               )
             : Column(
@@ -958,6 +979,7 @@ class _DonationOffersSection extends StatelessWidget {
       ),
     ],
   );
+  }
 }
 
 class _AssistanceSection extends StatelessWidget {
@@ -971,20 +993,22 @@ class _AssistanceSection extends StatelessWidget {
   final Future<void> Function(String, String) onUpdate;
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     children: [
-      const _SectionHeading(
-        eyebrow: 'رعاية المستفيدين',
-        title: 'طلبات المساعدة',
-        subtitle: 'تابع الحالات من الطلب الأول حتى اكتمال المساعدة.',
+      _SectionHeading(
+        eyebrow: l10n.beneficiaryCare,
+        title: l10n.assistanceRequestsTitle,
+        subtitle: l10n.assistanceRequestsSubtitle,
       ),
       const SizedBox(height: 14),
       state.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (items) => items.isEmpty
-            ? const _Empty(
-                text: 'لا توجد طلبات مساعدة حاليًا.',
+            ? _Empty(
+                text: l10n.noAssistanceRequests,
                 icon: Icons.health_and_safety_outlined,
               )
             : Column(
@@ -1005,6 +1029,7 @@ class _AssistanceSection extends StatelessWidget {
       ),
     ],
   );
+  }
 }
 
 class _OrganizationProfileSection extends StatelessWidget {
@@ -1020,29 +1045,31 @@ class _OrganizationProfileSection extends StatelessWidget {
   final VoidCallback onUpload;
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       _SectionHeading(
-        eyebrow: 'بيانات موثوقة',
-        title: 'ملف المنظمة',
-        subtitle: 'حافظ على دقة بيانات التواصل ووثائق الاعتماد.',
+        eyebrow: l10n.reliableData,
+        title: l10n.orgProfile,
+        subtitle: l10n.orgProfileSubtitle,
         action: IconButton.filledTonal(
           onPressed: onEdit,
-          tooltip: 'تعديل الملف',
+          tooltip: l10n.editProfileLabel,
           icon: const Icon(Icons.edit_outlined),
         ),
       ),
       const SizedBox(height: 14),
       dashboard.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (data) => _ProfileDetailsCard(data: data),
       ),
       const SizedBox(height: 16),
       verification.when(
         loading: () => const LinearProgressIndicator(),
-        error: (error, _) => Text(_errorText(error)),
+        error: (error, _) => Text(_errorText(l10n, error)),
         data: (data) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1054,9 +1081,9 @@ class _OrganizationProfileSection extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             _SectionHeading(
-              eyebrow: 'المستندات',
-              title: 'وثائق الاعتماد',
-              subtitle: '${data.documents.length} ملفات مرفوعة للمراجعة.',
+              eyebrow: l10n.documentsLabel,
+              title: l10n.accreditationDocs,
+              subtitle: l10n.uploadedDocsCount(data.documents.length),
               action: IconButton.outlined(
                 onPressed: onUpload,
                 icon: const Icon(Icons.add_rounded),
@@ -1064,8 +1091,8 @@ class _OrganizationProfileSection extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             if (data.documents.isEmpty)
-              const _Empty(
-                text: 'لم تُرفع وثائق اعتماد بعد.',
+              _Empty(
+                text: l10n.noAccreditationDocs,
                 icon: Icons.folder_open_outlined,
               )
             else
@@ -1077,6 +1104,7 @@ class _OrganizationProfileSection extends StatelessWidget {
       ),
     ],
   );
+  }
 }
 
 class _OrganizationHero extends StatelessWidget {
@@ -1087,16 +1115,13 @@ class _OrganizationHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final verified =
         data.verificationStatus.toLowerCase() == 'verified' ||
         data.verificationStatus.toLowerCase() == 'approved';
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.appColors.primaryDeep, context.appColors.primary],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(27),
         border: Border.all(
           color: Colors.white.withValues(alpha: .08),
@@ -1104,7 +1129,7 @@ class _OrganizationHero extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: context.appColors.primaryDeep.withValues(alpha: .14),
+            color: context.appColors.primary.withValues(alpha: .14),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -1127,7 +1152,7 @@ class _OrganizationHero extends StatelessWidget {
                       ),
                       child: Icon(
                         Icons.apartment_rounded,
-                        color: context.appColors.secondary,
+                        color: context.appColors.primaryLight,
                         size: 29,
                       ),
                     ),
@@ -1172,13 +1197,13 @@ class _OrganizationHero extends StatelessWidget {
                                 ? Icons.verified_rounded
                                 : Icons.hourglass_top_rounded,
                             color: verified
-                                ? context.appColors.secondary
+                                ? context.appColors.primaryLight
                                 : Colors.white70,
                             size: 16,
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            _verificationShort(data.verificationStatus),
+                            _verificationShort(l10n, data.verificationStatus),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
@@ -1193,15 +1218,15 @@ class _OrganizationHero extends StatelessWidget {
                 Row(
                   children: [
                     _HeroCount(
-                      label: 'حملات نشطة',
+                      label: l10n.activeCampaigns,
                       value: data.activeCampaignsCount,
                     ),
                     _HeroCount(
-                      label: 'عروض تنتظر',
+                      label: l10n.pendingOffers,
                       value: data.pendingDonationOffersCount,
                     ),
                     _HeroCount(
-                      label: 'طلبات مفتوحة',
+                      label: l10n.openRequests,
                       value: data.openAssistanceRequestsCount,
                     ),
                   ],
@@ -1218,7 +1243,7 @@ class _OrganizationHero extends StatelessWidget {
                           foregroundColor: context.appColors.primaryDeep,
                         ),
                         icon: const Icon(Icons.add_rounded, size: 19),
-                        label: const Text('إنشاء حملة جديدة'),
+                        label: Text(l10n.createNewCampaign),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -1508,7 +1533,7 @@ class _CompactCampaignCard extends StatelessWidget {
             ),
           ),
           _StatusPill(
-            label: _campaignStatus(item.status),
+            label: _campaignStatus(AppLocalizations.of(context), item.status),
                 color: _campaignColor(context.appColors, item.status),
           ),
         ],
@@ -1528,7 +1553,9 @@ class _CampaignCard extends StatelessWidget {
   final ValueChanged<String> onUpdate;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1576,12 +1603,18 @@ class _CampaignCard extends StatelessWidget {
               PopupMenuButton<String>(
                 enabled: !working,
                 onSelected: onUpdate,
-                itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'Active', child: Text('تفعيل الحملة')),
-                  PopupMenuItem(value: 'Closed', child: Text('إغلاق الحملة')),
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    value: 'Active',
+                    child: Text(l10n.activateCampaign),
+                  ),
+                  PopupMenuItem(
+                    value: 'Closed',
+                    child: Text(l10n.closeCampaign),
+                  ),
                   PopupMenuItem(
                     value: 'Cancelled',
-                    child: Text('إلغاء الحملة'),
+                    child: Text(l10n.cancelCampaign),
                   ),
                 ],
               ),
@@ -1593,14 +1626,14 @@ class _CampaignCard extends StatelessWidget {
             runSpacing: 7,
             children: [
               _StatusPill(
-                label: _campaignStatus(item.status),
+                label: _campaignStatus(l10n, item.status),
             color: _campaignColor(context.appColors, item.status),
               ),
               if (item.isUrgent)
-                _StatusPill(label: 'عاجلة', color: context.appColors.primaryDark),
+                _StatusPill(label: l10n.urgentLabel, color: context.appColors.primaryDark),
               if (item.acceptsPublicDonations)
                 _StatusPill(
-                  label: 'تستقبل التبرعات',
+                  label: l10n.acceptsDonationsLabel,
                   color: context.appColors.primary,
                 ),
             ],
@@ -1616,7 +1649,7 @@ class _CampaignCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'تنتهي في ${_shortDate(item.endsAtUtc!)}',
+                  l10n.campaignEndsOn(_shortDate(item.endsAtUtc!)),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -1626,6 +1659,7 @@ class _CampaignCard extends StatelessWidget {
       ),
     ),
   );
+  }
 }
 
 class _DonationOfferCard extends StatelessWidget {
@@ -1640,7 +1674,12 @@ class _DonationOfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = donationStatus(context.appColors, offer.status);
+    final l10n = AppLocalizations.of(context);
+    final state = donationStatus(
+      context.appColors,
+      offer.status,
+      l10n,
+    );
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -1671,7 +1710,7 @@ class _DonationOfferCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        '${offer.packageCount} عبوات · ${offer.donorFullName}',
+                        l10n.offerPackages(offer.packageCount, offer.donorFullName),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -1690,12 +1729,12 @@ class _DonationOfferCard extends StatelessWidget {
               if (offer.reviewingPharmacyName != null)
                 _InlineDetail(
                   icon: Icons.verified_outlined,
-                  text: 'تم التحقق عبر ${offer.reviewingPharmacyName}',
+                  text: l10n.verifiedViaPharmacy(offer.reviewingPharmacyName!),
                 ),
               if (offer.expiryDateUtc != null)
                 _InlineDetail(
                   icon: Icons.event_outlined,
-                  text: 'الصلاحية حتى ${_shortDate(offer.expiryDateUtc!)}',
+                  text: l10n.validUntil(_shortDate(offer.expiryDateUtc!)),
                 ),
             ],
             if (offer.status == 'PendingReview') ...[
@@ -1706,13 +1745,13 @@ class _DonationOfferCard extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: working ? null : () => onReview('Approved'),
                       icon: const Icon(Icons.check_rounded, size: 18),
-                      label: const Text('قبول العرض'),
+                      label: Text(l10n.acceptOffer),
                     ),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: working ? null : () => onReview('Rejected'),
-                    child: const Text('رفض'),
+                    child: Text(l10n.reject),
                   ),
                 ],
               ),
@@ -1723,7 +1762,7 @@ class _DonationOfferCard extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: working ? null : () => onReview('Received'),
                   icon: const Icon(Icons.inventory_2_outlined),
-                  label: const Text('تأكيد استلام التبرع'),
+                  label: Text(l10n.confirmDonationReceived),
                 ),
               ),
             ],
@@ -1746,7 +1785,12 @@ class _AssistanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = donationStatus(context.appColors, request.status);
+    final l10n = AppLocalizations.of(context);
+    final state = donationStatus(
+      context.appColors,
+      request.status,
+      l10n,
+    );
     final active = request.status == 'Open' || request.status == 'UnderReview';
     return Card(
       child: Padding(
@@ -1760,12 +1804,12 @@ class _AssistanceCard extends StatelessWidget {
                   width: 47,
                   height: 47,
                   decoration: BoxDecoration(
-                    color: context.appColors.primaryDark.withValues(alpha: .08),
+                    color: context.appColors.primary.withValues(alpha: .08),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Icon(
                     Icons.favorite_outline_rounded,
-                    color: context.appColors.primaryDark,
+                    color: context.appColors.primary,
                   ),
                 ),
                 const SizedBox(width: 11),
@@ -1778,7 +1822,7 @@ class _AssistanceCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        '${request.requestedPackageCount} عبوات · ${request.requesterFullName}',
+                        l10n.requestPackages(request.requestedPackageCount, request.requesterFullName),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -1798,7 +1842,7 @@ class _AssistanceCard extends StatelessWidget {
               if (request.neededBeforeUtc != null)
                 _InlineDetail(
                   icon: Icons.schedule_outlined,
-                  text: 'مطلوب قبل ${_shortDate(request.neededBeforeUtc!)}',
+                  text: l10n.neededBefore(_shortDate(request.neededBeforeUtc!)),
                 ),
             ],
             if (active) ...[
@@ -1811,16 +1855,16 @@ class _AssistanceCard extends StatelessWidget {
                     OutlinedButton.icon(
                       onPressed: working ? null : () => onUpdate('UnderReview'),
                       icon: const Icon(Icons.visibility_outlined, size: 18),
-                      label: const Text('بدء المراجعة'),
+                      label: Text(l10n.startReview),
                     ),
                   FilledButton.icon(
                     onPressed: working ? null : () => onUpdate('Fulfilled'),
                     icon: const Icon(Icons.done_all_rounded, size: 18),
-                    label: const Text('تمت المساعدة'),
+                    label: Text(l10n.assistanceCompleted),
                   ),
                   TextButton(
                     onPressed: working ? null : () => onUpdate('Rejected'),
-                    child: const Text('تعذر التلبية'),
+                    child: Text(l10n.cannotFulfill),
                   ),
                 ],
               ),
@@ -1837,36 +1881,38 @@ class _ProfileDetailsCard extends StatelessWidget {
   final OrganizationDashboard data;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(17),
       child: Column(
         children: [
           _InfoRow(
             icon: Icons.apartment_outlined,
-            label: 'اسم المنظمة',
+            label: l10n.organizationNameField,
             value: data.organizationName,
           ),
           _InfoRow(
             icon: Icons.badge_outlined,
-            label: 'رقم التسجيل',
+            label: l10n.registrationNumberField,
             value: data.registrationNumber,
           ),
           _InfoRow(
             icon: Icons.location_on_outlined,
-            label: 'العنوان',
+            label: l10n.addressLabel,
             value: '${data.city}، ${data.area} · ${data.address}',
           ),
           if (data.phoneNumber != null)
             _InfoRow(
               icon: Icons.phone_outlined,
-              label: 'التواصل',
+              label: l10n.contactLabel,
               value: data.phoneNumber!,
             ),
           if (data.description != null)
             _InfoRow(
               icon: Icons.notes_rounded,
-              label: 'نبذة',
+              label: l10n.aboutLabel,
               value: data.description!,
               last: true,
             ),
@@ -1874,6 +1920,7 @@ class _ProfileDetailsCard extends StatelessWidget {
       ),
     ),
   );
+  }
 }
 
 class _InfoRow extends StatelessWidget {
@@ -1967,7 +2014,7 @@ class _DocumentTile extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
                 Text(
-                  '${_documentType(document.documentType)} · ${_fileSize(document.fileSizeBytes)}',
+                  '${_documentType(AppLocalizations.of(context), document.documentType)} · ${_fileSize(document.fileSizeBytes)}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -2080,7 +2127,9 @@ class _DateSelector extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    value == null ? 'اختياري' : _shortDate(value!),
+                    value == null
+                        ? AppLocalizations.of(context).optionalLabel
+                        : _shortDate(value!),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
@@ -2109,6 +2158,7 @@ class _VerificationCard extends StatelessWidget {
   final VoidCallback onUpload;
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final verified =
         status.toLowerCase() == 'verified' ||
         status.toLowerCase() == 'approved';
@@ -2144,11 +2194,11 @@ class _VerificationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _verificationText(status),
+                  _verificationText(l10n, status),
                   style: TextStyle(color: color, fontWeight: FontWeight.w900),
                 ),
                 Text(
-                  notes ?? '$documents وثائق مرفوعة',
+                  notes ?? l10n.documentsUploaded(documents),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall,
@@ -2158,7 +2208,7 @@ class _VerificationCard extends StatelessWidget {
           ),
           IconButton.filledTonal(
             onPressed: onUpload,
-            tooltip: 'رفع وثيقة',
+            tooltip: l10n.uploadDocument,
             icon: const Icon(Icons.upload_rounded),
           ),
         ],
@@ -2198,41 +2248,45 @@ class _Empty extends StatelessWidget {
   );
 }
 
-String _errorText(Object error) =>
-    error is ApiException ? error.message : 'تعذر إكمال العملية حاليًا.';
-String _verificationText(String status) => switch (status.toLowerCase()) {
-  'verified' || 'approved' => 'تم التحقق من المنظمة',
-  'rejected' => 'تم رفض التحقق',
-  'underreview' || 'pending' => 'التحقق قيد المراجعة',
-  _ => 'التحقق غير مكتمل',
-};
-String _verificationShort(String status) => switch (status.toLowerCase()) {
-  'verified' || 'approved' => 'موثقة',
-  'rejected' => 'مرفوضة',
-  'underreview' || 'pending' => 'قيد المراجعة',
-  _ => 'غير مكتملة',
-};
-String _campaignStatus(String status) => switch (status.toLowerCase()) {
-  'active' => 'نشطة',
-  'closed' => 'مغلقة',
-  'cancelled' => 'ملغاة',
-  _ => 'مسودة',
-};
+String _errorText(AppLocalizations l10n, Object error) =>
+    error is ApiException ? error.localize(l10n) : l10n.operationFailed;
+String _verificationText(AppLocalizations l10n, String status) =>
+    switch (status.toLowerCase()) {
+      'verified' || 'approved' => l10n.orgVerified,
+      'rejected' => l10n.orgVerificationRejected,
+      'underreview' || 'pending' => l10n.orgVerificationUnderReview,
+      _ => l10n.orgVerificationIncomplete,
+    };
+String _verificationShort(AppLocalizations l10n, String status) =>
+    switch (status.toLowerCase()) {
+      'verified' || 'approved' => l10n.verifiedShort,
+      'rejected' => l10n.rejectedShort,
+      'underreview' || 'pending' => l10n.underReviewShort,
+      _ => l10n.incompleteShort,
+    };
+String _campaignStatus(AppLocalizations l10n, String status) =>
+    switch (status.toLowerCase()) {
+      'active' => l10n.campaignActive,
+      'closed' => l10n.campaignClosed,
+      'cancelled' => l10n.campaignCancelled,
+      _ => l10n.campaignDraft,
+    };
 Color _campaignColor(AppColors colors, String status) => switch (status
     .toLowerCase()) {
   'active' => colors.primary,
   'closed' => colors.textMuted,
-  'cancelled' => colors.primaryDark,
-  _ => colors.primaryDeep,
+  'cancelled' => colors.primary,
+  _ => colors.primary,
 };
 String _shortDate(DateTime value) =>
     '${value.year}/${value.month.toString().padLeft(2, '0')}/${value.day.toString().padLeft(2, '0')}';
-String _documentType(String value) => switch (value.toLowerCase()) {
-  'registrationcertificate' => 'شهادة التسجيل',
-  'licenseddocument' => 'وثيقة الترخيص',
-  'identitydocument' => 'إثبات الهوية',
-  _ => 'وثيقة اعتماد',
-};
+String _documentType(AppLocalizations l10n, String value) =>
+    switch (value.toLowerCase()) {
+      'registrationcertificate' => l10n.docRegistrationCertificate,
+      'licenseddocument' => l10n.docLicensedDocument,
+      'identitydocument' => l10n.docIdentityDocument,
+      _ => l10n.docAccreditation,
+    };
 String _fileSize(int bytes) {
   if (bytes >= 1024 * 1024) {
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';

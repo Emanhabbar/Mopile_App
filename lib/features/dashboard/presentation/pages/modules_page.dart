@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/data/models/auth_session.dart';
 import '../../data/role_modules.dart';
 import '../navigation/module_navigation.dart';
@@ -14,7 +15,8 @@ class ModulesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final modules = modulesForRole(user.primaryRole);
+    final l10n = AppLocalizations.of(context);
+    final modules = modulesForRole(l10n, user.primaryRole);
     final width = MediaQuery.sizeOf(context).width;
     final columns = width >= 900
         ? 4
@@ -54,12 +56,12 @@ class ModulesPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'خدماتك',
+                          l10n.modulesTitle,
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          'كل ما تحتاجه في مكان واضح وسريع',
+                          l10n.modulesSubtitle,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],

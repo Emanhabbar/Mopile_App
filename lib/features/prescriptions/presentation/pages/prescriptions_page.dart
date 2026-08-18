@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/prescription_models.dart';
 import '../../data/repositories/prescriptions_repository.dart';
 import '../controllers/prescriptions_providers.dart';
@@ -23,10 +24,11 @@ class _PrescriptionsPageState extends ConsumerState<PrescriptionsPage> {
   @override
   Widget build(BuildContext context) {
     final orders = ref.watch(myPrescriptionsProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('وصفاتي الطبية')),
+      appBar: AppBar(title: Text(l10n.myPrescriptionsTitle)),
       body: orders.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل الوصفات...'),
+        loading: () => AppLoadingState(label: l10n.prescriptionsLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(myPrescriptionsProvider),
@@ -40,7 +42,7 @@ class _PrescriptionsPageState extends ConsumerState<PrescriptionsPage> {
               _UploadCard(uploading: _uploading, onUpload: _pickAndAnalyze),
               const SizedBox(height: 20),
               Text(
-                'الوصفات السابقة',
+                l10n.previousPrescriptions,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 10),
@@ -65,6 +67,7 @@ class _PrescriptionsPageState extends ConsumerState<PrescriptionsPage> {
   }
 
   Future<void> _pickAndAnalyze() async {
+    final l10n = AppLocalizations.of(context);
     const acceptedTypes = XTypeGroup(
       label: 'prescription',
       extensions: ['jpg', 'jpeg', 'png', 'pdf'],
@@ -74,7 +77,7 @@ class _PrescriptionsPageState extends ConsumerState<PrescriptionsPage> {
     if (file == null) return;
     final fileSize = await file.length();
     if (fileSize <= 0 || fileSize > 10 * 1024 * 1024) {
-      _message('يجب ألا يتجاوز حجم الوصفة 10 ميغابايت.', error: true);
+      _message(l10n.prescriptionFileTooLarge, error: true);
       return;
     }
 
@@ -87,7 +90,7 @@ class _PrescriptionsPageState extends ConsumerState<PrescriptionsPage> {
       if (mounted) context.push('/user/prescriptions/${order.id}');
     } catch (error) {
       _message(
-        error is ApiException ? error.message : 'تعذر تحليل الوصفة حاليًا.',
+        error is ApiException ? error.localize(l10n) : l10n.prescriptionAnalyzeFailed,
         error: true,
       );
     } finally {
@@ -116,6 +119,7 @@ class _UploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -128,12 +132,12 @@ class _UploadCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'إضافة وصفة جديدة',
+              l10n.addNewPrescription,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 5),
             Text(
-              'اختر صورة واضحة أو ملف PDF لوصفة مطبوعة، بحجم أقصى 10 ميغابايت.',
+              l10n.uploadPrescriptionHint,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
@@ -151,7 +155,9 @@ class _UploadCard extends StatelessWidget {
                         ),
                       )
                     : const Icon(Icons.upload_file_rounded),
-                label: Text(uploading ? 'جاري التحليل...' : 'اختيار الوصفة'),
+                label: Text(
+                  uploading ? l10n.analyzing : l10n.choosePrescription,
+                ),
               ),
             ),
           ],
@@ -169,7 +175,8 @@ class _PrescriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = prescriptionStatusInfo(context.appColors, order.status);
+    final l10n = AppLocalizations.of(context);
+    final status = prescriptionStatusInfo(context.appColors, order.status, l10n);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: ListTile(
@@ -179,10 +186,12 @@ class _PrescriptionCard extends StatelessWidget {
           child: Icon(status.icon, color: status.color),
         ),
         title: Text(
-          order.originalFileName.isEmpty ? 'وصفة طبية' : order.originalFileName,
+          order.originalFileName.isEmpty
+              ? l10n.prescriptionFallbackTitle
+              : order.originalFileName,
         ),
         subtitle: Text(
-          '${order.items.length} أدوية · ${formatDate(order.createdAtUtc)}',
+          '${l10n.prescriptionItemsCount(order.items.length)} · ${formatDate(order.createdAtUtc)}',
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -210,7 +219,7 @@ class _EmptyPrescriptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: EdgeInsets.all(28),
+      padding: const EdgeInsets.all(28),
       child: Column(
         children: [
           Icon(
@@ -218,8 +227,8 @@ class _EmptyPrescriptions extends StatelessWidget {
             color: context.appColors.textMuted,
             size: 36,
           ),
-          SizedBox(height: 10),
-          Text('لم تتم إضافة أي وصفة بعد'),
+          const SizedBox(height: 10),
+          Text(AppLocalizations.of(context).noPrescriptions),
         ],
       ),
     ),
@@ -229,34 +238,35 @@ class _EmptyPrescriptions extends StatelessWidget {
 ({String label, Color color, IconData icon}) prescriptionStatusInfo(
   AppColors colors,
   String status,
+  AppLocalizations l10n,
 ) => switch (status.toLowerCase()) {
   'reserved' => (
-    label: 'محجوزة',
+    label: l10n.prescriptionStatusReserved,
     color: const Color(0xFFB47618),
     icon: Icons.bookmark_added_rounded,
   ),
   'readyforpickup' => (
-    label: 'جاهزة للاستلام',
+    label: l10n.prescriptionStatusReady,
     color: colors.success,
     icon: Icons.inventory_2_rounded,
   ),
   'collected' => (
-    label: 'تم الاستلام',
+    label: l10n.prescriptionStatusCollected,
     color: colors.success,
     icon: Icons.task_alt_rounded,
   ),
   'expired' => (
-    label: 'منتهية',
+    label: l10n.prescriptionStatusExpired,
     color: colors.textMuted,
     icon: Icons.timer_off_rounded,
   ),
   'cancelled' => (
-    label: 'ملغاة',
+    label: l10n.prescriptionStatusCancelled,
     color: colors.danger,
     icon: Icons.block_rounded,
   ),
   _ => (
-    label: 'تم التحليل',
+    label: l10n.prescriptionStatusAnalyzed,
     color: colors.primary,
     icon: Icons.document_scanner_rounded,
   ),

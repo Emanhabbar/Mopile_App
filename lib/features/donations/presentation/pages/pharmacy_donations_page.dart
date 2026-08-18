@@ -6,6 +6,7 @@ import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/donation_models.dart';
 import '../../data/repositories/donations_repository.dart';
 import '../controllers/donations_providers.dart';
@@ -16,14 +17,15 @@ class PharmacyDonationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final offers = ref.watch(pharmacyDonationOffersProvider(null));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('التحقق من التبرعات'),
+            Text(l10n.verifyDonationsTitle),
             Text(
-              'سلامة الدواء قبل وصوله للمستفيد',
+              l10n.verifyDonationsSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -34,8 +36,7 @@ class PharmacyDonationsPage extends ConsumerWidget {
         ),
       ),
       body: offers.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل عروض التبرع...'),
+        loading: () => AppLoadingState(label: l10n.donationOffersLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(pharmacyDonationOffersProvider),
@@ -47,15 +48,15 @@ class PharmacyDonationsPage extends ConsumerWidget {
               ? ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    SizedBox(height: 120),
+                    const SizedBox(height: 120),
                     Icon(
                       Icons.verified_outlined,
                       size: 54,
                       color: context.appColors.textMuted,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
-                      'لا توجد تبرعات بانتظار التحقق.',
+                      l10n.noDonationsToVerify,
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -88,26 +89,27 @@ class PharmacyDonationsPage extends ConsumerWidget {
     DonationOffer offer,
     String status,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final note = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(_actionLabel(status)),
+        title: Text(_actionLabel(status, l10n)),
         content: AppTextField(
           controller: note,
-          label: 'ملاحظة الفحص (اختياري)',
-          hint: 'أضف ملاحظات حول فحص التبرع',
+          label: l10n.reviewNoteLabel,
+          hint: l10n.reviewNoteHint,
           maxLines: 4,
           minLines: 2,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('تأكيد'),
+            child: Text(l10n.confirm),
           ),
         ],
       ),
@@ -125,16 +127,16 @@ class PharmacyDonationsPage extends ConsumerWidget {
           );
       ref.invalidate(pharmacyDonationOffersProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تحديث حالة التبرع بنجاح.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.donationStatusUpdated)));
       }
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error is ApiException ? error.message : 'تعذر تحديث التبرع.',
+            error is ApiException ? error.localize(l10n) : l10n.donationUpdateFailed,
           ),
           backgroundColor: context.appColors.danger,
         ),
@@ -147,7 +149,9 @@ class _PharmacyDonationHero extends StatelessWidget {
   const _PharmacyDonationHero({required this.count});
   final int count;
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -170,21 +174,21 @@ class _PharmacyDonationHero extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'مراجعة دقيقة وآمنة',
-                style: TextStyle(
+                l10n.pharmacyReviewTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               Text(
-                'افحص العبوات ثم حدّث حالتها حسب نتيجة التحقق.',
-                style: TextStyle(color: Colors.white70, fontSize: 10.5),
+                l10n.pharmacyReviewSubtitle,
+                style: const TextStyle(color: Colors.white70, fontSize: 10.5),
               ),
             ],
           ),
@@ -205,7 +209,8 @@ class _PharmacyDonationHero extends StatelessWidget {
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _DonationReviewCard extends StatelessWidget {
@@ -216,6 +221,7 @@ class _DonationReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pending = offer.pharmacyReviewStatus == 'PendingPharmacyReview';
     final approved = offer.pharmacyReviewStatus == 'PharmacyApproved';
     return Card(
@@ -242,7 +248,7 @@ class _DonationReviewCard extends StatelessWidget {
                         offer.medicineName,
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
-                      Text('${offer.packageCount} عبوات'),
+                      Text(l10n.packagesCount(offer.packageCount)),
                     ],
                   ),
                 ),
@@ -250,13 +256,15 @@ class _DonationReviewCard extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
-            Text('المتبرع: ${offer.donorFullName}'),
+            Text(l10n.donorLabel(offer.donorFullName)),
             if (offer.targetOrganizationName != null)
-              Text('الجهة المستفيدة: ${offer.targetOrganizationName}'),
+              Text(l10n.beneficiaryLabel(offer.targetOrganizationName!)),
             if (offer.expiryDateUtc != null)
               Text(
-                'الانتهاء: ${offer.expiryDateUtc!.year}/'
-                '${offer.expiryDateUtc!.month}/${offer.expiryDateUtc!.day}',
+                l10n.expiryLabel(
+                  '${offer.expiryDateUtc!.year}/'
+                  '${offer.expiryDateUtc!.month}/${offer.expiryDateUtc!.day}',
+                ),
               ),
             if (pending) ...[
               const SizedBox(height: 12),
@@ -266,13 +274,13 @@ class _DonationReviewCard extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: () => onReview('PharmacyApproved'),
                       icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('قبول بعد الفحص'),
+                      label: Text(l10n.acceptAfterInspection),
                     ),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: () => onReview('PharmacyRejected'),
-                    child: const Text('رفض'),
+                    child: Text(l10n.reject),
                   ),
                 ],
               ),
@@ -283,7 +291,7 @@ class _DonationReviewCard extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: () => onReview('ReceivedByPharmacy'),
                   icon: const Icon(Icons.inventory_2_outlined),
-                  label: const Text('تأكيد استلام العبوات'),
+                  label: Text(l10n.confirmReceivePackages),
                 ),
               ),
             ],
@@ -312,7 +320,7 @@ class _StatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        _statusLabel(status),
+        _statusLabel(status, AppLocalizations.of(context)),
         style: TextStyle(
           color: color,
           fontSize: 10,
@@ -323,16 +331,16 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-String _statusLabel(String status) => switch (status) {
-  'PharmacyApproved' => 'مقبول',
-  'PharmacyRejected' => 'مرفوض',
-  'ReceivedByPharmacy' => 'تم الاستلام',
-  _ => 'بانتظار الفحص',
+String _statusLabel(String status, AppLocalizations l10n) => switch (status) {
+  'PharmacyApproved' => l10n.donationStatusApproved,
+  'PharmacyRejected' => l10n.donationStatusRejected,
+  'ReceivedByPharmacy' => l10n.donationStatusReceived,
+  _ => l10n.statusPendingInspection,
 };
 
-String _actionLabel(String status) => switch (status) {
-  'PharmacyApproved' => 'اعتماد التبرع',
-  'PharmacyRejected' => 'رفض التبرع',
-  'ReceivedByPharmacy' => 'تأكيد الاستلام',
-  _ => 'تحديث التبرع',
+String _actionLabel(String status, AppLocalizations l10n) => switch (status) {
+  'PharmacyApproved' => l10n.actionApproveDonation,
+  'PharmacyRejected' => l10n.actionRejectDonation,
+  'ReceivedByPharmacy' => l10n.actionConfirmReceipt,
+  _ => l10n.actionUpdateDonation,
 };

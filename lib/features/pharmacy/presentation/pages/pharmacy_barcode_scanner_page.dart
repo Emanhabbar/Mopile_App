@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 class PharmacyBarcodeScannerPage extends StatefulWidget {
   const PharmacyBarcodeScannerPage({super.key});
@@ -43,13 +44,13 @@ class _PharmacyBarcodeScannerPageState
     appBar: AppBar(
       backgroundColor: const Color(0xFF061D23),
       foregroundColor: Colors.white,
-      title: const Text('مسح باركود الدواء'),
+      title: Text(AppLocalizations.of(context).scanMedicineBarcode),
       actions: [
         ValueListenableBuilder(
           valueListenable: _controller,
           builder: (context, state, _) => IconButton(
             onPressed: state.isInitialized ? _controller.toggleTorch : null,
-            tooltip: 'تشغيل الإضاءة',
+            tooltip: AppLocalizations.of(context).toggleFlash,
             icon: Icon(
               state.torchState == TorchState.on
                   ? Icons.flash_on_rounded
@@ -69,24 +70,24 @@ class _PharmacyBarcodeScannerPageState
           placeholderBuilder: (_) => Center(
             child: CircularProgressIndicator(color: context.appColors.secondary),
           ),
-          errorBuilder: (_, _) => const ColoredBox(
-            color: Color(0xFF061D23),
+          errorBuilder: (_, _) => ColoredBox(
+            color: const Color(0xFF061D23),
             child: Center(
               child: Padding(
-                padding: EdgeInsets.all(28),
+                padding: const EdgeInsets.all(28),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.no_photography_outlined,
                       color: Colors.white70,
                       size: 44,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
-                      'تعذر تشغيل الكاميرا. اسمح للتطبيق باستخدامها أو أدخل الباركود يدوياً.',
+                      AppLocalizations.of(context).cameraError,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70),
+                      style: const TextStyle(color: Colors.white70),
                     ),
                   ],
                 ),
@@ -112,10 +113,10 @@ class _PharmacyBarcodeScannerPageState
                     color: Colors.black.withValues(alpha: .5),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Text(
-                    'ضع الرمز داخل الإطار وثبّت الهاتف للحظة',
+                  child: Text(
+                    AppLocalizations.of(context).placeBarcodeInFrame,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -127,7 +128,7 @@ class _PharmacyBarcodeScannerPageState
                     backgroundColor: Colors.black.withValues(alpha: .35),
                   ),
                   icon: const Icon(Icons.keyboard_rounded),
-                  label: const Text('إدخال الباركود يدوياً'),
+                  label: Text(AppLocalizations.of(context).enterBarcodeManually),
                 ),
               ],
             ),
@@ -151,30 +152,31 @@ class _PharmacyBarcodeScannerPageState
   Future<void> _enterManually() async {
     await _controller.stop();
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
     final field = TextEditingController();
     final value = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('إدخال الباركود'),
+        title: Text(l10n.enterBarcodeTitle),
         content: TextField(
           controller: field,
           autofocus: true,
           keyboardType: TextInputType.number,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            labelText: 'رقم الباركود',
-            prefixIcon: Icon(Icons.qr_code_2_rounded),
+          decoration: InputDecoration(
+            labelText: l10n.barcodeNumberLabel,
+            prefixIcon: const Icon(Icons.qr_code_2_rounded),
           ),
           onSubmitted: (value) => Navigator.pop(dialogContext, value.trim()),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, field.text.trim()),
-            child: const Text('استخدام'),
+            child: Text(l10n.use),
           ),
         ],
       ),

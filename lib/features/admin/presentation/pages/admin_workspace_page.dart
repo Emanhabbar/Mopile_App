@@ -12,6 +12,7 @@ import '../../data/models/admin_models.dart';
 import '../../data/repositories/admin_repository.dart';
 import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../controllers/admin_providers.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 class AdminWorkspacePage extends ConsumerStatefulWidget {
   const AdminWorkspacePage({this.initialSection = 0, super.key});
@@ -42,6 +43,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final dashboard = ref.watch(adminDashboardProvider);
     final pending = dashboard.valueOrNull == null
         ? null
@@ -53,9 +55,9 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('مركز الإدارة'),
+            Text(l10n.adminCenterTitle),
             Text(
-              'إدارة منصة دوائي ومتابعة عملياتها',
+              l10n.adminCenterSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 10.5,
@@ -67,14 +69,14 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
         actions: [
           IconButton(
             onPressed: _refreshCurrentSection,
-            tooltip: 'تحديث',
+            tooltip: l10n.adminRefreshTooltip,
             icon: const Icon(Icons.refresh_rounded),
           ),
           IconButton(
             onPressed: _workingId == 'location-service'
                 ? null
                 : _showLocationService,
-            tooltip: 'خدمة مواقع الصيدليات',
+            tooltip: l10n.adminLocationServiceTooltip,
             icon: const Icon(Icons.cloud_sync_outlined),
           ),
           const SizedBox(width: 8),
@@ -163,7 +165,8 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'لا يمكن الموافقة على الصيدلية. حالة الترخيص: ${verification.status}. يجب أن يكون الترخيص موثقاً أولاً.',
+                  AppLocalizations.of(context)
+                      .adminCannotApprovePharmacy(verification.status),
                 ),
                 backgroundColor: context.appColors.danger,
               ),
@@ -175,7 +178,10 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('تعذر التحقق من حالة الترخيص: ${e.toString()}'),
+              content: Text(
+                AppLocalizations.of(context)
+                    .adminLicenseCheckFailed(e.toString()),
+              ),
               backgroundColor: context.appColors.danger,
             ),
           );
@@ -198,6 +204,7 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
     AdminOrganization organization,
     bool approved,
   ) => _run(organization.organizationId, () async {
+    final l10n = AppLocalizations.of(context);
     if (organization.verificationDocumentsCount > 0) {
       await ref
           .read(adminRepositoryProvider)
@@ -205,8 +212,8 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
             organization.organizationId,
             status: approved ? 'Approved' : 'NeedsUpdate',
             notes: approved
-                ? 'تمت مراجعة وثائق المنظمة واعتمادها.'
-                : 'يرجى تحديث وثائق التحقق المطلوبة.',
+                ? l10n.adminOrgReviewApproved
+                : l10n.adminOrgReviewNeedsUpdate,
           );
     } else {
       await ref
@@ -219,33 +226,34 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
   Future<void> _updateAccount(AdminAccount account) async {
     String? reason;
     if (account.isActive) {
+      final l10n = AppLocalizations.of(context);
       final controller = TextEditingController();
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('إيقاف الحساب'),
+          title: Text(l10n.adminDeactivateAccount),
           content: TextField(
             controller: controller,
             minLines: 3,
             maxLines: 5,
             maxLength: 500,
-            decoration: const InputDecoration(
-              labelText: 'سبب الإيقاف',
-              helperText: 'اكتب سببًا واضحًا لا يقل عن 10 أحرف.',
+            decoration: InputDecoration(
+              labelText: l10n.adminDeactivateReason,
+              helperText: l10n.adminDeactivateReasonHint,
               alignLabelWithHint: true,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('إلغاء'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () {
                 if (controller.text.trim().length < 10) return;
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('إيقاف الحساب'),
+              child: Text(l10n.adminDeactivateAccount),
             ),
           ],
         ),
@@ -310,10 +318,11 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
           .read(pharmacyDiscoveryRepositoryProvider)
           .getHealth();
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
       final clear = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('خدمة مواقع الصيدليات'),
+          title: Text(l10n.adminLocationServiceTitle),
           content: Row(
             children: [
               Icon(
@@ -326,8 +335,8 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
               Expanded(
                 child: Text(
                   health.isHealthy
-                      ? 'الخدمة تعمل بصورة طبيعية.'
-                      : 'الخدمة لا تستجيب بالصورة المتوقعة.',
+                      ? l10n.adminLocationServiceHealthy
+                      : l10n.adminLocationServiceUnhealthy,
                 ),
               ),
             ],
@@ -335,12 +344,12 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('إغلاق'),
+              child: Text(l10n.close),
             ),
             FilledButton.tonalIcon(
               onPressed: () => Navigator.pop(dialogContext, true),
               icon: const Icon(Icons.cleaning_services_outlined),
-              label: const Text('تنظيف البيانات القديمة'),
+              label: Text(l10n.adminCleanCache),
             ),
           ],
         ),
@@ -350,16 +359,16 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
             .read(pharmacyDiscoveryRepositoryProvider)
             .clearCache();
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(message)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message ?? l10n.adminCacheCleared)),
+          );
         }
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_error(error)),
+            content: Text(_error(AppLocalizations.of(context), error)),
             backgroundColor: context.appColors.danger,
           ),
         );
@@ -384,13 +393,17 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('تم حفظ التحديث.')));
+        ).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context).updateSaved),
+          ),
+        );
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_error(error)),
+            content: Text(_error(AppLocalizations.of(context), error)),
             backgroundColor: context.appColors.danger,
           ),
         );
@@ -413,15 +426,16 @@ class _AdminSectionNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final items = <({String label, IconData icon, int? count})>[
-      (label: 'الملخص', icon: Icons.grid_view_rounded, count: null),
+      (label: l10n.adminSectionSummary, icon: Icons.grid_view_rounded, count: null),
       (
-        label: 'الموافقات',
+        label: l10n.adminSectionApprovals,
         icon: Icons.fact_check_outlined,
         count: pendingCount,
       ),
-      (label: 'الحسابات', icon: Icons.manage_accounts_outlined, count: null),
-      (label: 'الإعلانات', icon: Icons.campaign_outlined, count: null),
+      (label: l10n.adminSectionAccounts, icon: Icons.manage_accounts_outlined, count: null),
+      (label: l10n.adminSectionAds, icon: Icons.campaign_outlined, count: null),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -555,6 +569,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     final duty = _type == 'DutyPharmacy';
     final color = colors.primary;
@@ -621,7 +636,9 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.item == null ? 'محتوى جديد' : 'تعديل المحتوى',
+                          widget.item == null
+                              ? l10n.adminTickerNewContent
+                              : l10n.adminTickerEditContent,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
@@ -630,7 +647,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'سيظهر هذا المحتوى في الصفحة الرئيسية للمستخدمين.',
+                          l10n.adminTickerAppearsHint,
                           style: TextStyle(
                             color: colors.textMuted,
                             fontSize: 13,
@@ -674,7 +691,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'إعلان عام',
+                              l10n.adminAnnouncement,
                               style: TextStyle(
                                 color: _type == 'Announcement' ? Colors.white : colors.textMuted,
                                 fontWeight: FontWeight.w700,
@@ -706,7 +723,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'صيدلية مناوبة',
+                              l10n.adminDutyPharmacy,
                               style: TextStyle(
                                 color: _type == 'DutyPharmacy' ? Colors.white : colors.textMuted,
                                 fontWeight: FontWeight.w700,
@@ -745,7 +762,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          'الصيدلية المناوبة',
+                          l10n.adminDutyPharmacyLabel,
                           style: TextStyle(
                             color: colors.primary,
                             fontWeight: FontWeight.w700,
@@ -760,7 +777,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                           ? _pharmacyId
                           : null,
                       decoration: InputDecoration(
-                        hintText: 'اختر الصيدلية',
+                        hintText: l10n.adminChoosePharmacy,
                         filled: true,
                         fillColor: colors.surfaceSoft,
                         border: OutlineInputBorder(
@@ -801,7 +818,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'العنوان',
+                        l10n.adminTitleLabel,
                         style: TextStyle(
                           color: colors.primary,
                           fontWeight: FontWeight.w700,
@@ -815,7 +832,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                     controller: _titleCtrl,
                     maxLength: 150,
                     decoration: InputDecoration(
-                      hintText: 'أدخل عنوان المحتوى',
+                      hintText: l10n.adminEnterTitleHint,
                       filled: true,
                       fillColor: colors.surfaceSoft,
                       border: OutlineInputBorder(
@@ -849,7 +866,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'النص الظاهر للمستخدم',
+                        l10n.adminVisibleTextLabel,
                         style: TextStyle(
                           color: colors.primary,
                           fontWeight: FontWeight.w700,
@@ -865,7 +882,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                     minLines: 3,
                     maxLines: 5,
                     decoration: InputDecoration(
-                      hintText: 'أدخل النص المراد إظهاره',
+                      hintText: l10n.adminEnterTextHint,
                       filled: true,
                       fillColor: colors.surfaceSoft,
                       border: OutlineInputBorder(
@@ -908,7 +925,7 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'نشر المحتوى',
+                          l10n.adminPublishContent,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
@@ -916,7 +933,9 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                           ),
                         ),
                         Text(
-                          _active ? 'ظاهر حاليًا للمستخدمين' : 'محفوظ دون نشر',
+                          _active
+                              ? l10n.adminVisibleNow
+                              : l10n.adminSavedUnpublished,
                           style: TextStyle(
                             color: colors.textMuted,
                             fontSize: 12,
@@ -952,8 +971,8 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
                     ),
                   ),
                   icon: const Icon(Icons.check_rounded, size: 22),
-                  label: const Text(
-                    'حفظ المحتوى',
+                  label: Text(
+                    l10n.adminSaveContent,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -977,44 +996,50 @@ class _DashboardTab extends ConsumerWidget {
   const _DashboardTab();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(adminDashboardProvider);
     return state.when(
-      loading: () => const AppLoadingState(label: 'جاري تحميل المؤشرات...'),
+      loading: () => AppLoadingState(label: l10n.adminLoadingIndicators),
       error: (error, _) => AppErrorState(
         error: error,
         onRetry: () => ref.invalidate(adminDashboardProvider),
       ),
       data: (data) {
-        final values = [
-          ('المستخدمون', data.totalUsers, Icons.people_rounded),
-          ('حسابات نشطة', data.activeUsers, Icons.verified_user_rounded),
-          ('الصيدليات', data.totalPharmacies, Icons.local_pharmacy_rounded),
+        final values = <({String label, IconData icon, int? count, bool pending})>[
+          (label: l10n.adminUsers, icon: Icons.people_rounded, count: data.totalUsers, pending: false),
+          (label: l10n.adminActiveAccounts, icon: Icons.verified_user_rounded, count: data.activeUsers, pending: false),
+          (label: l10n.adminPharmacies, icon: Icons.local_pharmacy_rounded, count: data.totalPharmacies, pending: false),
           (
-            'صيدليات معلقة',
-            data.pendingPharmacies,
-            Icons.hourglass_top_rounded,
+            label: l10n.adminPendingPharmacies,
+            icon: Icons.hourglass_top_rounded,
+            count: data.pendingPharmacies,
+            pending: true,
           ),
-          ('المنظمات', data.totalOrganizations, Icons.apartment_rounded),
-          ('المستودعات', data.totalWarehouses, Icons.warehouse_rounded),
+          (label: l10n.adminOrganizations, icon: Icons.apartment_rounded, count: data.totalOrganizations, pending: false),
+          (label: l10n.adminWarehouses, icon: Icons.warehouse_rounded, count: data.totalWarehouses, pending: false),
           (
-            'مستودعات معلقة',
-            data.pendingWarehouses,
-            Icons.inventory_2_outlined,
-          ),
-          (
-            'تحقق منظمات',
-            data.pendingOrganizationVerifications,
-            Icons.fact_check_outlined,
+            label: l10n.adminPendingWarehouses,
+            icon: Icons.inventory_2_outlined,
+            count: data.pendingWarehouses,
+            pending: true,
           ),
           (
-            'طلبات الأدوية',
-            data.totalMedicineRequests,
-            Icons.receipt_long_rounded,
+            label: l10n.adminOrganizationVerifications,
+            icon: Icons.fact_check_outlined,
+            count: data.pendingOrganizationVerifications,
+            pending: true,
           ),
           (
-            'تبرعات',
-            data.totalDonationOffers,
-            Icons.volunteer_activism_rounded,
+            label: l10n.adminMedicineRequests,
+            icon: Icons.receipt_long_rounded,
+            count: data.totalMedicineRequests,
+            pending: false,
+          ),
+          (
+            label: l10n.adminDonations,
+            icon: Icons.volunteer_activism_rounded,
+            count: data.totalDonationOffers,
+            pending: false,
           ),
         ];
         return RefreshIndicator(
@@ -1025,22 +1050,20 @@ class _DashboardTab extends ConsumerWidget {
             children: [
               AppReveal(child: _AdminHero(data: data)),
               const SizedBox(height: 22),
-              const _AdminSectionHeading(
-                eyebrow: 'المشهد العام',
-                title: 'مؤشرات المنصة',
-                subtitle:
-                    'الأرقام الأساسية وحالات الاعتماد التي تتطلب المتابعة.',
+              _AdminSectionHeading(
+                eyebrow: l10n.adminOverviewEyebrow,
+                title: l10n.adminPlatformIndicators,
+                subtitle: l10n.adminOverviewSubtitle,
               ),
               const SizedBox(height: 11),
               RoleMetricsGrid(
                 items: values
                     .map(
                       (v) => RoleMetricData(
-                        label: v.$1,
-                        value: '${v.$2}',
-                        icon: v.$3,
-                        color: v.$1.contains('معلقة') ||
-                                v.$1.contains('تحقق')
+                        label: v.label,
+                        value: '${v.count}',
+                        icon: v.icon,
+                        color: v.pending
                             ? context.appColors.secondary
                             : context.appColors.primary,
                       ),
@@ -1062,6 +1085,7 @@ class _AdminHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pending =
         data.pendingPharmacies +
         data.pendingOrganizationVerifications +
@@ -1100,7 +1124,7 @@ class _AdminHero extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'نبض منصة دوائي',
+                        l10n.adminHeroPulse,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22,
@@ -1110,7 +1134,7 @@ class _AdminHero extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'نظرة موحدة على الحسابات والجهات والخدمات',
+                        l10n.adminHeroSubtitle,
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 13,
@@ -1144,8 +1168,8 @@ class _AdminHero extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      const Text(
-                        'تحتاج قرارًا',
+                      Text(
+                        l10n.adminNeedsDecision,
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 10,
@@ -1161,15 +1185,15 @@ class _AdminHero extends StatelessWidget {
             Row(
               children: [
                 _AdminHeroMetric(
-                  label: 'حساب نشط',
+                  label: l10n.adminActiveAccount,
                   value: data.activeUsers,
                 ),
                 _AdminHeroMetric(
-                  label: 'نقاط دوائية',
+                  label: l10n.adminPharmacyPoints,
                   value: data.totalPharmacies + data.totalWarehouses,
                 ),
                 _AdminHeroMetric(
-                  label: 'منظمات',
+                  label: l10n.adminOrganizations,
                   value: data.totalOrganizations,
                 ),
               ],
@@ -1271,44 +1295,45 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
           .getPharmacyLicenseVerification(pharmacy.pharmacyId);
       if (!context.mounted) return;
       
+      final l10n = AppLocalizations.of(context);
       final needsManualReview = verification.status == 'manual_review' || 
                                   verification.status == 'manualreview' ||
                                   verification.status == 'failed';
       final isApproved = verification.status == 'approved' || 
                          verification.status == 'verified';
       final statusMessage = isApproved 
-          ? 'الترخيص موثق، يمكنك الموافقة على الصيدلية'
+          ? l10n.adminLicenseVerifiedMsg
           : needsManualReview 
-              ? 'الترخيص يحتاج إلى مراجعة يدوية. يجب أن يكون الترخيص موثقاً أولاً قبل الموافقة على الصيدلية.'
-              : 'الترخيص قيد المعالجة.';
+              ? l10n.adminLicenseManualReviewMsg
+              : l10n.adminLicenseProcessingMsg;
       
       await showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('تفاصيل ترخيص الصيدلية'),
+          title: Text(l10n.adminLicenseDetailsTitle),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _licenseRow('الحالة', verification.status),
-                _licenseRow('الاسم المسجل', verification.registeredName),
+                _licenseRow(l10n.statusLabel, verification.status),
+                _licenseRow(l10n.registeredNameLabel, verification.registeredName),
                 if (verification.extractedName != null)
-                  _licenseRow('الاسم في الوثيقة', verification.extractedName!),
+                  _licenseRow(l10n.adminLicenseNameInDocument, verification.extractedName!),
                 if (verification.registryNumber != null)
-                  _licenseRow('رقم السجل', verification.registryNumber!),
+                  _licenseRow(l10n.registryNumberLabel, verification.registryNumber!),
                 if (verification.matchScore != null)
                   _licenseRow(
-                    'درجة التطابق',
+                    l10n.adminMatchScore,
                     '${(verification.matchScore! * 100).toStringAsFixed(1)}%',
                   ),
                 if (verification.rejectionReason != null)
-                  _licenseRow('سبب الرفض', verification.rejectionReason!),
+                  _licenseRow(l10n.adminRejectionReason, verification.rejectionReason!),
                 if (verification.failureReason != null)
-                  _licenseRow('مشكلة القراءة', verification.failureReason!),
+                  _licenseRow(l10n.adminReadFailure, verification.failureReason!),
                 if (verification.manualReviewNote != null)
                   _licenseRow(
-                    'ملاحظة المراجعة',
+                    l10n.manualReviewNoteLabel,
                     verification.manualReviewNote!,
                   ),
                 const SizedBox(height: 16),
@@ -1375,11 +1400,11 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                 verification.verificationId,
               ),
               icon: const Icon(Icons.image_outlined),
-              label: const Text('عرض الوثيقة'),
+              label: Text(l10n.adminViewDocument),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('إغلاق'),
+              child: Text(l10n.close),
             ),
           ],
         ),
@@ -1388,7 +1413,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_error(error)),
+          content: Text(_error(AppLocalizations.of(context), error)),
           backgroundColor: context.appColors.danger,
         ),
       );
@@ -1431,19 +1456,20 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_error(error)),
+          content: Text(_error(AppLocalizations.of(context), error)),
           backgroundColor: context.appColors.danger,
         ),
       );
     }
   }
 
-  String _error(Object error) {
-    return error is ApiException ? error.message : 'حدث خطأ غير متوقع.';
+  String _error(AppLocalizations l10n, Object error) {
+    return error is ApiException ? error.localize(l10n) : l10n.unexpectedError;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pharmacies = ref.watch(adminPendingPharmaciesProvider);
     final organizations = ref.watch(adminPendingOrganizationsProvider);
     final warehouses = ref.watch(adminPendingWarehousesProvider);
@@ -1464,10 +1490,10 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 112),
         children: [
-          const _AdminSectionHeading(
-            eyebrow: 'قرارات الاعتماد',
-            title: 'طلبات تحتاج مراجعتك',
-            subtitle: 'تحقق من بيانات الجهة قبل منحها صلاحية العمل على المنصة.',
+          _AdminSectionHeading(
+            eyebrow: l10n.adminApprovalDecisions,
+            title: l10n.adminPendingYourReview,
+            subtitle: l10n.adminApprovalSubtitle,
           ),
           const SizedBox(height: 16),
           _RoleSelector(
@@ -1477,7 +1503,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
           const SizedBox(height: 20),
           if (_selectedRole == null)
             Text(
-              'الصيدليات',
+              l10n.adminPharmacies,
               style: TextStyle(
                 color: context.appColors.primary,
                 fontSize: 14,
@@ -1514,7 +1540,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _error(error),
+                        _error(l10n, error),
                         style: TextStyle(
                           color: context.appColors.danger,
                           fontSize: 13,
@@ -1542,7 +1568,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'لا توجد طلبات معلقة ضمن هذا القسم.',
+                              l10n.adminNoPendingRequests,
                               style: TextStyle(
                                 color: context.appColors.textMuted,
                                 fontSize: 14,
@@ -1567,23 +1593,23 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                                 working: widget.workingId == item.pharmacyId,
                                 onApprove: () => _showReasonSheet(
                                   context,
-                                  title: 'اعتماد الصيدلية',
+                                  title: l10n.adminApprovePharmacy,
                                   onConfirm: (reason) => widget.onPharmacy(item.pharmacyId, true, reason),
                                 ),
                                 onReject: () => _showReasonSheet(
                                   context,
-                                  title: 'رفض الصيدلية',
+                                  title: l10n.adminRejectPharmacy,
                                   onConfirm: (reason) => widget.onPharmacy(item.pharmacyId, false, reason),
                                 ),
                                 onDetails: () => _showPharmacyLicense(context, ref, item),
                                 expandedChild: _ApprovalDetails(
                                   rows: [
-                                    _DetailRow(label: 'المالك', value: item.ownerFullName),
-                                    _DetailRow(label: 'البريد', value: item.ownerEmail),
-                                    _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
-                                    _DetailRow(label: 'المدينة', value: item.city),
-                                    _DetailRow(label: 'المنطقة', value: item.area),
-                                    _DetailRow(label: 'العنوان', value: item.address),
+                                    _DetailRow(label: l10n.adminOwner, value: item.ownerFullName),
+                                    _DetailRow(label: l10n.emailLabel, value: item.ownerEmail),
+                                    _DetailRow(label: l10n.registerLicenseNumber, value: item.licenseNumber),
+                                    _DetailRow(label: l10n.cityLabel, value: item.city),
+                                    _DetailRow(label: l10n.areaLabel, value: item.area),
+                                    _DetailRow(label: l10n.addressLabel, value: item.address),
                                   ],
                                 ),
                               ),
@@ -1596,7 +1622,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
             const SizedBox(height: 24),
           if (_selectedRole == null)
             Text(
-              'المنظمات',
+              l10n.adminOrganizations,
               style: TextStyle(
                 color: context.appColors.primaryDark,
                 fontSize: 14,
@@ -1633,7 +1659,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _error(error),
+                        _error(l10n, error),
                         style: TextStyle(
                           color: context.appColors.danger,
                           fontSize: 13,
@@ -1661,7 +1687,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'لا توجد طلبات معلقة ضمن هذا القسم.',
+                              l10n.adminNoPendingRequests,
                               style: TextStyle(
                                 color: context.appColors.textMuted,
                                 fontSize: 14,
@@ -1681,21 +1707,23 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                                 icon: Icons.apartment_outlined,
                                 color: context.appColors.primaryDark,
                                 title: item.organizationName,
-                                subtitle:
-                                    '${item.ownerFullName} · ${item.verificationDocumentsCount} وثائق',
+                                subtitle: l10n.adminVerificationDocsSubtitle(
+                                  item.ownerFullName,
+                                  item.verificationDocumentsCount,
+                                ),
                                 location: '${item.city}، ${item.area}',
                                 working: widget.workingId == item.organizationId,
                                 onApprove: () => widget.onOrganization(item, true),
                                 onReject: () => widget.onOrganization(item, false),
                                 expandedChild: _ApprovalDetails(
                                   rows: [
-                                    _DetailRow(label: 'المالك', value: item.ownerFullName),
-                                    _DetailRow(label: 'البريد', value: item.ownerEmail),
-                                    _DetailRow(label: 'رقم السجل', value: item.registrationNumber),
-                                    _DetailRow(label: 'المدينة', value: item.city),
-                                    _DetailRow(label: 'المنطقة', value: item.area),
-                                    _DetailRow(label: 'حالة التحقق', value: item.verificationStatus),
-                                    _DetailRow(label: 'الوثائق', value: '${item.verificationDocumentsCount}'),
+                                    _DetailRow(label: l10n.adminOwner, value: item.ownerFullName),
+                                    _DetailRow(label: l10n.emailLabel, value: item.ownerEmail),
+                                    _DetailRow(label: l10n.registryNumberLabel, value: item.registrationNumber),
+                                    _DetailRow(label: l10n.cityLabel, value: item.city),
+                                    _DetailRow(label: l10n.areaLabel, value: item.area),
+                                    _DetailRow(label: l10n.adminVerificationStatus, value: item.verificationStatus),
+                                    _DetailRow(label: l10n.adminVerificationDocsLabel, value: '${item.verificationDocumentsCount}'),
                                   ],
                                 ),
                               ),
@@ -1708,7 +1736,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
             const SizedBox(height: 24),
           if (_selectedRole == null)
             Text(
-              'المستودعات',
+              l10n.adminWarehouses,
               style: TextStyle(
                 color: context.appColors.primary,
                 fontSize: 14,
@@ -1745,7 +1773,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        _error(error),
+                        _error(l10n, error),
                         style: TextStyle(
                           color: context.appColors.danger,
                           fontSize: 13,
@@ -1773,7 +1801,7 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'لا توجد طلبات معلقة ضمن هذا القسم.',
+                              l10n.adminNoPendingRequests,
                               style: TextStyle(
                                 color: context.appColors.textMuted,
                                 fontSize: 14,
@@ -1798,26 +1826,26 @@ class _ApprovalsTabState extends ConsumerState<_ApprovalsTab> {
                                 working: widget.workingId == item.warehouseId,
                                 onApprove: () => _showReasonSheet(
                                   context,
-                                  title: 'اعتماد المستودع',
+                                  title: l10n.adminApproveWarehouse,
                                   onConfirm: (reason) => widget.onWarehouse(item.warehouseId, true, reason),
                                 ),
                                 onReject: () => _showReasonSheet(
                                   context,
-                                  title: 'رفض المستودع',
+                                  title: l10n.adminRejectWarehouse,
                                   onConfirm: (reason) => widget.onWarehouse(item.warehouseId, false, reason),
                                 ),
                                 expandedChild: _ApprovalDetails(
                                   rows: [
-                                    _DetailRow(label: 'المالك', value: item.ownerFullName),
-                                    _DetailRow(label: 'البريد', value: item.ownerEmail),
-                                    _DetailRow(label: 'رقم الترخيص', value: item.licenseNumber),
-                                    _DetailRow(label: 'المدينة', value: item.city),
-                                    _DetailRow(label: 'المنطقة', value: item.area),
-                                    _DetailRow(label: 'العنوان', value: item.address),
-                                    _DetailRow(label: 'حد الطلب الأدنى', value: '${item.minimumOrderAmount} ر.س'),
-                                    _DetailRow(label: 'رسوم التوصيل', value: '${item.deliveryFee} ر.س'),
-                                    _DetailRow(label: 'دفعات الأدوية', value: '${item.medicineBatchesCount}'),
-                                    _DetailRow(label: 'المندوبين', value: '${item.representativesCount}'),
+                                    _DetailRow(label: l10n.adminOwner, value: item.ownerFullName),
+                                    _DetailRow(label: l10n.emailLabel, value: item.ownerEmail),
+                                    _DetailRow(label: l10n.registerLicenseNumber, value: item.licenseNumber),
+                                    _DetailRow(label: l10n.cityLabel, value: item.city),
+                                    _DetailRow(label: l10n.areaLabel, value: item.area),
+                                    _DetailRow(label: l10n.addressLabel, value: item.address),
+                                    _DetailRow(label: l10n.adminMinOrderLimit, value: '${item.minimumOrderAmount} ${l10n.adminCurrencySuffix}'),
+                                    _DetailRow(label: l10n.adminDeliveryFee, value: '${item.deliveryFee} ${l10n.adminCurrencySuffix}'),
+                                    _DetailRow(label: l10n.adminMedicineBatches, value: '${item.medicineBatchesCount}'),
+                                    _DetailRow(label: l10n.adminRepresentatives, value: '${item.representativesCount}'),
                                   ],
                                 ),
                               ),
@@ -1843,12 +1871,13 @@ class _RoleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     return Row(
       children: [
         Expanded(
           child: _RoleButton(
-            label: 'الكل',
+            label: l10n.allLabel,
             icon: Icons.apps_rounded,
             color: colors.primary,
             isSelected: selectedRole == null,
@@ -1858,7 +1887,7 @@ class _RoleSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _RoleButton(
-            label: 'الصيدليات',
+            label: l10n.adminPharmacies,
             icon: Icons.local_pharmacy_outlined,
             color: colors.primary,
             isSelected: selectedRole == 'pharmacies',
@@ -1868,7 +1897,7 @@ class _RoleSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _RoleButton(
-            label: 'المنظمات',
+            label: l10n.adminOrganizations,
             icon: Icons.apartment_outlined,
             color: colors.primary,
             isSelected: selectedRole == 'organizations',
@@ -1878,7 +1907,7 @@ class _RoleSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _RoleButton(
-            label: 'المستودعات',
+            label: l10n.adminWarehouses,
             icon: Icons.warehouse_outlined,
             color: colors.primary,
             isSelected: selectedRole == 'warehouses',
@@ -1966,6 +1995,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(adminAccountsProvider);
     return Column(
       children: [
@@ -1973,17 +2003,17 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
           child: Column(
             children: [
-              const _AdminSectionHeading(
-                eyebrow: 'دليل الحسابات',
-                title: 'مستخدمو المنصة',
-                subtitle: 'ابحث عن الحسابات وراجع حالتها ودورها.',
+              _AdminSectionHeading(
+                eyebrow: l10n.adminAccountsGuide,
+                title: l10n.adminPlatformUsers,
+                subtitle: l10n.adminAccountsSubtitle,
               ),
               const SizedBox(height: 14),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'بحث',
+                    l10n.searchLabel,
                     style: TextStyle(
                       color: context.appColors.text,
                       fontSize: 14,
@@ -2003,7 +2033,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'ابحث بالاسم أو البريد الإلكتروني',
+                      hintText: l10n.adminSearchByNameOrEmail,
                       hintStyle: TextStyle(
                         color: context.appColors.textMuted.withValues(alpha: 0.6),
                         fontSize: 14,
@@ -2061,7 +2091,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
                 child: Row(
                   children: [
                     _RoleFilter(
-                      label: 'الكل',
+                      label: l10n.allLabel,
                       selected: _role == null,
                       onTap: () => setState(() => _role = null),
                     ),
@@ -2073,7 +2103,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
                       'Representative',
                     ])
                       _RoleFilter(
-                        label: _roleLabel(role),
+                        label: _roleLabel(l10n, role),
                         selected: _role == role,
                         onTap: () => setState(() => _role = role),
                       ),
@@ -2085,8 +2115,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
         ),
         Expanded(
           child: state.when(
-            loading: () =>
-                const AppLoadingState(label: 'جاري تحميل الحسابات...'),
+            loading: () => AppLoadingState(label: l10n.adminLoadingAccounts),
             error: (error, _) => AppErrorState(
               error: error,
               onRetry: () => ref.invalidate(adminAccountsProvider),
@@ -2106,10 +2135,10 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
                   })
                   .toList(growable: false);
               if (filtered.isEmpty) {
-                return const _AdminEmptyState(
+                return _AdminEmptyState(
                   icon: Icons.manage_search_rounded,
-                  title: 'لا توجد نتائج مطابقة',
-                  subtitle: 'غيّر كلمات البحث أو اختر دورًا آخر.',
+                  title: l10n.noSearchResultsTitle,
+                  subtitle: l10n.adminNoResultsSubtitle,
                 );
               }
               return RefreshIndicator(
@@ -2154,7 +2183,7 @@ class _AccountsTabState extends ConsumerState<_AccountsTab> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_error(error)),
+          content: Text(_error(AppLocalizations.of(context), error)),
           backgroundColor: context.appColors.danger,
         ),
       );
@@ -2174,35 +2203,35 @@ class _TickerTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(adminTickerProvider);
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
           child: _AdminSectionHeading(
-            eyebrow: 'المحتوى المباشر',
-            title: 'شريط الصفحة الرئيسية',
-            subtitle:
-                'أدر الإعلانات العامة والصيدليات المناوبة الظاهرة للمستخدمين.',
+            eyebrow: l10n.adminLiveContent,
+            title: l10n.adminHomeTicker,
+            subtitle: l10n.adminTickerSubtitle,
             action: IconButton.filled(
               onPressed: () => onSave(null),
-              tooltip: 'إضافة إعلان',
+              tooltip: l10n.adminAddAd,
               icon: const Icon(Icons.add_rounded),
             ),
           ),
         ),
         Expanded(
           child: state.when(
-            loading: () => const AppLoadingState(label: 'جاري التحميل...'),
+            loading: () => AppLoadingState(label: l10n.adminLoading),
             error: (error, _) => AppErrorState(
               error: error,
               onRetry: () => ref.invalidate(adminTickerProvider),
             ),
             data: (items) => items.isEmpty
-                ? const _AdminEmptyState(
+                ? _AdminEmptyState(
                     icon: Icons.campaign_outlined,
-                    title: 'لا يوجد محتوى منشور',
-                    subtitle: 'أضف إعلانًا أو صيدلية مناوبة لتظهر في الرئيسية.',
+                    title: l10n.adminNoPublishedContent,
+                    subtitle: l10n.adminNoContentSubtitle,
                   )
                 : RefreshIndicator(
                     onRefresh: () => ref.refresh(adminTickerProvider.future),
@@ -2337,6 +2366,7 @@ class _ApprovalCardState extends State<_ApprovalCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     return GestureDetector(
       onTap: widget.expandedChild != null ? _toggle : null,
@@ -2455,7 +2485,7 @@ class _ApprovalCardState extends State<_ApprovalCard>
                   child: OutlinedButton.icon(
                     onPressed: widget.working ? null : widget.onDetails,
                     icon: const Icon(Icons.badge_outlined, size: 18),
-                    label: const Text('مراجعة الترخيص'),
+                    label: Text(l10n.adminReviewLicense),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       foregroundColor: widget.color,
@@ -2493,7 +2523,7 @@ class _ApprovalCardState extends State<_ApprovalCard>
                     child: FilledButton.icon(
                       onPressed: widget.working ? null : widget.onApprove,
                       icon: const Icon(Icons.check_rounded, size: 20),
-                      label: const Text('اعتماد'),
+                      label: Text(l10n.adminApprove),
                       style: FilledButton.styleFrom(
                         backgroundColor: widget.color,
                         foregroundColor: Colors.white,
@@ -2510,7 +2540,7 @@ class _ApprovalCardState extends State<_ApprovalCard>
                     child: OutlinedButton.icon(
                       onPressed: widget.working ? null : widget.onReject,
                       icon: const Icon(Icons.close_rounded, size: 18),
-                      label: const Text('رفض'),
+                      label: Text(l10n.reject),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: colors.primaryDark,
                         side: BorderSide(color: colors.border),
@@ -2591,6 +2621,7 @@ class _ReasonSheetBodyState extends State<_ReasonSheetBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -2619,7 +2650,7 @@ class _ReasonSheetBodyState extends State<_ReasonSheetBody> {
             Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 6),
             Text(
-              'اكتب سبب القرار (10 أحرف على الأقل)',
+              l10n.adminWriteReasonHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: colors.textMuted,
               ),
@@ -2631,8 +2662,8 @@ class _ReasonSheetBodyState extends State<_ReasonSheetBody> {
               minLines: 2,
               textInputAction: TextInputAction.newline,
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(
-                hintText: 'مثال: تمت مراجعة البيانات والوثائق والاعتماد مطابق للمعايير المطلوبة.',
+              decoration: InputDecoration(
+                hintText: l10n.adminReasonExample,
               ),
             ),
             const SizedBox(height: 16),
@@ -2641,7 +2672,7 @@ class _ReasonSheetBodyState extends State<_ReasonSheetBody> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('إلغاء'),
+                    child: Text(l10n.cancel),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -2650,7 +2681,7 @@ class _ReasonSheetBodyState extends State<_ReasonSheetBody> {
                     onPressed: _controller.text.trim().length >= 10
                         ? () => Navigator.of(context).pop(_controller.text.trim())
                         : null,
-                    child: const Text('تأكيد'),
+                    child: Text(l10n.confirm),
                   ),
                 ),
               ],
@@ -2713,6 +2744,7 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     final color = _roleColor(colors, account.role);
     return Container(
@@ -2783,11 +2815,11 @@ class _AccountCard extends StatelessWidget {
                       runSpacing: 4,
                       children: [
                         _AdminPill(
-                          label: _roleLabel(account.role),
+                          label: _roleLabel(l10n, account.role),
                           color: color,
                         ),
                         _AdminPill(
-                          label: account.isActive ? 'نشط' : 'موقوف',
+                          label: account.isActive ? l10n.adminActive : l10n.adminSuspended,
                           color: account.isActive
                               ? colors.primary
                               : colors.primaryDark,
@@ -2817,18 +2849,19 @@ class _AccountDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
 
     final basicInfo = <({String label, String value, IconData icon})>[
       (
-        label: 'الاسم',
+        label: l10n.nameLabel,
         value: details['profileName']?.toString() ?? account.fullName,
         icon: Icons.person_outline_rounded,
       ),
-      (label: 'البريد', value: account.email, icon: Icons.mail_outline_rounded),
+      (label: l10n.emailLabel, value: account.email, icon: Icons.mail_outline_rounded),
       (
-        label: 'الدور',
-        value: _roleLabel(account.role),
+        label: l10n.adminRole,
+        value: _roleLabel(l10n, account.role),
         icon: _roleIcon(account.role),
       ),
     ];
@@ -2836,20 +2869,20 @@ class _AccountDetailsSheet extends StatelessWidget {
     final additionalInfo = <({String label, String value, IconData icon})>[
       if (details['city']?.toString().isNotEmpty == true)
         (
-          label: 'الموقع',
+          label: l10n.adminLocation,
           value:
               '${details['city'] ?? ''}، ${details['area'] ?? ''}',
           icon: Icons.location_on_outlined,
         ),
       if (details['address']?.toString().isNotEmpty == true)
         (
-          label: 'العنوان',
+          label: l10n.addressLabel,
           value: details['address'].toString(),
           icon: Icons.home_outlined,
         ),
       if (details['licenseOrRegistrationNumber']?.toString().isNotEmpty == true)
         (
-          label: 'رقم الاعتماد',
+          label: l10n.adminAccreditationNumber,
           value: details['licenseOrRegistrationNumber'].toString(),
           icon: Icons.verified_outlined,
         ),
@@ -2930,7 +2963,9 @@ class _AccountDetailsSheet extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              account.isActive ? 'حساب نشط' : 'حساب موقوف',
+                              account.isActive
+                                  ? l10n.adminActiveAccount
+                                  : l10n.adminSuspendedAccount,
                               style: TextStyle(
                                 color: account.isActive ? colors.primary : colors.primaryDark,
                                 fontWeight: FontWeight.w700,
@@ -2951,7 +2986,7 @@ class _AccountDetailsSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
             child: Text(
-              'المعلومات الأساسية',
+              l10n.basicInfoTitle,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
@@ -3016,7 +3051,7 @@ class _AccountDetailsSheet extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
               child: Text(
-                'معلومات إضافية',
+                l10n.adminAdditionalInfo,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
@@ -3096,6 +3131,7 @@ class _TickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final duty = item.type == 'DutyPharmacy';
     final colors = context.appColors;
     final color = colors.primary;
@@ -3168,7 +3204,7 @@ class _TickerCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              duty ? 'صيدلية مناوبة' : 'إعلان عام',
+                              duty ? l10n.adminDutyPharmacy : l10n.adminAnnouncement,
                               style: TextStyle(
                                 color: color,
                                 fontSize: 11,
@@ -3195,7 +3231,7 @@ class _TickerCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  item.isActive ? 'منشور' : 'متوقف',
+                                  item.isActive ? l10n.adminPublished : l10n.adminStopped,
                                   style: TextStyle(
                                     color: item.isActive ? colors.primary : colors.textMuted,
                                     fontSize: 11,
@@ -3215,9 +3251,9 @@ class _TickerCard extends StatelessWidget {
                   icon: Icon(Icons.more_vert_rounded, color: colors.textMuted),
                   onSelected: (value) =>
                       value == 'edit' ? onEdit() : onDelete(),
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'edit', child: Text('تعديل')),
-                    PopupMenuItem(value: 'delete', child: Text('حذف')),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(value: 'edit', child: Text(l10n.editLabel)),
+                    PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
                   ],
                 ),
               ],
@@ -3337,15 +3373,16 @@ class _AdminEmptyState extends StatelessWidget {
   );
 }
 
-String _error(Object error) =>
-    error is ApiException ? error.message : 'تعذر إكمال العملية.';
-String _roleLabel(String role) => switch (role.toLowerCase()) {
-  'admin' => 'إدارة',
-  'pharmacy' => 'صيدلية',
-  'organization' => 'منظمة',
-  'warehouse' => 'مستودع',
-  'representative' => 'مندوب',
-  _ => 'مستخدم',
+String _error(AppLocalizations l10n, Object error) =>
+    error is ApiException ? error.localize(l10n) : l10n.operationFailed;
+String _roleLabel(AppLocalizations l10n, String role) =>
+    switch (role.toLowerCase()) {
+  'admin' => l10n.adminRoleAdmin,
+  'pharmacy' => l10n.adminRolePharmacy,
+  'organization' => l10n.adminRoleOrganization,
+  'warehouse' => l10n.adminRoleWarehouse,
+  'representative' => l10n.adminRoleRepresentative,
+  _ => l10n.adminRoleUser,
 };
 IconData _roleIcon(String role) => switch (role.toLowerCase()) {
   'admin' => Icons.admin_panel_settings_outlined,

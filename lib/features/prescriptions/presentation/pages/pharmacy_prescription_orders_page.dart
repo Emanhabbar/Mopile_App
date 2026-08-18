@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/prescription_models.dart';
 import '../../data/repositories/prescriptions_repository.dart';
 import '../controllers/prescriptions_providers.dart';
@@ -26,20 +27,21 @@ class _PharmacyPrescriptionOrdersPageState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(pharmacyPrescriptionOrdersProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('طلبات الوصفات'),
+        title: Text(l10n.prescriptionOrdersTitle),
         actions: [
           IconButton(
             onPressed: () => ref.invalidate(pharmacyPrescriptionOrdersProvider),
-            tooltip: 'تحديث الطلبات',
+            tooltip: l10n.refreshOrders,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل الطلبات...'),
+        loading: () => AppLoadingState(label: l10n.ordersLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(pharmacyPrescriptionOrdersProvider),
@@ -88,33 +90,34 @@ class _PharmacyPrescriptionOrdersPageState
   }
 
   Future<void> _markCollected(PrescriptionOrder order) async {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
     final code = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تأكيد تسليم الوصفة'),
+        title: Text(l10n.confirmDeliveryTitle),
         content: AppTextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          label: 'رمز الاستلام',
-          hint: 'أدخل رمز الاستلام المكون من 8 أرقام',
+          label: l10n.pickupCodeLabel,
+          hint: l10n.pickupCodeHint,
           icon: Icons.pin_outlined,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('تأكيد'),
+            child: Text(l10n.confirm),
           ),
         ],
       ),
     );
     controller.dispose();
     if (code == null || code.length != 8) {
-      if (code != null) _message('أدخل رمز الاستلام المكون من 8 أرقام.', true);
+      if (code != null) _message(l10n.invalidPickupCode, true);
       return;
     }
     await _update(order, status: 'Collected', pickupCode: code);
@@ -125,6 +128,7 @@ class _PharmacyPrescriptionOrdersPageState
     required String status,
     String? pickupCode,
   }) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _workingOrderId = order.id);
     try {
       await ref
@@ -137,13 +141,13 @@ class _PharmacyPrescriptionOrdersPageState
       ref.invalidate(pharmacyPrescriptionOrdersProvider);
       _message(
         status == 'Collected'
-            ? 'تم تأكيد استلام الوصفة.'
-            : 'تم تحديث الطلب إلى جاهز للاستلام.',
+            ? l10n.prescriptionCollectedMsg
+            : l10n.prescriptionReadyMsg,
         false,
       );
     } catch (error) {
       _message(
-        error is ApiException ? error.message : 'تعذر تحديث حالة الوصفة.',
+        error is ApiException ? error.localize(l10n) : l10n.prescriptionStatusUpdateFailed,
         true,
       );
     } finally {
@@ -179,7 +183,8 @@ class _PharmacyOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = prescriptionStatusInfo(context.appColors, order.status);
+    final l10n = AppLocalizations.of(context);
+    final info = prescriptionStatusInfo(context.appColors, order.status, l10n);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -202,7 +207,7 @@ class _PharmacyOrderCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     order.originalFileName.isEmpty
-                        ? 'وصفة طبية'
+                        ? l10n.prescriptionFallbackTitle
                         : order.originalFileName,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
@@ -242,10 +247,12 @@ class _PharmacyOrderCard extends StatelessWidget {
                     size: 19,
                   ),
                   const SizedBox(width: 7),
-                  Text('${order.items.length} أدوية'),
+                  Text(l10n.prescriptionItemsCount(order.items.length)),
                   const Spacer(),
                   Text(
-                    'تطابق ${order.matchPercentage.toStringAsFixed(0)}٪',
+                    l10n.matchPercentage(
+                      order.matchPercentage.toStringAsFixed(0),
+                    ),
                     style: TextStyle(
                       color: context.appColors.primary,
                       fontWeight: FontWeight.w800,
@@ -302,8 +309,8 @@ class _PharmacyOrderCard extends StatelessWidget {
                         ),
                   label: Text(
                     order.isReserved
-                        ? 'تحديد كجاهزة للاستلام'
-                        : 'تأكيد التسليم بالرمز',
+                        ? l10n.markReadyAction
+                        : l10n.confirmDeliveryWithCode,
                   ),
                 ),
               ),
@@ -327,7 +334,9 @@ class _OrdersOverview extends StatelessWidget {
   final int ready;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -353,33 +362,34 @@ class _OrdersOverview extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 13),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'وصفات الصيدلية',
-                style: TextStyle(
+                l10n.pharmacyPrescriptionsTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               Text(
-                'جهّز الوصفة ثم أكّد تسليمها بالرمز',
-                style: TextStyle(color: Colors.white70, fontSize: 11),
+                l10n.pharmacyPrescriptionsSubtitle,
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),
         ),
-        _OrderFact(value: active, label: 'نشطة'),
+        _OrderFact(value: active, label: l10n.orderFactActive),
         const SizedBox(width: 11),
-        _OrderFact(value: ready, label: 'جاهزة'),
+        _OrderFact(value: ready, label: l10n.orderFactReady),
         const SizedBox(width: 11),
-        _OrderFact(value: total, label: 'الكل'),
+        _OrderFact(value: total, label: l10n.statusAll),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _OrderFact extends StatelessWidget {
@@ -411,10 +421,13 @@ class _EmptyOrders extends StatelessWidget {
     physics: const AlwaysScrollableScrollPhysics(),
     padding: const EdgeInsets.all(32),
     children: [
-      SizedBox(height: 80),
+      const SizedBox(height: 80),
       Icon(Icons.receipt_long_outlined, color: context.appColors.textMuted, size: 42),
-      SizedBox(height: 12),
-      Text('لا توجد طلبات وصفات للصيدلية', textAlign: TextAlign.center),
+      const SizedBox(height: 12),
+      Text(
+        AppLocalizations.of(context).noPharmacyOrders,
+        textAlign: TextAlign.center,
+      ),
     ],
   );
 }

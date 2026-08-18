@@ -7,6 +7,7 @@ import '../../../../core/constants/app_roles.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/notification_models.dart';
 import '../../data/repositories/notifications_repository.dart';
@@ -30,14 +31,15 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   Widget build(BuildContext context) {
     final notifications = ref.watch(notificationsProvider(_filter));
     final summary = ref.watch(notificationSummaryProvider).valueOrNull;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('الإشعارات'),
+            Text(l10n.notificationsTitle),
             Text(
-              'كل جديد في مكان واحد',
+              l10n.notificationsSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -51,7 +53,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             onPressed: _markingAll || (summary?.unreadCount ?? 0) == 0
                 ? null
                 : _markAllRead,
-            child: Text(_markingAll ? 'جاري التحديث...' : 'قراءة الكل'),
+            child: Text(
+              _markingAll ? l10n.markingAllRead : l10n.markAllRead,
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -78,7 +82,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           Expanded(
             child: notifications.when(
               loading: () =>
-                  const AppLoadingState(label: 'جاري تحميل الإشعارات...'),
+                  AppLoadingState(label: l10n.notificationsLoading),
               error: (error, _) => AppErrorState(
                 error: error,
                 onRetry: () => ref.invalidate(notificationsProvider(_filter)),
@@ -106,6 +110,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   }
 
   Future<void> _open(AppNotification notification) async {
+    final l10n = AppLocalizations.of(context);
     try {
       if (!notification.isRead) {
         await ref
@@ -114,7 +119,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         await _refresh();
       }
     } catch (error) {
-      _message(error, 'تعذر تحديث الإشعار.');
+      _message(error, l10n.notifUpdateFailed);
       return;
     }
     if (!mounted) return;
@@ -143,6 +148,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   }
 
   Future<void> _markAllRead() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _markingAll = true);
     try {
       final count = await ref
@@ -150,10 +156,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           .markAllRead();
       await _refresh();
       if (count > 0) {
-        _showText('تم تعليم $count إشعارات كمقروءة.');
+        _showText(l10n.markedReadCount(count));
       }
     } catch (error) {
-      _message(error, 'تعذر تحديث الإشعارات.');
+      _message(error, l10n.notificationsUpdateFailed);
     } finally {
       if (mounted) setState(() => _markingAll = false);
     }
@@ -171,7 +177,12 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   }
 
   void _message(Object error, String fallback) {
-    _showText(error is ApiException ? error.message : fallback, error: true);
+    _showText(
+      error is ApiException
+          ? error.localize(AppLocalizations.of(context))
+          : fallback,
+      error: true,
+    );
   }
 
   void _showText(String text, {bool error = false}) {
@@ -197,7 +208,9 @@ class _NotificationsHero extends StatelessWidget {
   final int total, unread, read;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(17),
     decoration: BoxDecoration(
       color: context.appColors.primary,
@@ -220,17 +233,18 @@ class _NotificationsHero extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _NotificationStat(label: 'الإجمالي', value: total),
+          child: _NotificationStat(label: l10n.notifStatTotal, value: total),
         ),
         Expanded(
-          child: _NotificationStat(label: 'جديدة', value: unread),
+          child: _NotificationStat(label: l10n.notifStatNew, value: unread),
         ),
         Expanded(
-          child: _NotificationStat(label: 'مقروءة', value: read),
+          child: _NotificationStat(label: l10n.notifStatRead, value: read),
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _NotificationStat extends StatelessWidget {
@@ -270,6 +284,7 @@ class _Filters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
       child: Container(
@@ -281,7 +296,7 @@ class _Filters extends StatelessWidget {
         child: Row(
           children: [
             FilterChip(
-              label: const Text('الجديدة فقط'),
+              label: Text(l10n.unreadOnlyLabel),
               selected: unreadOnly,
               onSelected: onUnreadChanged,
               showCheckmark: false,
@@ -292,20 +307,22 @@ class _Filters extends StatelessWidget {
                 initialValue: selectedType,
                 isExpanded: true,
                 decoration: InputDecoration(
-                  hintText: 'نوع الإشعار',
+                  hintText: l10n.notificationTypeHint,
                   isDense: true,
                   filled: true,
                   fillColor: context.appColors.surface,
                 ),
                 items: [
-                  const DropdownMenuItem<String?>(
+                  DropdownMenuItem<String?>(
                     value: null,
-                    child: Text('جميع الإشعارات'),
+                    child: Text(l10n.allNotifications),
                   ),
                   ...types.map(
                     (item) => DropdownMenuItem<String?>(
                       value: item.type,
-                      child: Text('${_typeText(item.type)} (${item.count})'),
+                      child: Text(
+                        '${_typeText(l10n, item.type)} (${item.count})',
+                      ),
                     ),
                   ),
                 ],
@@ -400,14 +417,17 @@ class _EmptyNotifications extends StatelessWidget {
     physics: const AlwaysScrollableScrollPhysics(),
     padding: const EdgeInsets.all(32),
     children: [
-      SizedBox(height: 80),
+      const SizedBox(height: 80),
       Icon(
         Icons.notifications_none_rounded,
         color: context.appColors.textMuted,
         size: 42,
       ),
-      SizedBox(height: 12),
-      Text('لا توجد إشعارات لعرضها', textAlign: TextAlign.center),
+      const SizedBox(height: 12),
+      Text(
+        AppLocalizations.of(context).noNotifications,
+        textAlign: TextAlign.center,
+      ),
     ],
   );
 }
@@ -429,14 +449,14 @@ class _EmptyNotifications extends StatelessWidget {
   return (icon: Icons.notifications_rounded, color: colors.primary);
 }
 
-String _typeText(String type) {
+String _typeText(AppLocalizations l10n, String type) {
   final value = type.toLowerCase();
-  if (value.contains('prescription')) return 'الوصفات';
-  if (value.contains('request')) return 'الطلبات';
-  if (value.contains('reminder')) return 'التذكيرات';
-  if (value.contains('approval')) return 'الموافقات';
-  if (value.contains('verification')) return 'التحقق';
-  return 'عام';
+  if (value.contains('prescription')) return l10n.notifTypePrescriptions;
+  if (value.contains('request')) return l10n.notifTypeRequests;
+  if (value.contains('reminder')) return l10n.notifTypeReminders;
+  if (value.contains('approval')) return l10n.notifTypeApprovals;
+  if (value.contains('verification')) return l10n.notifTypeVerification;
+  return l10n.notifTypeGeneral;
 }
 
 String _dateTime(DateTime value) =>

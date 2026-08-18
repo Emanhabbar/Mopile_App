@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../medicines/presentation/controllers/medicines_providers.dart';
 import '../../data/models/donation_models.dart';
 import '../../data/repositories/donations_repository.dart';
@@ -47,6 +48,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final medicines = ref.watch(
       medicinesProvider((searchTerm: _searchTerm, pageNumber: 1, pageSize: 30)),
     );
@@ -63,7 +65,9 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isOffer ? 'تقديم عرض تبرع' : 'طلب مساعدة دوائية'),
+        title: Text(
+          _isOffer ? l10n.offerDonationTitle : l10n.assistanceRequestPageTitle,
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -75,15 +79,15 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
               children: [
                 AppReveal(child: _DonationFormHero(isOffer: _isOffer)),
                 const SizedBox(height: 22),
-                const _FormSectionTitle(
+                _FormSectionTitle(
                   number: '01',
-                  title: 'اختيار الدواء',
-                  subtitle: 'ابحث في دليل الأدوية وحدد الصنف المطلوب',
+                  title: l10n.chooseMedicineSection,
+                  subtitle: l10n.chooseMedicineSectionSubtitle,
                 ),
                 const SizedBox(height: 10),
                 AppTextField(
-                  label: 'البحث عن دواء',
-                  hint: 'ابحث باسم الدواء ثم اختر من النتائج',
+                  label: l10n.medicineSearchLabel,
+                  hint: l10n.medicineSearchHint,
                   controller: _medicineSearch,
                   icon: Icons.search_rounded,
                   textInputAction: TextInputAction.search,
@@ -91,16 +95,16 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                   suffixIcon: IconButton.filled(
                     onPressed: () => _searchMedicines(_medicineSearch.text),
                     icon: const Icon(Icons.search_rounded),
-                    tooltip: 'بحث',
+                    tooltip: l10n.searchLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
                 medicines.when(
                   loading: () => const LinearProgressIndicator(),
-                  error: (_, _) => const Text('تعذر تحميل دليل الأدوية.'),
+                  error: (_, _) => Text(l10n.catalogLoadFailed),
                   data: (page) => _FormDropdown<String>(
-                    label: 'الدواء',
-                    hint: 'اختر الدواء من الدليل',
+                    label: l10n.medicineDropdownLabel,
+                    hint: l10n.medicineDropdownHint,
                     icon: Icons.medication_outlined,
                     initialValue:
                         page.items.any((item) => item.id == _medicineId)
@@ -120,25 +124,25 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                         )
                         .toList(growable: false),
                     onChanged: (value) => setState(() => _medicineId = value),
-                    validator: (value) =>
-                        value == null ? 'اختر الدواء من الدليل.' : null,
+                    validator: (value) => value == null
+                        ? l10n.chooseMedicineFromCatalog
+                        : null,
                   ),
                 ),
                 const SizedBox(height: 16),
                 if (_isOffer) ...[
-                  const _FormSectionTitle(
+                  _FormSectionTitle(
                     number: '02',
-                    title: 'صيدلية التحقق والاستلام',
-                    subtitle: 'ستتأكد الصيدلية من سلامة العبوات قبل تسليمها',
+                    title: l10n.verificationPharmacySection,
+                    subtitle: l10n.verificationPharmacySectionSubtitle,
                   ),
                   const SizedBox(height: 10),
                   verificationPharmacies.when(
                     loading: () => const LinearProgressIndicator(),
-                    error: (_, _) =>
-                        const Text('تعذر تحميل صيدليات التحقق المعتمدة.'),
+                    error: (_, _) => Text(l10n.verificationPharmaciesLoadFailed),
                     data: (items) => _FormDropdown<String>(
-                      label: 'صيدلية التحقق',
-                      hint: 'اختر الصيدلية المعتمدة',
+                      label: l10n.verificationPharmacyLabel,
+                      hint: l10n.verificationPharmacyHint,
                       icon: Icons.verified_outlined,
                       initialValue: _reviewingPharmacyId,
                       items: items
@@ -155,7 +159,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                       onChanged: (value) =>
                           setState(() => _reviewingPharmacyId = value),
                       validator: (value) => value == null
-                          ? 'اختر الصيدلية التي ستتحقق من التبرع.'
+                          ? l10n.chooseVerificationPharmacy
                           : null,
                     ),
                   ),
@@ -163,27 +167,27 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                 ],
                 _FormSectionTitle(
                   number: _isOffer ? '03' : '02',
-                  title: 'الجهة والتفاصيل',
+                  title: l10n.organizationSection,
                   subtitle: _isOffer
-                      ? 'حدد الجهة المستفيدة وبيانات العبوات'
-                      : 'حدد الجهة المستهدفة واحتياجك الدوائي',
+                      ? l10n.organizationSectionOfferSubtitle
+                      : l10n.organizationSectionRequestSubtitle,
                 ),
                 const SizedBox(height: 10),
                 organizations.when(
                   loading: () => const LinearProgressIndicator(),
-                  error: (_, _) => const Text('تعذر تحميل المنظمات.'),
+                  error: (_, _) => Text(l10n.organizationsLoadFailed),
                   data: (items) => _FormDropdown<String>(
-                    label: 'المنظمة',
+                    label: l10n.organizationDropdownLabel,
                     hint: _isOffer
-                        ? 'اختر الجهة المستفيدة'
-                        : 'اختر المنظمة المستهدفة',
+                        ? l10n.organizationDropdownOfferHint
+                        : l10n.organizationDropdownRequestHint,
                     icon: Icons.apartment_rounded,
                     initialValue: _organizationId,
                     items: [
                       if (_isOffer)
-                        const DropdownMenuItem<String>(
+                        DropdownMenuItem<String>(
                           value: null,
-                          child: Text('بدون منظمة محددة'),
+                          child: Text(l10n.noSpecificOrganization),
                         ),
                       ...items.map(
                         (organization) => DropdownMenuItem(
@@ -197,21 +201,21 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                       _campaignId = null;
                     }),
                     validator: (value) => !_isOffer && value == null
-                        ? 'اختر المنظمة المستهدفة.'
+                        ? l10n.chooseTargetOrganization
                         : null,
                   ),
                 ),
                 const SizedBox(height: 14),
                 _FormDropdown<String?>(
-                  label: 'الحملة (اختياري)',
-                  hint: 'بدون حملة محددة',
+                  label: l10n.campaignOptionalLabel,
+                  hint: l10n.noSpecificCampaign,
                   icon: Icons.campaign_outlined,
                   initialValue: _campaignId,
                   enabled: _organizationId != null,
                   items: [
-                    const DropdownMenuItem<String?>(
+                    DropdownMenuItem<String?>(
                       value: null,
-                      child: Text('بدون حملة محددة'),
+                      child: Text(l10n.noSpecificCampaign),
                     ),
                     ...campaignItems.map(
                       (campaign) => DropdownMenuItem<String?>(
@@ -225,16 +229,16 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                 const SizedBox(height: 14),
                 AppTextField(
                   label: _isOffer
-                      ? 'عدد العبوات المتبرع بها'
-                      : 'عدد العبوات المطلوبة',
-                  hint: 'أدخل كمية بين 1 و1000',
+                      ? l10n.donatedPackagesLabel
+                      : l10n.requestedPackagesLabel,
+                  hint: l10n.packageCountHint,
                   controller: _package,
                   icon: Icons.numbers_rounded,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     final count = int.tryParse(value ?? '');
                     return count == null || count < 1 || count > 1000
-                        ? 'أدخل عددًا بين 1 و1000.'
+                        ? l10n.packageCountInvalid
                         : null;
                   },
                 ),
@@ -251,11 +255,11 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                   ),
                   leading: const Icon(Icons.event_outlined),
                   title: Text(
-                    _isOffer ? 'تاريخ انتهاء الدواء' : 'مطلوب قبل تاريخ',
+                    _isOffer ? l10n.medicineExpiryDate : l10n.neededBeforeDate,
                   ),
                   subtitle: Text(
                     _date == null
-                        ? 'اختياري'
+                        ? l10n.optionalHint
                         : '${_date!.year}/${_date!.month}/${_date!.day}',
                   ),
                   trailing: _date == null
@@ -270,18 +274,16 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                   const SizedBox(height: 8),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('العبوات مغلقة ولم تُفتح'),
-                    subtitle: const Text(
-                      'تأكد من سلامة العبوة قبل تقديم العرض.',
-                    ),
+                    title: Text(l10n.sealedPackagesTitle),
+                    subtitle: Text(l10n.sealedPackagesSubtitle),
                     value: _isSealed,
                     onChanged: (value) => setState(() => _isSealed = value),
                   ),
                 ],
                 const SizedBox(height: 8),
                 AppTextField(
-                  label: 'ملاحظات (اختياري)',
-                  hint: 'أضف أي تفاصيل إضافية',
+                  label: l10n.notesOptionalLabel,
+                  hint: l10n.notesHint,
                   controller: _notes,
                   minLines: 3,
                   maxLines: 5,
@@ -304,10 +306,10 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
                         ),
                   label: Text(
                     _saving
-                        ? 'جاري الإرسال...'
+                        ? l10n.sendingProgress
                         : _isOffer
-                        ? 'إرسال عرض التبرع'
-                        : 'إرسال طلب المساعدة',
+                        ? l10n.offerDonationTitle
+                        : l10n.assistanceRequestPageTitle,
                   ),
                 ),
               ],
@@ -342,6 +344,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context);
     final medicineId = _medicineId;
     final organizationId = _organizationId;
     final reviewingPharmacyId = _reviewingPharmacyId;
@@ -388,9 +391,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _isOffer
-                ? 'تم إرسال العرض إلى صيدلية التحقق بنجاح.'
-                : 'تم إرسال طلب المساعدة إلى المنظمة.',
+            _isOffer ? l10n.offerSubmitted : l10n.assistanceSubmitted,
           ),
         ),
       );
@@ -400,9 +401,7 @@ class _DonationFormPageState extends ConsumerState<DonationFormPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error is ApiException
-                ? error.message
-                : 'تعذر إرسال البيانات حاليًا.',
+            error is ApiException ? error.localize(l10n) : l10n.submitFailed,
           ),
           backgroundColor: context.appColors.danger,
         ),
@@ -417,7 +416,9 @@ class _DonationFormHero extends StatelessWidget {
   const _DonationFormHero({required this.isOffer});
   final bool isOffer;
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
       color: isOffer
@@ -454,7 +455,7 @@ class _DonationFormHero extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isOffer ? 'عرض تبرع دوائي' : 'طلب مساعدة دوائية',
+                isOffer ? l10n.donationOfferHeroTitle : l10n.assistanceHeroTitle,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -462,8 +463,8 @@ class _DonationFormHero extends StatelessWidget {
               ),
               Text(
                 isOffer
-                    ? 'أدخل بيانات دقيقة لتسهيل التحقق والاستلام.'
-                    : 'أدخل احتياجك واختر المنظمة المناسبة للطلب.',
+                    ? l10n.donationOfferHeroSubtitle
+                    : l10n.assistanceHeroSubtitle,
                 style: TextStyle(
                   color: context.appColors.textMuted,
                   fontSize: 10.5,
@@ -475,7 +476,8 @@ class _DonationFormHero extends StatelessWidget {
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _FormSectionTitle extends StatelessWidget {

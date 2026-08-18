@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -19,22 +20,14 @@ class _PharmacyWorkingHoursPageState
     extends ConsumerState<PharmacyWorkingHoursPage> {
   List<PharmacyWorkingPeriod>? _periods;
   bool _saving = false;
-  static const _days = [
-    'الأحد',
-    'الاثنين',
-    'الثلاثاء',
-    'الأربعاء',
-    'الخميس',
-    'الجمعة',
-    'السبت',
-  ];
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(pharmacyWorkingHoursProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ساعات العمل'),
+        title: Text(l10n.workingHoursTitle),
         actions: [
           _saving
               ? const Padding(
@@ -49,7 +42,7 @@ class _PharmacyWorkingHoursPageState
                 )
               : IconButton(
                   onPressed: _save,
-                  tooltip: 'حفظ',
+                  tooltip: l10n.saveTooltip,
                   icon: const Icon(Icons.save_rounded),
                 ),
           const SizedBox(width: 4),
@@ -58,15 +51,14 @@ class _PharmacyWorkingHoursPageState
               _periods = null;
               ref.invalidate(pharmacyWorkingHoursProvider);
             },
-            tooltip: 'استعادة الساعات المحفوظة',
+            tooltip: l10n.restoreSavedHours,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: state.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل ساعات العمل...'),
+        loading: () => AppLoadingState(label: l10n.workingHoursLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(pharmacyWorkingHoursProvider),
@@ -97,8 +89,8 @@ class _PharmacyWorkingHoursPageState
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'للدوام بعد منتصف الليل اختر وقت إغلاق أسبق من وقت الفتح، وسيُحفظ لليوم التالي تلقائيًا.',
-                        style: TextStyle(fontSize: 12),
+                        l10n.overnightHint,
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
@@ -114,6 +106,16 @@ class _PharmacyWorkingHoursPageState
   }
 
   Widget _dayEditor(int index) {
+    final l10n = AppLocalizations.of(context);
+    final days = [
+      l10n.daySunday,
+      l10n.dayMonday,
+      l10n.dayTuesday,
+      l10n.dayWednesday,
+      l10n.dayThursday,
+      l10n.dayFriday,
+      l10n.daySaturday,
+    ];
     final period = _periods![index];
     final overnight = _isOvernight(period);
     return Card(
@@ -135,7 +137,7 @@ class _PharmacyWorkingHoursPageState
                     borderRadius: BorderRadius.circular(13),
                   ),
                   child: Text(
-                    _days[index].substring(0, 2),
+                    days[index].substring(0, 2),
                     style: TextStyle(
                       color: period.isClosed
                           ? context.appColors.textMuted
@@ -150,14 +152,14 @@ class _PharmacyWorkingHoursPageState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _days[index],
+                        days[index],
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                       Text(
                         period.isClosed
-                            ? 'الصيدلية مغلقة'
+                            ? l10n.pharmacyClosed
                             : overnight
-                            ? 'دوام ممتد لليوم التالي'
+                            ? l10n.overnightShift
                             : '${period.openTime!.substring(0, 5)} – ${period.closeTime!.substring(0, 5)}',
                         style: TextStyle(
                           color: overnight
@@ -188,7 +190,7 @@ class _PharmacyWorkingHoursPageState
                 children: [
                   Expanded(
                     child: _TimeButton(
-                      label: 'من',
+                      label: l10n.timeFrom,
                       value: period.openTime!,
                       onTap: () => _pickTime(index, true),
                     ),
@@ -196,7 +198,7 @@ class _PharmacyWorkingHoursPageState
                   const SizedBox(width: 10),
                   Expanded(
                     child: _TimeButton(
-                      label: 'إلى',
+                      label: l10n.timeTo,
                       value: period.closeTime!,
                       onTap: () => _pickTime(index, false),
                     ),
@@ -214,7 +216,7 @@ class _PharmacyWorkingHoursPageState
                     ),
                     SizedBox(width: 5),
                     Text(
-                      'ينتهي الدوام في اليوم التالي',
+                      l10n.endsNextDay,
                       style: TextStyle(
                         color: context.appColors.warning,
                         fontSize: 11,
@@ -232,12 +234,13 @@ class _PharmacyWorkingHoursPageState
   }
 
   Future<void> _pickTime(int index, bool opening) async {
+    final l10n = AppLocalizations.of(context);
     final period = _periods![index];
     final current = _parse(opening ? period.openTime : period.closeTime);
     final picked = await showTimePicker(
       context: context,
       initialTime: current,
-      helpText: opening ? 'وقت بدء الدوام' : 'وقت انتهاء الدوام',
+      helpText: opening ? l10n.openingTimeHelp : l10n.closingTimeHelp,
     );
     if (picked == null) return;
     final value =
@@ -254,9 +257,10 @@ class _PharmacyWorkingHoursPageState
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     for (final period in _periods!) {
       if (!period.isClosed && period.openTime == period.closeTime) {
-        _message('وقت الفتح والإغلاق يجب أن يكونا مختلفين.', true);
+        _message(l10n.timesMustDiffer, true);
         return;
       }
     }
@@ -269,10 +273,10 @@ class _PharmacyWorkingHoursPageState
       ref
         ..invalidate(pharmacyWorkingHoursProvider)
         ..invalidate(pharmacyDashboardProvider);
-      _message('تم حفظ ساعات العمل.', false);
+      _message(l10n.workingHoursSaved, false);
     } catch (error) {
       _message(
-        error is ApiException ? error.message : 'تعذر حفظ ساعات العمل.',
+        error is ApiException ? error.localize(l10n) : l10n.workingHoursSaveFailed,
         true,
       );
     } finally {
@@ -315,7 +319,9 @@ class _HoursOverview extends StatelessWidget {
   final int overnight;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(19),
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -341,31 +347,32 @@ class _HoursOverview extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 13),
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'جدول الصيدلية',
-                style: TextStyle(
+                l10n.scheduleTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               Text(
-                'حدّد أوقات استقبال طلبات المستخدمين',
-                style: TextStyle(color: Colors.white70, fontSize: 11),
+                l10n.scheduleSubtitle,
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),
         ),
-        _HourFact(value: '$openDays', label: 'أيام عمل'),
+        _HourFact(value: '$openDays', label: l10n.workDays),
         const SizedBox(width: 11),
-        _HourFact(value: '$overnight', label: 'ليلي'),
+        _HourFact(value: '$overnight', label: l10n.overnightLabel),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _HourFact extends StatelessWidget {

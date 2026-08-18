@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/layout.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../controllers/supply_chain_providers.dart';
 
@@ -12,9 +14,10 @@ class WarehouseHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(supplyDashboardProvider);
     return state.when(
-      loading: () => const AppLoadingState(label: 'نجهّز مركز المستودع...'),
+      loading: () => AppLoadingState(label: l10n.supplyLoadingWarehouse),
       error: (error, _) => AppErrorState(
         error: error,
         onRetry: () => ref.invalidate(supplyDashboardProvider),
@@ -23,46 +26,45 @@ class WarehouseHomePage extends ConsumerWidget {
         onRefresh: () => ref.refresh(supplyDashboardProvider.future),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 112),
+          padding: EdgeInsets.fromLTRB(20, 14, 20, kBottomNavReserved),
           children: [
             RoleDashboardHero(
-              title: 'توريد منظم من المخزون للتسليم',
-              subtitle:
-                  'راقب التشغيلات والطلبات والشحنات قبل أن تتحول إلى تأخير.',
+              title: l10n.warehouseHeroTitle,
+              subtitle: l10n.warehouseHeroSubtitle,
               icon: Icons.warehouse_rounded,
               accent: context.appColors.primary,
               badge: data.pendingOrders > 0
-                  ? '${data.pendingOrders} طلبات توريد بانتظارك'
-                  : 'الطلبات محدثة',
+                  ? l10n.warehousePendingOrders(data.pendingOrders)
+                  : l10n.warehouseOrdersUpToDate,
             ),
             const SizedBox(height: 22),
-            const RoleSectionHeader(
-              title: 'حالة التشغيل',
-              subtitle: 'مؤشرات حية من مخزون المستودع',
+            RoleSectionHeader(
+              title: l10n.warehouseOpsStatus,
+              subtitle: l10n.warehouseOpsStatusSubtitle,
             ),
             const SizedBox(height: 11),
             RoleMetricsGrid(
               items: [
                 RoleMetricData(
-                  label: 'تشغيلات نشطة',
+                  label: l10n.supplyActiveBatches,
                   value: '${data.activeBatches}',
                   icon: Icons.inventory_2_rounded,
                   color: context.appColors.primary,
                 ),
                 RoleMetricData(
-                  label: 'مخزون منخفض',
+                  label: l10n.supplyLowStock,
                   value: '${data.lowStockBatches}',
                   icon: Icons.warning_amber_rounded,
                   color: context.appColors.primary,
                 ),
                 RoleMetricData(
-                  label: 'قريبة الانتهاء',
+                  label: l10n.supplyExpiringSoon,
                   value: '${data.expiringBatches}',
                   icon: Icons.event_busy_outlined,
                   color: context.appColors.primary,
                 ),
                 RoleMetricData(
-                  label: 'شحنات نشطة',
+                  label: l10n.supplyActiveDeliveries,
                   value: '${data.activeDeliveries}',
                   icon: Icons.local_shipping_rounded,
                   color: context.appColors.primary,
@@ -71,24 +73,23 @@ class WarehouseHomePage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             RoleNoticeCard(
-              title: 'قيمة المخزون الحالية',
-              message:
-                  '${_money(data.inventoryValue)} ل.س ضمن التشغيلات النشطة',
+              title: l10n.warehouseInventoryValueTitle,
+              message: l10n.warehouseInventoryValueMessage(_money(data.inventoryValue)),
               icon: Icons.account_balance_wallet_outlined,
               color: context.appColors.primary,
               onTap: () => context.go('/supply-chain'),
             ),
             const SizedBox(height: 24),
-            const RoleSectionHeader(
-              title: 'تشغيل سريع',
-              subtitle: 'اختصارات لأهم أعمال المستودع',
+            RoleSectionHeader(
+              title: l10n.warehouseQuickOps,
+              subtitle: l10n.warehouseQuickOpsSubtitle,
             ),
             const SizedBox(height: 11),
             RoleActionsGrid(
               items: [
                 RoleActionData(
-                  title: 'إدارة المستودع',
-                  subtitle: 'التشغيلات والمخزون',
+                  title: l10n.warehouseManage,
+                  subtitle: l10n.warehouseManageSubtitle,
                   badge: data.lowStockBatches > 0
                       ? '${data.lowStockBatches}'
                       : null,
@@ -97,8 +98,8 @@ class WarehouseHomePage extends ConsumerWidget {
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
-                  title: 'طلبات التوريد',
-                  subtitle: 'قبول وتجهيز وإسناد الطلبات',
+                  title: l10n.warehouseSupplyOrders,
+                  subtitle: l10n.warehouseSupplyOrdersSubtitle,
                   badge: data.pendingOrders > 0
                       ? '${data.pendingOrders}'
                       : null,
@@ -107,8 +108,8 @@ class WarehouseHomePage extends ConsumerWidget {
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
-                  title: 'الشحن والتوصيل',
-                  subtitle: 'المندوبون وحالة الشحنات',
+                  title: l10n.warehouseShipping,
+                  subtitle: l10n.warehouseShippingSubtitle,
                   badge: data.activeDeliveries > 0
                       ? '${data.activeDeliveries}'
                       : null,
@@ -117,8 +118,8 @@ class WarehouseHomePage extends ConsumerWidget {
                   onTap: () => context.go('/supply-chain'),
                 ),
                 RoleActionData(
-                  title: 'تحليل المخزون',
-                  subtitle: 'توقع النفاد ودعم قرار التوريد',
+                  title: l10n.warehouseInventoryAnalysis,
+                  subtitle: l10n.warehouseInventoryAnalysisSubtitle,
                   icon: Icons.auto_graph_rounded,
                   color: context.appColors.primary,
                   onTap: () => context.push('/intelligence'),
@@ -128,11 +129,11 @@ class WarehouseHomePage extends ConsumerWidget {
             if (data.alerts.isNotEmpty) ...[
               const SizedBox(height: 24),
               RoleSectionHeader(
-                title: 'تنبيهات المخزون',
-                subtitle: 'التشغيلات التي تحتاج تدخلاً قريباً',
+                title: l10n.warehouseAlertsTitle,
+                subtitle: l10n.warehouseAlertsSubtitle,
                 action: TextButton(
                   onPressed: () => context.go('/supply-chain'),
-                  child: const Text('عرض الكل'),
+                  child: Text(l10n.viewAll),
                 ),
               ),
               const SizedBox(height: 10),
@@ -143,8 +144,7 @@ class WarehouseHomePage extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 9),
                       child: RoleNoticeCard(
                         title: batch.medicineName,
-                        message:
-                            'تشغيلة ${batch.batchNumber} · ${batch.sellableQuantity} عبوات متاحة',
+                        message: l10n.warehouseBatchAlert(batch.batchNumber, batch.sellableQuantity),
                         icon: batch.sellableQuantity <= 0
                             ? Icons.remove_circle_outline_rounded
                             : Icons.inventory_2_outlined,
@@ -156,9 +156,9 @@ class WarehouseHomePage extends ConsumerWidget {
             ],
             if (data.recentOrders.isNotEmpty) ...[
               const SizedBox(height: 24),
-              const RoleSectionHeader(
-                title: 'أحدث الطلبات',
-                subtitle: 'آخر طلبات التوريد الواردة للمستودع',
+              RoleSectionHeader(
+                title: l10n.warehouseRecentOrders,
+                subtitle: l10n.warehouseRecentOrdersSubtitle,
               ),
               const SizedBox(height: 10),
               ...data.recentOrders
@@ -168,8 +168,11 @@ class WarehouseHomePage extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 9),
                       child: RoleNoticeCard(
                         title: order.pharmacyName,
-                        message:
-                            '${order.orderCode} · ${_orderStatus(order.status)} · ${_money(order.totalAmount)} ل.س',
+                        message: l10n.warehouseOrderSummary(
+                          order.orderCode,
+                          _orderStatus(l10n, order.status),
+                          _money(order.totalAmount),
+                        ),
                         icon: Icons.receipt_long_outlined,
                         color: _orderColor(context.appColors, order.status),
                         onTap: () => context.go('/supply-chain'),
@@ -189,15 +192,15 @@ String _money(double value) {
   return digits.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => '،');
 }
 
-String _orderStatus(String status) => switch (status) {
-  'Submitted' => 'جديد',
-  'Accepted' => 'مقبول',
-  'Preparing' => 'قيد التجهيز',
-  'ReadyForDispatch' => 'جاهز للشحن',
-  'OutForDelivery' => 'في الطريق',
-  'Delivered' => 'تم التسليم',
-  'Rejected' => 'مرفوض',
-  'Cancelled' => 'ملغى',
+String _orderStatus(AppLocalizations l10n, String status) => switch (status) {
+  'Submitted' => l10n.newLabel,
+  'Accepted' => l10n.supplyStatusAccepted,
+  'Preparing' => l10n.supplyStatusPreparing,
+  'ReadyForDispatch' => l10n.supplyStatusReadyForDispatch,
+  'OutForDelivery' => l10n.supplyStatusOutForDelivery,
+  'Delivered' => l10n.supplyStatusDelivered,
+  'Rejected' => l10n.supplyStatusRejected,
+  'Cancelled' => l10n.statusCancelled,
   _ => status,
 };
 

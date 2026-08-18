@@ -135,13 +135,14 @@ class PharmacyDiscoveryRemoteDataSource {
   Future<PharmacyLocatorHealth> getHealth() async =>
       PharmacyLocatorHealth.fromJson(await _get(ApiEndpoints.pharmaciesHealth));
 
-  Future<String> clearCache({int hours = 24}) async {
+  Future<String?> clearCache({int hours = 24}) async {
     final json = await _post(
       ApiEndpoints.pharmaciesCacheClear,
       null,
       query: {'hours': hours},
     );
-    return json['message']?.toString() ?? 'تم تنظيف بيانات المواقع القديمة.';
+    final message = json['message']?.toString();
+    return message == null || message.trim().isEmpty ? null : message;
   }
 
   Future<Map<String, dynamic>> _get(

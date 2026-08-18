@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/intelligence_models.dart';
 import '../../data/repositories/intelligence_repository.dart';
@@ -55,31 +56,42 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
       AppRole.pharmacy,
       AppRole.warehouse,
     }.contains(role);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('المعلومات الدوائية الذكية')),
+      appBar: AppBar(title: Text(l10n.intelligenceTitle)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
         children: [
           const _IntroCard(),
           const SizedBox(height: 18),
-          Text('البحث عن بدائل', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            l10n.searchAlternativesTitle,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 10),
           AppTextField(
             controller: _medicine,
-            label: 'اسم الدواء',
-            hint: 'أدخل اسم الدواء للبحث عن بدائل',
+            label: l10n.medicineNameLabel,
+            hint: l10n.medicineAlternativesHint,
             icon: Icons.medication_outlined,
           ),
           const SizedBox(height: 10),
           FilledButton.icon(
             onPressed: _loadingAlternatives ? null : _loadAlternatives,
             icon: const Icon(Icons.compare_arrows_rounded),
-            label: Text(_loadingAlternatives ? 'جاري البحث...' : 'عرض البدائل'),
+            label: Text(
+              _loadingAlternatives
+                  ? l10n.searchingProgress
+                  : l10n.showAlternatives,
+            ),
           ),
           if (_alternatives != null) ...[
             const SizedBox(height: 12),
             if (_alternatives!.alternatives.isEmpty)
-              const Text('لم يتم العثور على بدائل مناسبة.')
+              Text(
+                l10n.noAlternativesFound,
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
             else
               ..._alternatives!.alternatives.map(
                 (item) => Card(
@@ -110,7 +122,7 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
           if (canPredict) ...[
             const SizedBox(height: 24),
             Text(
-              'توقع نفاد المخزون',
+              l10n.stockoutPredictionTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
@@ -122,11 +134,11 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
               children: [
-                _NumberField(_stock, 'المخزون'),
-                _NumberField(_sold, 'المباع'),
-                _NumberField(_average, 'المتوسط اليومي', decimal: true),
-                _NumberField(_week, 'مبيعات 7 أيام'),
-                _NumberField(_monthSales, 'مبيعات 30 يومًا'),
+                _NumberField(_stock, l10n.stockLabel),
+                _NumberField(_sold, l10n.soldLabel),
+                _NumberField(_average, l10n.averageDailyLabel, decimal: true),
+                _NumberField(_week, l10n.sales7DaysLabel),
+                _NumberField(_monthSales, l10n.sales30DaysLabel),
               ],
             ),
             const SizedBox(height: 10),
@@ -134,7 +146,7 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
               onPressed: _loadingPrediction ? null : _predict,
               icon: const Icon(Icons.auto_graph_rounded),
               label: Text(
-                _loadingPrediction ? 'جاري التحليل...' : 'تحليل المخزون',
+                _loadingPrediction ? l10n.analyzing : l10n.analyzeStock,
               ),
             ),
             if (_prediction != null) ...[
@@ -148,8 +160,9 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
   }
 
   Future<void> _loadAlternatives() async {
+    final l10n = AppLocalizations.of(context);
     final name = _medicine.text.trim();
-    if (name.isEmpty) return _show('أدخل اسم الدواء أولًا.', true);
+    if (name.isEmpty) return _show(l10n.enterMedicineFirst, true);
     setState(() => _loadingAlternatives = true);
     try {
       final value = await ref
@@ -157,13 +170,14 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
           .getAlternatives(name);
       if (mounted) setState(() => _alternatives = value);
     } catch (error) {
-      if (mounted) _show(_error(error), true);
+      if (mounted) _show(_error(error, l10n), true);
     } finally {
       if (mounted) setState(() => _loadingAlternatives = false);
     }
   }
 
   Future<void> _predict() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _loadingPrediction = true);
     try {
       final value = await ref
@@ -178,7 +192,7 @@ class _IntelligencePageState extends ConsumerState<IntelligencePage> {
           );
       if (mounted) setState(() => _prediction = value);
     } catch (error) {
-      if (mounted) _show(_error(error), true);
+      if (mounted) _show(_error(error, l10n), true);
     } finally {
       if (mounted) setState(() => _loadingPrediction = false);
     }
@@ -205,10 +219,10 @@ class _IntroCard extends StatelessWidget {
     child: Row(
       children: [
         Icon(Icons.psychology_alt_outlined, color: context.appColors.primary),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
-            'نتائج مساعدة لاتخاذ القرار، ويجب مراجعة المختص قبل استبدال أي دواء.',
+            AppLocalizations.of(context).intelligenceIntro,
           ),
         ),
       ],
@@ -242,8 +256,10 @@ class _PredictionCard extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'متوقع النفاد خلال ${value.daysUntilStockout.toStringAsFixed(1)} يوم\n'
-              'الكمية المقترحة للطلب: ${value.recommendedReorderQuantity}',
+              AppLocalizations.of(context).predictionResult(
+                value.daysUntilStockout.toStringAsFixed(1),
+                value.recommendedReorderQuantity,
+              ),
             ),
           ),
           Text(
@@ -256,6 +272,6 @@ class _PredictionCard extends StatelessWidget {
   );
 }
 
-String _error(Object error) => error is ApiException
-    ? error.message
-    : 'الخدمة الذكية غير متاحة حاليًا. حاول لاحقًا.';
+String _error(Object error, AppLocalizations l10n) => error is ApiException
+    ? error.localize(l10n)
+    : l10n.intelligenceUnavailable;

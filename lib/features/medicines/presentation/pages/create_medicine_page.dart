@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/medicine_models.dart';
 import '../../data/repositories/medicines_repository.dart';
 import '../controllers/medicines_providers.dart';
@@ -62,8 +63,9 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('إضافة دواء')),
+      appBar: AppBar(title: Text(l10n.addMedicine)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -71,58 +73,59 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
           children: [
             const _Intro(),
             const SizedBox(height: 22),
-            const _SectionTitle(
+            _SectionTitle(
               icon: Icons.medication_outlined,
-              title: 'البيانات الأساسية',
+              title: l10n.basicDataTitle,
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الاسم التجاري بالإنكليزية',
+              label: l10n.englishTradeNameLabel,
               controller: _name,
-              hint: 'مثال: Paracetamol 500',
+              hint: l10n.englishTradeNameHint,
               icon: Icons.medication_liquid_outlined,
               textInputAction: TextInputAction.next,
               validator: (value) => _requiredLength(
                 value,
                 maximum: 500,
-                requiredMessage: 'اسم الدواء مطلوب.',
+                requiredMessage: l10n.medicineNameRequired,
+                l10n: l10n,
               ),
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الاسم التجاري بالعربية',
+              label: l10n.arabicTradeNameLabel,
               controller: _arabicName,
-              hint: 'مثال: باراسيتامول 500',
+              hint: l10n.arabicTradeNameHint,
               icon: Icons.translate_rounded,
               textInputAction: TextInputAction.next,
-              validator: (value) => _maximum(value, 500),
+              validator: (value) => _maximum(value, 500, l10n),
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الباركود',
+              label: l10n.barcodeLabel,
               controller: _barcode,
-              hint: 'أرقام أو أحرف أو شرطة',
+              hint: l10n.barcodeHint,
               icon: Icons.qr_code_rounded,
               textInputAction: TextInputAction.next,
-              validator: _barcodeValidator,
+              validator: (value) => _barcodeValidator(value, l10n),
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الاسم العلمي بالإنكليزية',
+              label: l10n.englishScientificNameLabel,
               controller: _scientificName,
-              hint: 'اختياري',
+              hint: l10n.optionalHint,
               icon: Icons.science_outlined,
               textInputAction: TextInputAction.next,
-              validator: (value) => _maximum(value, 2000),
+              validator: (value) => _maximum(value, 2000, l10n),
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الاسم العلمي بالعربية',
+              label: l10n.arabicScientificNameLabel,
               controller: _arabicScientificName,
-              hint: 'اختياري',
+              hint: l10n.optionalHint,
               icon: Icons.science_rounded,
               textInputAction: TextInputAction.next,
-              validator: (value) => _maximum(value, 2000),
+              validator: (value) => _maximum(value, 2000, l10n),
             ),
             const SizedBox(height: 14),
             Row(
@@ -130,53 +133,53 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'سعر الشراء',
+                    label: l10n.purchasePriceLabel,
                     controller: _purchasePrice,
                     hint: '0',
                     icon: Icons.shopping_cart_outlined,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    validator: _nonNegativeNumber,
+                    validator: (value) => _nonNegativeNumber(value, l10n),
                   ),
                 ),
                 const SizedBox(width: 11),
                 Expanded(
                   child: AppTextField(
-                    label: 'سعر البيع',
+                    label: l10n.sellingPriceLabel,
                     controller: _sellingPrice,
                     hint: '0',
                     icon: Icons.payments_outlined,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    validator: _nonNegativeNumber,
+                    validator: (value) => _nonNegativeNumber(value, l10n),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الكمية المرجعية',
+              label: l10n.referenceQuantityLabel,
               controller: _quantity,
               hint: '0',
               icon: Icons.inventory_2_outlined,
               keyboardType: TextInputType.number,
-              validator: _nonNegativeInteger,
+              validator: (value) => _nonNegativeInteger(value, l10n),
             ),
             const SizedBox(height: 22),
-            const _SectionTitle(
+            _SectionTitle(
               icon: Icons.category_outlined,
-              title: 'التصنيف والتصنيع',
+              title: l10n.categoryManufacturingTitle,
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الشركة المصنعة',
+              label: l10n.manufacturerLabel,
               controller: _manufacturer,
-              hint: 'اختياري',
+              hint: l10n.optionalHint,
               icon: Icons.factory_outlined,
               textInputAction: TextInputAction.next,
-              validator: (value) => _maximum(value, 200),
+              validator: (value) => _maximum(value, 200, l10n),
             ),
             const SizedBox(height: 14),
             Row(
@@ -184,32 +187,32 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
               children: [
                 Expanded(
                   child: AppTextField(
-                    label: 'الشكل الدوائي',
+                    label: l10n.dosageFormLabel,
                     controller: _dosageForm,
-                    hint: 'أقراص، شراب...',
+                    hint: l10n.optionalHint,
                     icon: Icons.category_outlined,
-                    validator: (value) => _maximum(value, 100),
+                    validator: (value) => _maximum(value, 100, l10n),
                   ),
                 ),
                 const SizedBox(width: 11),
                 Expanded(
                   child: AppTextField(
-                    label: 'السعة',
+                    label: l10n.capacityFieldLabel,
                     controller: _capacity,
-                    hint: '500 mg',
+                    hint: l10n.capacityHint,
                     icon: Icons.scale_outlined,
-                    validator: (value) => _maximum(value, 100),
+                    validator: (value) => _maximum(value, 100, l10n),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'حجم العبوة',
+              label: l10n.packageSizeLabel,
               controller: _packageSize,
-              hint: 'مثال: 20 قرصًا',
+              hint: l10n.packageSizeHint,
               icon: Icons.inventory_outlined,
-              validator: (value) => _maximum(value, 100),
+              validator: (value) => _maximum(value, 100, l10n),
             ),
             const SizedBox(height: 14),
             _PrescriptionSwitch(
@@ -218,29 +221,29 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
                   setState(() => _requiresPrescription = value),
             ),
             const SizedBox(height: 22),
-            const _SectionTitle(
+            _SectionTitle(
               icon: Icons.description_outlined,
-              title: 'المعلومات التفصيلية',
+              title: l10n.detailedInfoTitle,
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'التركيب',
+              label: l10n.compositionLabel,
               controller: _composition,
-              hint: 'المواد الفعالة والتركيب',
+              hint: l10n.compositionHint,
               icon: Icons.biotech_outlined,
               minLines: 3,
               maxLines: 5,
-              validator: (value) => _maximum(value, 2000),
+              validator: (value) => _maximum(value, 2000, l10n),
             ),
             const SizedBox(height: 14),
             AppTextField(
-              label: 'الوصف',
+              label: l10n.descriptionLabel,
               controller: _description,
-              hint: 'وصف مختصر ودقيق للدواء',
+              hint: l10n.descriptionHint,
               icon: Icons.notes_rounded,
               minLines: 3,
               maxLines: 5,
-              validator: (value) => _maximum(value, 1000),
+              validator: (value) => _maximum(value, 1000, l10n),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -254,7 +257,9 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
                       ),
                     )
                   : const Icon(Icons.check_rounded),
-              label: Text(_saving ? 'جاري الحفظ...' : 'حفظ الدواء'),
+              label: Text(
+                _saving ? l10n.savingProgress : l10n.saveMedicine,
+              ),
             ),
           ],
         ),
@@ -263,6 +268,7 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) return;
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _saving = true);
@@ -293,14 +299,14 @@ class _CreateMedicinePageState extends ConsumerState<CreateMedicinePage> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تمت إضافة الدواء بنجاح.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.medicineAdded)));
       context.go('/medicines/${created.id}');
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error is ApiException ? error.message : 'تعذر إضافة الدواء حاليًا.',
+            error is ApiException ? error.localize(l10n) : l10n.medicineAddFailed,
           ),
           backgroundColor: context.appColors.danger,
         ),
@@ -322,14 +328,14 @@ class _Intro extends StatelessWidget {
       borderRadius: BorderRadius.circular(22),
       border: Border.all(color: context.appColors.primary.withValues(alpha: 0.13)),
     ),
-    child: const Row(
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.library_add_rounded, color: Color(0xFF216474)),
-        SizedBox(width: 11),
+        const Icon(Icons.library_add_rounded, color: Color(0xFF216474)),
+        const SizedBox(width: 11),
         Expanded(
           child: Text(
-            'أدخل بيانات الدواء بدقة. سيصبح الدواء متاحًا للصيدليات لإضافته إلى مخزونها بعد الحفظ.',
+            AppLocalizations.of(context).createMedicineIntro,
           ),
         ),
       ],
@@ -360,54 +366,58 @@ class _PrescriptionSwitch extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: SwitchListTile(
-      value: value,
-      onChanged: onChanged,
-      secondary: const Icon(
-        Icons.receipt_long_outlined,
-        color: Color(0xFF216474),
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
+      child: SwitchListTile(
+        value: value,
+        onChanged: onChanged,
+        secondary: const Icon(
+          Icons.receipt_long_outlined,
+          color: Color(0xFF216474),
+        ),
+        title: Text(l10n.requiresPrescriptionSwitchTitle),
+        subtitle: Text(l10n.requiresPrescriptionSwitchSubtitle),
       ),
-      title: const Text('يتطلب وصفة طبية'),
-      subtitle: const Text('فعّل الخيار إذا كان صرف الدواء يحتاج وصفة'),
-    ),
-  );
+    );
+  }
 }
 
 String? _requiredLength(
   String? value, {
   required int maximum,
   required String requiredMessage,
+  required AppLocalizations l10n,
 }) {
   final text = value?.trim() ?? '';
   if (text.isEmpty) return requiredMessage;
-  return text.length > maximum ? 'الحد الأقصى $maximum حرفًا.' : null;
+  return text.length > maximum ? l10n.maxLengthMessage(maximum) : null;
 }
 
-String? _maximum(String? value, int maximum) =>
+String? _maximum(String? value, int maximum, AppLocalizations l10n) =>
     (value?.trim().length ?? 0) > maximum
-    ? 'الحد الأقصى $maximum حرفًا.'
+    ? l10n.maxLengthMessage(maximum)
     : null;
 
-String? _barcodeValidator(String? value) {
+String? _barcodeValidator(String? value, AppLocalizations l10n) {
   final text = value?.trim() ?? '';
   if (text.isEmpty) return null;
-  if (text.length > 64) return 'الحد الأقصى 64 محرفًا.';
+  if (text.length > 64) return l10n.maxLength64;
   return RegExp(r'^[0-9A-Za-z-]+$').hasMatch(text)
       ? null
-      : 'استخدم الأرقام أو الأحرف الإنكليزية أو الشرطة فقط.';
+      : l10n.barcodeInvalidChars;
 }
 
-String? _nonNegativeNumber(String? value) {
+String? _nonNegativeNumber(String? value, AppLocalizations l10n) {
   final number = double.tryParse((value ?? '').trim().replaceAll(',', '.'));
-  if (number == null) return 'أدخل رقمًا صحيحًا.';
-  return number < 0 ? 'لا يمكن أن تكون القيمة سالبة.' : null;
+  if (number == null) return l10n.enterValidNumber;
+  return number < 0 ? l10n.valueNotNegative : null;
 }
 
-String? _nonNegativeInteger(String? value) {
+String? _nonNegativeInteger(String? value, AppLocalizations l10n) {
   final number = int.tryParse((value ?? '').trim());
-  if (number == null) return 'أدخل عددًا صحيحًا.';
-  return number < 0 ? 'لا يمكن أن تكون القيمة سالبة.' : null;
+  if (number == null) return l10n.enterValidInteger;
+  return number < 0 ? l10n.valueNotNegative : null;
 }
 
 double _number(String value) => double.parse(value.trim().replaceAll(',', '.'));

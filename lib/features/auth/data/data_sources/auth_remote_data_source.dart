@@ -22,11 +22,14 @@ class AuthRemoteDataSource {
       );
       final data = response.data;
       if (data == null) {
-        throw const ApiException('استجابة تسجيل الدخول غير مكتملة.');
+        throw const ApiException(
+          '',
+          kind: ApiErrorKind.loginResponseIncomplete,
+        );
       }
       final session = AuthSession.fromJson(data);
       if (session.accessToken.isEmpty || session.user.userId.isEmpty) {
-        throw const ApiException('تعذر قراءة بيانات الجلسة.');
+        throw const ApiException('', kind: ApiErrorKind.sessionReadFailed);
       }
       return session;
     } on DioException catch (exception) {
@@ -42,11 +45,14 @@ class AuthRemoteDataSource {
       );
       final data = response.data;
       if (data == null) {
-        throw const ApiException('استجابة إنشاء الحساب غير مكتملة.');
+        throw const ApiException(
+          '',
+          kind: ApiErrorKind.registerResponseIncomplete,
+        );
       }
       final session = AuthSession.fromJson(data);
       if (session.accessToken.isEmpty || session.user.userId.isEmpty) {
-        throw const ApiException('تعذر قراءة بيانات الحساب الجديد.');
+        throw const ApiException('', kind: ApiErrorKind.newAccountReadFailed);
       }
       return session;
     } on DioException catch (exception) {

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/medicine_models.dart';
 import '../controllers/medicines_providers.dart';
@@ -51,13 +52,13 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('دليل الأدوية'),
+        title: Text(AppLocalizations.of(context).medicinesCatalogTitle),
         actions: [
           if (isAdmin)
             TextButton.icon(
               onPressed: () => context.push('/medicines/create'),
               icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
-              label: const Text('إضافة دواء'),
+              label: Text(AppLocalizations.of(context).addMedicine),
             ),
           const SizedBox(width: 8),
         ],
@@ -71,7 +72,9 @@ class _MedicinesPageState extends ConsumerState<MedicinesPage> {
           ),
           Expanded(
             child: state.isLoading
-                ? const AppLoadingState(label: 'جاري تحميل دليل الأدوية...')
+                ? AppLoadingState(
+                    label: AppLocalizations.of(context).catalogLoading,
+                  )
                 : state.error != null && state.items.isEmpty
                     ? AppErrorState(
                         error: state.error!,
@@ -165,6 +168,7 @@ class _CatalogHeaderState extends State<_CatalogHeader> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
@@ -174,7 +178,7 @@ class _CatalogHeaderState extends State<_CatalogHeader> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'دليل الأدوية',
+            l10n.medicinesCatalogTitle,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w900,
@@ -183,7 +187,7 @@ class _CatalogHeaderState extends State<_CatalogHeader> {
           ),
           const SizedBox(height: 4),
           Text(
-            'ابحث عن الأدوية واطلع على تفاصيلها',
+            l10n.catalogSubtitle,
             style: TextStyle(
               fontSize: 14,
               color: colors.textMuted,
@@ -195,7 +199,7 @@ class _CatalogHeaderState extends State<_CatalogHeader> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'بحث',
+                l10n.searchLabel,
                 style: TextStyle(
                   color: colors.text,
                   fontSize: 14,
@@ -217,7 +221,7 @@ class _CatalogHeaderState extends State<_CatalogHeader> {
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'ابحث باسم الدواء، الاسم العلمي أو الشركة',
+                  hintText: l10n.catalogSearchHint,
                   hintStyle: TextStyle(
                     color: colors.textMuted.withValues(alpha: 0.6),
                     fontSize: 14,
@@ -282,6 +286,7 @@ class _MedicineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: colors.surface,
@@ -366,7 +371,7 @@ class _MedicineCard extends StatelessWidget {
                       children: [
                         _ModernTag(
                           icon: Icons.payments_outlined,
-                          text: _currency(medicine.sellingPrice),
+                          text: _currency(l10n, medicine.sellingPrice),
                           color: colors.primary,
                         ),
                         if (medicine.dosageForm case final form?)
@@ -378,7 +383,7 @@ class _MedicineCard extends StatelessWidget {
                         if (medicine.requiresPrescription)
                           _ModernTag(
                             icon: Icons.receipt_long_outlined,
-                            text: 'بوصفة طبية',
+                            text: l10n.byPrescriptionTag,
                             color: colors.warning,
                           ),
                       ],
@@ -457,7 +462,7 @@ class _LoadingMoreIndicator extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'جاري تحميل المزيد...',
+              AppLocalizations.of(context).loadingMore,
               style: TextStyle(
                 color: colors.textMuted,
                 fontSize: 12,
@@ -478,6 +483,7 @@ class _EmptyCatalog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(34),
@@ -500,7 +506,7 @@ class _EmptyCatalog extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          hasSearch ? 'لا توجد نتائج مطابقة' : 'دليل الأدوية فارغ',
+          hasSearch ? l10n.noSearchResultsTitle : l10n.emptyCatalogTitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 20,
@@ -510,9 +516,7 @@ class _EmptyCatalog extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          hasSearch
-              ? 'جرّب اسمًا آخر أو جزءًا من الاسم العلمي.'
-              : 'ستظهر الأدوية المسجلة هنا.',
+          hasSearch ? l10n.noSearchResultsHint : l10n.emptyCatalogNoSearch,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -525,7 +529,7 @@ class _EmptyCatalog extends StatelessWidget {
   }
 }
 
-String _currency(double value) {
+String _currency(AppLocalizations l10n, double value) {
   final digits = value == value.roundToDouble() ? 0 : 2;
-  return '${value.toStringAsFixed(digits)} ل.س';
+  return l10n.currencySYP(value.toStringAsFixed(digits));
 }

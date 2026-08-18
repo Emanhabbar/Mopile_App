@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/chat_models.dart';
 import '../../data/repositories/chat_repository.dart';
 import '../controllers/chat_providers.dart';
@@ -38,6 +39,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(chatSessionProvider(widget.sessionId));
     final session = state.valueOrNull;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -46,10 +48,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             Text(
               session?.title.isNotEmpty == true
                   ? session!.title
-                  : 'المساعد الدوائي',
+                  : l10n.pharmacyAssistant,
             ),
             Text(
-              session?.isEnded == true ? 'محادثة منتهية' : 'جاهز لمساعدتك',
+              session?.isEnded == true
+                  ? l10n.endedConversation
+                  : l10n.readyToHelp,
               style: TextStyle(
                 color: session?.isEnded == true
                     ? context.appColors.textMuted
@@ -64,14 +68,14 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           if (session != null && !session.isEnded)
             IconButton(
               onPressed: _ending ? null : _endSession,
-              tooltip: 'إنهاء المحادثة',
+              tooltip: l10n.endConversation,
               icon: const Icon(Icons.stop_circle_outlined),
             ),
           const SizedBox(width: 8),
         ],
       ),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل الرسائل...'),
+        loading: () => AppLoadingState(label: l10n.chatLoadingMessages),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(chatSessionProvider(widget.sessionId)),
@@ -198,7 +202,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          error is ApiException ? error.message : 'تعذر إرسال الرسالة.',
+          error is ApiException
+              ? error.localize(AppLocalizations.of(context))
+              : AppLocalizations.of(context).sendMessageFailed,
         ),
         backgroundColor: context.appColors.danger,
       ),
@@ -211,7 +217,9 @@ class _SourcesPanel extends StatelessWidget {
   final List<ChatAiSource> sources;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
@@ -222,13 +230,13 @@ class _SourcesPanel extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(Icons.menu_book_rounded, color: Color(0xFF216474), size: 18),
-            SizedBox(width: 7),
+            const Icon(Icons.menu_book_rounded, color: Color(0xFF216474), size: 18),
+            const SizedBox(width: 7),
             Text(
-              'مراجع دوائية مرتبطة بالإجابة',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+              l10n.referencesTitle,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
             ),
           ],
         ),
@@ -256,14 +264,16 @@ class _SourcesPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      source.displayName,
+                      source.displayName.isEmpty
+                          ? l10n.referenceFallback
+                          : source.displayName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      details.isEmpty ? 'بيانات دوائية مرجعية' : details,
+                      details.isEmpty ? l10n.referenceFallback : details,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -279,7 +289,8 @@ class _SourcesPanel extends StatelessWidget {
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _ConversationNotice extends StatelessWidget {
@@ -291,18 +302,18 @@ class _ConversationNotice extends StatelessWidget {
       color: context.appColors.surfaceWarm,
       borderRadius: BorderRadius.circular(15),
     ),
-    child: const Row(
+    child: Row(
       children: [
-        Icon(
+        const Icon(
           Icons.lightbulb_outline_rounded,
           color: Color(0xFFB7791F),
           size: 19,
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
-            'اكتب سؤالك بوضوح لتحصل على نتيجة أدق، ولا تعتمد على المحادثة في الحالات الطارئة.',
-            style: TextStyle(fontSize: 10, color: Color(0xFF668087)),
+            AppLocalizations.of(context).conversationNotice,
+            style: const TextStyle(fontSize: 10, color: Color(0xFF668087)),
           ),
         ),
       ],
@@ -409,7 +420,9 @@ class _Composer extends StatelessWidget {
   final VoidCallback onSend;
 
   @override
-  Widget build(BuildContext context) => SafeArea(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SafeArea(
     top: false,
     child: Container(
       padding: const EdgeInsets.fromLTRB(12, 9, 12, 12),
@@ -428,7 +441,9 @@ class _Composer extends StatelessWidget {
               maxLines: 5,
               textInputAction: TextInputAction.newline,
               decoration: InputDecoration(
-                hintText: disabled ? 'تم إنهاء هذه المحادثة' : 'اكتب رسالتك...',
+                hintText: disabled
+                    ? l10n.conversationEndedHint
+                    : l10n.typeYourMessage,
                 counterText: '',
                 filled: true,
                 fillColor: context.appColors.surfaceSoft,
@@ -455,5 +470,6 @@ class _Composer extends StatelessWidget {
         ],
       ),
     ),
-  );
+    );
+  }
 }

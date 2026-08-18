@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_discovery_models.dart';
 import '../controllers/pharmacy_discovery_providers.dart';
 
@@ -16,11 +17,11 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(externalPharmacyDetailsProvider(placeId));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل الصيدلية')),
+      appBar: AppBar(title: Text(l10n.pharmacyDetailsTitle)),
       body: state.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل بيانات الصيدلية...'),
+        loading: () => AppLoadingState(label: l10n.pharmacyDetailsLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () =>
@@ -53,7 +54,7 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
                       const SizedBox(height: 10),
                       _InfoLine(
                         icon: Icons.schedule_rounded,
-                        text: pharmacy.isOpenNow ? 'مفتوحة الآن' : 'مغلقة الآن',
+                        text: pharmacy.isOpenNow ? l10n.openNow : l10n.closedNow,
                         color: pharmacy.isOpenNow
                             ? context.appColors.primary
                             : context.appColors.danger,
@@ -62,8 +63,10 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
                         const SizedBox(height: 10),
                         _InfoLine(
                           icon: Icons.star_rounded,
-                          text:
-                              '${pharmacy.rating.toStringAsFixed(1)} من ${pharmacy.totalRatings} تقييم',
+                          text: l10n.ratingOf(
+                            pharmacy.rating.toStringAsFixed(1),
+                            pharmacy.totalRatings,
+                          ),
                           color: context.appColors.secondary,
                         ),
                       ],
@@ -71,7 +74,7 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
                         const SizedBox(height: 10),
                         _InfoLine(
                           icon: Icons.route_outlined,
-                          text: _distance(pharmacy.distanceMeters),
+                          text: _distance(l10n, pharmacy.distanceMeters),
                         ),
                       ],
                     ],
@@ -84,14 +87,14 @@ class ExternalPharmacyDetailsPage extends ConsumerWidget {
                     ? null
                     : () => _openDirections(pharmacy.googleMapsUrl),
                 icon: const Icon(Icons.navigation_rounded),
-                label: const Text('فتح الاتجاهات'),
+                label: Text(l10n.openDirections),
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(54),
                 ),
               ),
               const SizedBox(height: 9),
               Text(
-                'هذه الصيدلية معروضة من خدمة الخرائط وقد لا تكون مسجلة داخل منصة دوائي.',
+                l10n.externalPharmacyNotice,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
@@ -176,6 +179,6 @@ class _InfoLine extends StatelessWidget {
   );
 }
 
-String _distance(double meters) => meters < 1000
-    ? '${meters.round()} متر'
-    : '${(meters / 1000).toStringAsFixed(1)} كم';
+String _distance(AppLocalizations l10n, double meters) => meters < 1000
+    ? l10n.distanceMetersFull('${meters.round()}')
+    : l10n.distanceKm((meters / 1000).toStringAsFixed(1));

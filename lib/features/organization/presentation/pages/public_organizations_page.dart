@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../donations/data/models/donation_models.dart';
 import '../../../donations/presentation/controllers/donations_providers.dart';
 
@@ -14,9 +15,10 @@ class PublicOrganizationsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final organizations = ref.watch(publicOrganizationsProvider);
     final campaigns = ref.watch(activeCampaignsProvider(null));
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المنظمات والحملات')),
+      appBar: AppBar(title: Text(l10n.organizationsAndCampaignsTitle)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(publicOrganizationsProvider);
@@ -36,19 +38,18 @@ class PublicOrganizationsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             _SectionTitle(
-              title: 'الحملات النشطة',
-              subtitle: 'مبادرات دوائية متاحة للمساهمة',
+              title: l10n.activeCampaignsTitle,
+              subtitle: l10n.activeCampaignsSubtitle,
             ),
             const SizedBox(height: 12),
             campaigns.when(
-              loading: () =>
-                  const AppLoadingState(label: 'جاري تحميل الحملات...'),
+              loading: () => AppLoadingState(label: l10n.campaignsLoading),
               error: (error, _) => AppErrorState(
                 error: error,
                 onRetry: () => ref.invalidate(activeCampaignsProvider(null)),
               ),
               data: (items) => items.isEmpty
-                  ? const _EmptyCard(text: 'لا توجد حملات نشطة حاليًا.')
+                  ? _EmptyCard(text: l10n.noActiveCampaigns)
                   : Column(
                       children: items
                           .map(
@@ -62,19 +63,19 @@ class PublicOrganizationsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             _SectionTitle(
-              title: 'المنظمات المعتمدة',
-              subtitle: 'استعرض الجهات وحملاتها الحالية',
+              title: l10n.approvedOrganizationsTitle,
+              subtitle: l10n.approvedOrganizationsSubtitle,
             ),
             const SizedBox(height: 12),
             organizations.when(
               loading: () =>
-                  const AppLoadingState(label: 'جاري تحميل المنظمات...'),
+                  AppLoadingState(label: l10n.organizationsLoading),
               error: (error, _) => AppErrorState(
                 error: error,
                 onRetry: () => ref.invalidate(publicOrganizationsProvider),
               ),
               data: (items) => items.isEmpty
-                  ? const _EmptyCard(text: 'لا توجد منظمات معتمدة حاليًا.')
+                  ? _EmptyCard(text: l10n.noApprovedOrganizations)
                   : Column(
                       children: items
                           .map(
@@ -105,7 +106,9 @@ class _IntroCard extends StatelessWidget {
   final int? campaignsCount;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
       color: context.appColors.primary,
@@ -124,14 +127,17 @@ class _IntroCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'دواء يصل لمن يحتاجه',
+                l10n.medicineReachesWhoNeedsIt,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 5),
               Text(
-                '${organizationsCount ?? '—'} منظمة • ${campaignsCount ?? '—'} حملة نشطة',
+                l10n.orgCampaignSummary(
+                  '${organizationsCount ?? '—'}',
+                  '${campaignsCount ?? '—'}',
+                ),
                 style: Theme.of(
                   context,
                 ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
@@ -141,7 +147,8 @@ class _IntroCard extends StatelessWidget {
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _OrganizationCard extends StatelessWidget {
@@ -171,7 +178,8 @@ class _OrganizationCard extends StatelessWidget {
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 6),
         child: Text(
-          '${organization.city}، ${organization.area}\n${organization.activeCampaignsCount} حملة نشطة',
+          '${organization.city}، ${organization.area}\n'
+          '${AppLocalizations.of(context).activeCampaignCount(organization.activeCampaignsCount)}',
         ),
       ),
       trailing: const Icon(Icons.chevron_left_rounded),
@@ -200,9 +208,9 @@ class _CampaignCard extends StatelessWidget {
                 ),
               ),
               if (campaign.isUrgent)
-                const Chip(
-                  avatar: Icon(Icons.priority_high_rounded, size: 16),
-                  label: Text('عاجلة'),
+                Chip(
+                  avatar: const Icon(Icons.priority_high_rounded, size: 16),
+                  label: Text(AppLocalizations.of(context).urgent),
                 ),
             ],
           ),
@@ -223,7 +231,9 @@ class _CampaignCard extends StatelessWidget {
           if (campaign.requestedMedicinesSummary != null) ...[
             const SizedBox(height: 9),
             Text(
-              'الاحتياج: ${campaign.requestedMedicinesSummary}',
+              AppLocalizations.of(context).needLabel(
+                campaign.requestedMedicinesSummary!,
+              ),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],

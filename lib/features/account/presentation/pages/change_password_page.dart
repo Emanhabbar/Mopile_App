@@ -329,7 +329,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
         SnackBar(
           content: Text(
             error is ApiException
-                ? error.message
+                ? error.localize(AppLocalizations.of(context))
                 : AppLocalizations.of(context).changePasswordFailed,
           ),
           backgroundColor: context.appColors.danger,

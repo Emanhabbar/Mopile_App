@@ -61,7 +61,7 @@ class _HealthProfilePageState extends ConsumerState<HealthProfilePage> {
       final error = next.error;
       if (error == null || previous?.error == error || !mounted) return;
       final message = error is ApiException
-          ? error.message
+          ? error.localize(AppLocalizations.of(context))
           : AppLocalizations.of(context).healthProfileSaveFailed;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()

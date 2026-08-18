@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/errors/api_exception.dart';
@@ -43,6 +44,7 @@ class _WarehouseWorkspaceState extends ConsumerState<_WarehouseWorkspace> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pending = ref
         .watch(supplyDashboardProvider)
         .valueOrNull
@@ -60,9 +62,9 @@ class _WarehouseWorkspaceState extends ConsumerState<_WarehouseWorkspace> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('إدارة المستودع'),
+            Text(l10n.supplyWarehouseTitle),
             Text(
-              'مركز الإمداد والتوزيع',
+              l10n.supplyWarehouseSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -73,7 +75,7 @@ class _WarehouseWorkspaceState extends ConsumerState<_WarehouseWorkspace> {
         ),
         actions: [
           IconButton(
-            tooltip: 'تحديث البيانات',
+            tooltip: l10n.refreshDataTooltip,
             onPressed: _refresh,
             icon: const Icon(Icons.refresh_rounded),
           ),
@@ -139,22 +141,26 @@ class _WarehouseNavigation extends StatelessWidget {
   final int pendingOrders;
   final ValueChanged<int> onSelected;
 
-  static const sections = <({String label, IconData icon, int? count})>[
-    (label: 'الملخص', icon: Icons.dashboard_rounded, count: null),
-    (label: 'التشغيلات', icon: Icons.inventory_2_outlined, count: null),
-    (label: 'الطلبات', icon: Icons.receipt_long_outlined, count: null),
-    (label: 'المندوبون', icon: Icons.delivery_dining_outlined, count: null),
-    (
-      label: 'المالية',
-      icon: Icons.account_balance_wallet_outlined,
-      count: null,
-    ),
-  ];
+  static List<({String label, IconData icon, int? count})> sections(
+    AppLocalizations l10n,
+  ) =>
+      [
+        (label: l10n.supplySummaryLabel, icon: Icons.dashboard_rounded, count: null),
+        (label: l10n.supplyBatchesLabel, icon: Icons.inventory_2_outlined, count: null),
+        (label: l10n.supplyOrdersLabel, icon: Icons.receipt_long_outlined, count: null),
+        (label: l10n.supplyRepresentativesLabel, icon: Icons.delivery_dining_outlined, count: null),
+        (
+          label: l10n.supplyFinanceLabel,
+          icon: Icons.account_balance_wallet_outlined,
+          count: null,
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
-    final itemsWithCounts = sections.map((item) {
-      if (item.label == 'الطلبات') {
+    final l10n = AppLocalizations.of(context);
+    final itemsWithCounts = sections(l10n).map((item) {
+      if (item.label == l10n.supplyOrdersLabel) {
         return (label: item.label, icon: item.icon, count: pendingOrders);
       }
       return item;
@@ -259,98 +265,102 @@ class _WarehouseNavigation extends StatelessWidget {
 class _WarehouseDashboard extends ConsumerWidget {
   const _WarehouseDashboard();
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ref
-      .watch(supplyDashboardProvider)
-      .when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل المستودع...'),
-        error: (e, _) => AppErrorState(
-          error: e,
-          onRetry: () => ref.invalidate(supplyDashboardProvider),
-        ),
-        data: (data) => RefreshIndicator(
-          onRefresh: () => ref.refresh(supplyDashboardProvider.future),
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              AppReveal(
-                child: _Hero(
-                  icon: Icons.warehouse_rounded,
-                  title: 'مركز تشغيل المستودع',
-                  subtitle: 'قيمة المخزون ${_money(data.inventoryValue)} ل.س',
-                  badge: '${data.pendingOrders} طلب جديد',
-                ),
-              ),
-              const SizedBox(height: 20),
-              const _SectionTitle(
-                'مؤشرات اليوم',
-                Icons.insights_rounded,
-                subtitle: 'قراءة سريعة لحالة التشغيل والمخزون',
-              ),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: 1.7,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                children: [
-                  AppReveal(
-                    delay: Duration(milliseconds: 70),
-                    child: _Metric(
-                      'تشغيلات نشطة',
-                      data.activeBatches,
-                      Icons.inventory_2_outlined,
-                      context.appColors.primary,
-                    ),
-                  ),
-                  AppReveal(
-                    delay: Duration(milliseconds: 110),
-                    child: _Metric(
-                      'مخزون منخفض',
-                      data.lowStockBatches,
-                      Icons.trending_down_rounded,
-                      context.appColors.primary,
-                    ),
-                  ),
-                  AppReveal(
-                    delay: Duration(milliseconds: 150),
-                    child: _Metric(
-                      'قرب الانتهاء',
-                      data.expiringBatches,
-                      Icons.event_busy_outlined,
-                      context.appColors.primary,
-                    ),
-                  ),
-                  AppReveal(
-                    delay: Duration(milliseconds: 190),
-                    child: _Metric(
-                      'شحنات نشطة',
-                      data.activeDeliveries,
-                      Icons.local_shipping_outlined,
-                      context.appColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-              if (data.alerts.isNotEmpty) ...[
-                const SizedBox(height: 20),
-                const _SectionTitle(
-                  'تحتاج إلى انتباه',
-                  Icons.notifications_active_outlined,
-                  subtitle: 'تشغيلات منخفضة أو قريبة من الانتهاء',
-                ),
-                ...data.alerts.map((b) => _BatchCard(batch: b)),
-              ],
-            ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return ref
+        .watch(supplyDashboardProvider)
+        .when(
+          loading: () => AppLoadingState(label: l10n.supplyLoadingWarehouse),
+          error: (e, _) => AppErrorState(
+            error: e,
+            onRetry: () => ref.invalidate(supplyDashboardProvider),
           ),
-        ),
-      );
+          data: (data) => RefreshIndicator(
+            onRefresh: () => ref.refresh(supplyDashboardProvider.future),
+            child: ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                AppReveal(
+                  child: _Hero(
+                    icon: Icons.warehouse_rounded,
+                    title: l10n.supplyWarehouseOpsTitle,
+                    subtitle: l10n.supplyInventoryValue(_money(data.inventoryValue)),
+                    badge: l10n.supplyNewOrdersCount(data.pendingOrders),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _SectionTitle(
+                  l10n.supplyTodayIndicators,
+                  Icons.insights_rounded,
+                  subtitle: l10n.supplyTodayIndicatorsSubtitle,
+                ),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.7,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  children: [
+                    AppReveal(
+                      delay: Duration(milliseconds: 70),
+                      child: _Metric(
+                        l10n.supplyActiveBatches,
+                        data.activeBatches,
+                        Icons.inventory_2_outlined,
+                        context.appColors.primary,
+                      ),
+                    ),
+                    AppReveal(
+                      delay: Duration(milliseconds: 110),
+                      child: _Metric(
+                        l10n.supplyLowStock,
+                        data.lowStockBatches,
+                        Icons.trending_down_rounded,
+                        context.appColors.primary,
+                      ),
+                    ),
+                    AppReveal(
+                      delay: Duration(milliseconds: 150),
+                      child: _Metric(
+                        l10n.supplyExpiringSoon,
+                        data.expiringBatches,
+                        Icons.event_busy_outlined,
+                        context.appColors.primary,
+                      ),
+                    ),
+                    AppReveal(
+                      delay: Duration(milliseconds: 190),
+                      child: _Metric(
+                        l10n.supplyActiveDeliveries,
+                        data.activeDeliveries,
+                        Icons.local_shipping_outlined,
+                        context.appColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                if (data.alerts.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  _SectionTitle(
+                    l10n.supplyNeedsAttention,
+                    Icons.notifications_active_outlined,
+                    subtitle: l10n.supplyNeedsAttentionSubtitle,
+                  ),
+                  ...data.alerts.map((b) => _BatchCard(batch: b)),
+                ],
+              ],
+            ),
+          ),
+        );
+  }
 }
 
 class _BatchesTab extends ConsumerWidget {
   const _BatchesTab();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(supplyBatchesProvider);
     return Scaffold(
       body: state.when(
@@ -362,9 +372,9 @@ class _BatchesTab extends ConsumerWidget {
         data: (items) => RefreshIndicator(
           onRefresh: () => ref.refresh(supplyBatchesProvider.future),
           child: items.isEmpty
-              ? const _Empty(
+              ? _Empty(
                   icon: Icons.inventory_2_outlined,
-                  text: 'لا توجد تشغيلات دوائية بعد.',
+                  text: l10n.supplyNoBatches,
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 90),
@@ -373,8 +383,8 @@ class _BatchesTab extends ConsumerWidget {
                   itemBuilder: (_, i) => i == 0
                       ? _CollectionHeader(
                           icon: Icons.inventory_2_outlined,
-                          title: 'مخزون التشغيلات',
-                          subtitle: 'تتبّع الكميات والأسعار وتواريخ الانتهاء',
+                          title: l10n.supplyBatchesStockTitle,
+                          subtitle: l10n.supplyBatchesStockSubtitle,
                           count: items.length,
                         )
                       : AppReveal(
@@ -391,7 +401,7 @@ class _BatchesTab extends ConsumerWidget {
         backgroundColor: context.appColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('تشغيلة'),
+        label: Text(l10n.supplyBatchLabel),
       ),
     );
   }
@@ -402,6 +412,7 @@ Future<void> _addBatch(BuildContext context, WidgetRef ref) async {
       .read(medicinesRepositoryProvider)
       .getMedicines(pageSize: 100);
   if (!context.mounted) return;
+  final l10n = AppLocalizations.of(context);
   String? medicineId = medicines.items.isEmpty
       ? null
       : medicines.items.first.id;
@@ -415,7 +426,7 @@ Future<void> _addBatch(BuildContext context, WidgetRef ref) async {
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => AlertDialog(
-        title: const Text('إضافة تشغيلة'),
+        title: Text(l10n.supplyAddBatch),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -423,7 +434,7 @@ Future<void> _addBatch(BuildContext context, WidgetRef ref) async {
               DropdownButtonFormField<String>(
                 initialValue: medicineId,
                 isExpanded: true,
-                decoration: const InputDecoration(labelText: 'الدواء'),
+                decoration: InputDecoration(labelText: l10n.medicineLabel),
                 items: medicines.items
                     .map(
                       (m) => DropdownMenuItem(
@@ -435,13 +446,13 @@ Future<void> _addBatch(BuildContext context, WidgetRef ref) async {
                 onChanged: (v) => medicineId = v,
               ),
               const SizedBox(height: 10),
-              _Field(batch, 'رقم التشغيلة'),
-              _Field(quantity, 'الكمية', number: true),
-              _Field(purchase, 'سعر الشراء', number: true),
-              _Field(price, 'سعر الجملة', number: true),
-              _Field(location, 'موضع التخزين'),
+              _Field(batch, l10n.supplyBatchNumber),
+              _Field(quantity, l10n.quantityLabel, number: true),
+              _Field(purchase, l10n.supplyPurchasePrice, number: true),
+              _Field(price, l10n.supplyWholesalePrice, number: true),
+              _Field(location, l10n.supplyStorageLocation),
               ListTile(
-                title: const Text('تاريخ الانتهاء'),
+                title: Text(l10n.expiryDateLabel),
                 subtitle: Text(_date(expiry)),
                 trailing: const Icon(Icons.calendar_month),
                 onTap: () async {
@@ -459,11 +470,11 @@ Future<void> _addBatch(BuildContext context, WidgetRef ref) async {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حفظ'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -485,9 +496,9 @@ Future<void> _addBatch(BuildContext context, WidgetRef ref) async {
       ref
         ..invalidate(supplyBatchesProvider)
         ..invalidate(supplyDashboardProvider);
-      if (context.mounted) _snack(context, 'تمت إضافة التشغيلة.');
+      if (context.mounted) _snack(context, l10n.supplyBatchAdded);
     } catch (e) {
-      if (context.mounted) _snack(context, _error(e), true);
+      if (context.mounted) _snack(context, _error(l10n, e), true);
     }
   }
   for (final c in [batch, quantity, purchase, price, location]) {
@@ -509,10 +520,11 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ref
         .watch(supplyOrdersProvider)
         .when(
-          loading: () => const AppLoadingState(label: 'جاري تحميل الطلبات...'),
+          loading: () => AppLoadingState(label: l10n.supplyLoadingOrders),
           error: (error, _) => AppErrorState(
             error: error,
             onRetry: () => ref.invalidate(supplyOrdersProvider),
@@ -525,10 +537,12 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
                   child: _CollectionHeader(
                     icon: Icons.receipt_long_outlined,
-                    title: widget.warehouse ? 'طلبات الصيدليات' : 'طلباتي',
+                    title: widget.warehouse
+                        ? l10n.supplyPharmacyOrdersTitle
+                        : l10n.supplyMyOrders,
                     subtitle: widget.warehouse
-                        ? 'معالجة الطلب من الاستلام حتى التسليم'
-                        : 'متابعة حالة طلبات التوريد والشحن',
+                        ? l10n.supplyPharmacyOrdersSubtitle
+                        : l10n.supplyMyOrdersSubtitle,
                     count: items.length,
                   ),
                 ),
@@ -538,20 +552,20 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     scrollDirection: Axis.horizontal,
                     children: [
-                      _filterChip('all', 'الكل', items.length),
+                      _filterChip('all', l10n.allLabel, items.length),
                       _filterChip(
                         'new',
-                        'جديدة',
+                        l10n.supplyNewOrdersFilter,
                         items.where((x) => x.status == 'Submitted').length,
                       ),
                       _filterChip(
                         'active',
-                        'قيد التنفيذ',
+                        l10n.supplyActiveOrdersFilter,
                         items.where(_isActive).length,
                       ),
                       _filterChip(
                         'done',
-                        'مكتملة',
+                        l10n.completedLabel,
                         items.where(_isDone).length,
                       ),
                     ],
@@ -561,9 +575,9 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
                   child: RefreshIndicator(
                     onRefresh: () => ref.refresh(supplyOrdersProvider.future),
                     child: visible.isEmpty
-                        ? const _Empty(
+                        ? _Empty(
                             icon: Icons.receipt_long_outlined,
-                            text: 'لا توجد طلبات ضمن هذا التصنيف.',
+                            text: l10n.supplyNoOrdersInCategory,
                           )
                         : ListView.separated(
                             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
@@ -632,7 +646,7 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
               Text(
                 label,
                 style: TextStyle(
-                  color: selected ? Colors.white : colors.text,
+                  color: selected ? Colors.white : colors.primary,
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
@@ -673,7 +687,9 @@ class _OrderCard extends ConsumerWidget {
   final bool actions;
   final VoidCallback onChanged;
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Card(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -707,18 +723,24 @@ class _OrderCard extends ConsumerWidget {
                 ),
               ),
               _Badge(
-                _status(order.status),
+                _status(l10n, order.status),
                 _statusColor(context.appColors, order.status),
               ),
             ],
           ),
           const Divider(height: 24),
           Text(
-            '${order.items.length} أصناف · ${_money(order.totalAmount)} ل.س',
+            l10n.supplyOrderItemsTotal(
+              order.items.length,
+              _money(order.totalAmount),
+            ),
           ),
           if (order.shipment != null)
             Text(
-              'الشحنة: ${order.shipment!.shipmentCode} · ${_status(order.shipment!.status)}',
+              l10n.supplyShipmentInfo(
+                order.shipment!.shipmentCode,
+                _status(l10n, order.shipment!.status),
+              ),
               style: TextStyle(color: context.appColors.textMuted),
             ),
           if (actions &&
@@ -734,29 +756,29 @@ class _OrderCard extends ConsumerWidget {
                 if (order.status == 'Submitted')
                   FilledButton(
                     onPressed: () => _statusUpdate(context, ref, 'Accepted'),
-                    child: const Text('قبول'),
+                    child: Text(l10n.supplyAccept),
                   ),
                 if (order.status == 'Accepted')
                   FilledButton(
                     onPressed: () => _statusUpdate(context, ref, 'Preparing'),
-                    child: const Text('بدء التجهيز'),
+                    child: Text(l10n.supplyStartPreparing),
                   ),
                 if (order.status == 'Preparing')
                   FilledButton(
                     onPressed: () =>
                         _statusUpdate(context, ref, 'ReadyForDispatch'),
-                    child: const Text('جاهز للشحن'),
+                    child: Text(l10n.supplyReadyForDispatch),
                   ),
                 if (order.status == 'ReadyForDispatch' &&
                     order.shipment == null)
                   FilledButton.icon(
                     onPressed: () => _assignShipment(context, ref),
                     icon: const Icon(Icons.delivery_dining_outlined),
-                    label: const Text('إسناد لمندوب'),
+                    label: Text(l10n.supplyAssignRepresentative),
                   ),
                 TextButton(
                   onPressed: () => _statusUpdate(context, ref, 'Rejected'),
-                  child: const Text('رفض'),
+                  child: Text(l10n.reject),
                 ),
               ],
             ),
@@ -770,7 +792,7 @@ class _OrderCard extends ConsumerWidget {
               child: FilledButton.icon(
                 onPressed: () => _confirmDelivery(context, ref),
                 icon: const Icon(Icons.qr_code_scanner_rounded),
-                label: const Text('تأكيد استلام الشحنة'),
+                label: Text(l10n.supplyConfirmReceipt),
               ),
             ),
           ],
@@ -781,7 +803,7 @@ class _OrderCard extends ConsumerWidget {
               child: TextButton.icon(
                 onPressed: () => _createReturn(context, ref),
                 icon: const Icon(Icons.keyboard_return_rounded),
-                label: const Text('طلب إرجاع صنف'),
+                label: Text(l10n.supplyReturnItem),
               ),
             ),
           ],
@@ -789,19 +811,21 @@ class _OrderCard extends ConsumerWidget {
       ),
     ),
   );
+  }
   Future<void> _statusUpdate(
     BuildContext context,
     WidgetRef ref,
     String status,
   ) async {
+    final l10n = AppLocalizations.of(context);
     try {
       await ref
           .read(supplyChainRepositoryProvider)
           .updateOrderStatus(order.id, status);
       onChanged();
-      if (context.mounted) _snack(context, 'تم تحديث الطلب.');
+      if (context.mounted) _snack(context, l10n.supplyOrderUpdated);
     } catch (e) {
-      if (context.mounted) _snack(context, _error(e), true);
+      if (context.mounted) _snack(context, _error(l10n, e), true);
     }
   }
 
@@ -811,6 +835,7 @@ class _OrderCard extends ConsumerWidget {
         supplyRepresentativesProvider.future,
       );
       if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context);
       String? selectedId = representatives
           .where((item) => item.isEnabled && item.isAvailable)
           .firstOrNull
@@ -820,13 +845,13 @@ class _OrderCard extends ConsumerWidget {
         context: context,
         builder: (dialogContext) => StatefulBuilder(
           builder: (context, setDialogState) => AlertDialog(
-            title: const Text('إسناد الشحنة'),
+            title: Text(l10n.supplyAssignShipment),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<String>(
                   initialValue: selectedId,
-                  decoration: const InputDecoration(labelText: 'المندوب'),
+                  decoration: InputDecoration(labelText: l10n.supplyRepresentativeLabel),
                   items: representatives
                       .where((item) => item.isEnabled)
                       .map(
@@ -840,19 +865,19 @@ class _OrderCard extends ConsumerWidget {
                       setDialogState(() => selectedId = value),
                 ),
                 const SizedBox(height: 10),
-                _Field(packages, 'عدد الطرود', number: true),
+                _Field(packages, l10n.supplyPackagesCount, number: true),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: const Text('إلغاء'),
+                child: Text(l10n.cancel),
               ),
               FilledButton(
                 onPressed: selectedId == null
                     ? null
                     : () => Navigator.pop(dialogContext, true),
-                child: const Text('إسناد'),
+                child: Text(l10n.supplyAssign),
               ),
             ],
           ),
@@ -865,34 +890,35 @@ class _OrderCard extends ConsumerWidget {
           .read(supplyChainRepositoryProvider)
           .assignShipment(order.id, selectedId!, packageCount: packageCount);
       onChanged();
-      if (context.mounted) _snack(context, 'تم إسناد الشحنة للمندوب.');
+      if (context.mounted) _snack(context, l10n.supplyShipmentAssigned);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(AppLocalizations.of(context), error), true);
     }
   }
 
   Future<void> _confirmDelivery(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final token = TextEditingController();
     final note = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تأكيد استلام الشحنة'),
+        title: Text(l10n.supplyConfirmReceipt),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _Field(token, 'رمز الاستلام'),
-            _Field(note, 'ملاحظة الاستلام'),
+            _Field(token, l10n.supplyReceiptCode),
+            _Field(note, l10n.supplyReceiptNote),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('تأكيد'),
+            child: Text(l10n.confirm),
           ),
         ],
       ),
@@ -907,14 +933,15 @@ class _OrderCard extends ConsumerWidget {
           .read(supplyChainRepositoryProvider)
           .confirmDelivery(order.shipment!.id, qrToken, note: proofNote);
       onChanged();
-      if (context.mounted) _snack(context, 'تم تأكيد استلام الشحنة.');
+      if (context.mounted) _snack(context, l10n.supplyReceiptConfirmed);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(l10n, error), true);
     }
   }
 
   Future<void> _createReturn(BuildContext context, WidgetRef ref) async {
     if (order.items.isEmpty) return;
+    final l10n = AppLocalizations.of(context);
     var itemId = order.items.first.id;
     final quantity = TextEditingController(text: '1');
     final reason = TextEditingController();
@@ -922,13 +949,13 @@ class _OrderCard extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('طلب إرجاع صنف'),
+          title: Text(l10n.supplyReturnItem),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 initialValue: itemId,
-                decoration: const InputDecoration(labelText: 'الصنف'),
+                decoration: InputDecoration(labelText: l10n.supplyItemLabel),
                 items: order.items
                     .map(
                       (item) => DropdownMenuItem(
@@ -942,18 +969,18 @@ class _OrderCard extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 8),
-              _Field(quantity, 'الكمية', number: true),
-              _Field(reason, 'سبب الإرجاع'),
+              _Field(quantity, l10n.quantityLabel, number: true),
+              _Field(reason, l10n.supplyReturnReason),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('إلغاء'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('إرسال الطلب'),
+              child: Text(l10n.sendRequest),
             ),
           ],
         ),
@@ -969,9 +996,9 @@ class _OrderCard extends ConsumerWidget {
           .read(supplyChainRepositoryProvider)
           .createReturn(order.id, itemId, count, returnReason);
       ref.invalidate(supplyReturnsProvider);
-      if (context.mounted) _snack(context, 'تم إرسال طلب الإرجاع.');
+      if (context.mounted) _snack(context, l10n.supplyReturnSent);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(l10n, error), true);
     }
   }
 }
@@ -979,7 +1006,9 @@ class _OrderCard extends ConsumerWidget {
 class _RepresentativesTab extends ConsumerWidget {
   const _RepresentativesTab();
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
     body: ref
         .watch(supplyRepresentativesProvider)
         .when(
@@ -989,9 +1018,9 @@ class _RepresentativesTab extends ConsumerWidget {
             onRetry: () => ref.invalidate(supplyRepresentativesProvider),
           ),
           data: (items) => items.isEmpty
-              ? const _Empty(
+              ? _Empty(
                   icon: Icons.badge_outlined,
-                  text: 'لا يوجد مندوبون.',
+                  text: l10n.supplyNoRepresentatives,
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 90),
@@ -1000,10 +1029,11 @@ class _RepresentativesTab extends ConsumerWidget {
                   itemBuilder: (context, i) => i == 0
                       ? _CollectionHeader(
                           icon: Icons.delivery_dining_outlined,
-                          title: 'فريق التوصيل',
-                          subtitle:
-                              '${items.where((x) => x.isAvailable).length} متاح الآن · '
-                              '${items.fold<int>(0, (sum, x) => sum + x.activeDeliveries)} مهمة نشطة',
+                          title: l10n.supplyDeliveryTeam,
+                          subtitle: l10n.supplyTeamSummary(
+                            items.where((x) => x.isAvailable).length,
+                            items.fold<int>(0, (sum, x) => sum + x.activeDeliveries),
+                          ),
                           count: items.length,
                         )
                       : AppReveal(
@@ -1021,9 +1051,10 @@ class _RepresentativesTab extends ConsumerWidget {
       backgroundColor: context.appColors.primary,
       foregroundColor: Colors.white,
       icon: const Icon(Icons.person_add_alt),
-      label: const Text('مندوب'),
+      label: Text(l10n.supplyRepresentativeLabel),
     ),
   );
+  }
 }
 
 class _RepresentativeCard extends ConsumerWidget {
@@ -1033,6 +1064,7 @@ class _RepresentativeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final r = representative;
     return Card(
       child: Padding(
@@ -1067,7 +1099,7 @@ class _RepresentativeCard extends ConsumerWidget {
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                       Text(
-                        '${r.employeeCode} · ${r.vehiclePlateNumber ?? 'دون مركبة'}',
+                        '${r.employeeCode} · ${r.vehiclePlateNumber ?? l10n.supplyNoVehicle}',
                         style: TextStyle(
                           color: context.appColors.textMuted,
                           fontSize: 11,
@@ -1077,7 +1109,7 @@ class _RepresentativeCard extends ConsumerWidget {
                   ),
                 ),
                 _Badge(
-                  r.isOnShift ? 'ضمن الوردية' : 'خارج الوردية',
+                  r.isOnShift ? l10n.supplyOnShift : l10n.supplyOffShift,
                   r.isOnShift
                       ? context.appColors.primary
                       : context.appColors.textMuted,
@@ -1089,14 +1121,14 @@ class _RepresentativeCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _CompactStat(
-                    label: 'نشطة',
+                    label: l10n.supplyActiveShort,
                     value: '${r.activeDeliveries}',
                     icon: Icons.route_outlined,
                   ),
                 ),
                 Expanded(
                   child: _CompactStat(
-                    label: 'مكتملة',
+                    label: l10n.supplyCompletedShort,
                     value: '${r.completedDeliveries}',
                     icon: Icons.task_alt_rounded,
                   ),
@@ -1104,7 +1136,7 @@ class _RepresentativeCard extends ConsumerWidget {
                 Column(
                   children: [
                     Text(
-                      'متاح',
+                      l10n.availableLabel,
                       style: TextStyle(
                         color: context.appColors.textMuted,
                         fontSize: 10,
@@ -1131,18 +1163,20 @@ class _RepresentativeCard extends ConsumerWidget {
     WidgetRef ref,
     bool value,
   ) async {
+    final l10n = AppLocalizations.of(context);
     try {
       await ref
           .read(supplyChainRepositoryProvider)
           .updateRepresentative(representative, isAvailable: value);
       ref.invalidate(supplyRepresentativesProvider);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(l10n, error), true);
     }
   }
 }
 
 Future<void> _addRepresentative(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
   final name = TextEditingController(),
       email = TextEditingController(),
       password = TextEditingController(),
@@ -1151,27 +1185,27 @@ Future<void> _addRepresentative(BuildContext context, WidgetRef ref) async {
   final save = await showDialog<bool>(
     context: context,
     builder: (c) => AlertDialog(
-      title: const Text('إضافة مندوب'),
+      title: Text(l10n.supplyAddRepresentative),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _Field(name, 'الاسم'),
-            _Field(email, 'البريد'),
-            _Field(password, 'كلمة المرور'),
-            _Field(code, 'رمز الموظف'),
-            _Field(plate, 'لوحة المركبة'),
+            _Field(name, l10n.nameLabel),
+            _Field(email, l10n.emailLabel),
+            _Field(password, l10n.registerPasswordLabel),
+            _Field(code, l10n.supplyEmployeeCode),
+            _Field(plate, l10n.supplyVehiclePlate),
           ],
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(c, false),
-          child: const Text('إلغاء'),
+          child: Text(l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(c, true),
-          child: const Text('إنشاء'),
+          child: Text(l10n.supplyCreate),
         ),
       ],
     ),
@@ -1188,9 +1222,9 @@ Future<void> _addRepresentative(BuildContext context, WidgetRef ref) async {
             vehiclePlateNumber: plate.text,
           );
       ref.invalidate(supplyRepresentativesProvider);
-      if (context.mounted) _snack(context, 'تم إنشاء حساب المندوب.');
+      if (context.mounted) _snack(context, l10n.supplyRepresentativeCreated);
     } catch (e) {
-      if (context.mounted) _snack(context, _error(e), true);
+      if (context.mounted) _snack(context, _error(l10n, e), true);
     }
   }
   for (final c in [name, email, password, code, plate]) {
@@ -1210,6 +1244,7 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pages = <Widget>[
       _AsyncList<SupplyInvoice>(
         state: ref.watch(supplyInvoicesProvider),
@@ -1223,19 +1258,19 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
       ),
       const _RecallsPanel(),
     ];
-    const items = <(String, IconData)>[
-      ('الفواتير', Icons.receipt_long_outlined),
-      ('المرتجعات', Icons.keyboard_return_rounded),
-      ('السحب', Icons.warning_amber_rounded),
+    final items = <(String, IconData)>[
+      (l10n.supplyInvoicesLabel, Icons.receipt_long_outlined),
+      (l10n.supplyReturnsLabel, Icons.keyboard_return_rounded),
+      (l10n.supplyRecallsLabel, Icons.warning_amber_rounded),
     ];
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 16, 20, 6),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
           child: _CollectionHeader(
             icon: Icons.account_balance_wallet_outlined,
-            title: 'المالية والرقابة',
-            subtitle: 'الفواتير والتحصيل والمرتجعات وسحب التشغيلات',
+            title: l10n.supplyFinanceTitle,
+            subtitle: l10n.supplyFinanceSubtitle,
           ),
         ),
         Padding(
@@ -1280,7 +1315,7 @@ class _FinanceTabState extends ConsumerState<_FinanceTab> {
                             style: TextStyle(
                               color: active
                                   ? Colors.white
-                                  : context.appColors.text,
+                                  : context.appColors.primary,
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                             ),
@@ -1319,6 +1354,7 @@ class _PharmacySupplyWorkspaceState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pages = <Widget>[
       const _MarketplaceTab(),
       const _OrdersTab(warehouse: false),
@@ -1326,10 +1362,10 @@ class _PharmacySupplyWorkspaceState
     ];
     return Scaffold(
       appBar: AppBar(
-        title: const Text('توريد الصيدلية'),
+        title: Text(l10n.supplyPharmacySupplyTitle),
         actions: [
           IconButton(
-            tooltip: 'تحديث البيانات',
+            tooltip: l10n.refreshDataTooltip,
             onPressed: _refresh,
             icon: const Icon(Icons.refresh_rounded),
           ),
@@ -1383,23 +1419,25 @@ class _PharmacySupplyNavigation extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onSelected;
 
-  static const sections = <(String, IconData)>[
-    ('المستودعات', Icons.store_mall_directory_outlined),
-    ('طلباتي', Icons.receipt_long_outlined),
-    ('احتياج المخزون', Icons.inventory_2_outlined),
+  static List<(String, IconData)> sections(AppLocalizations l10n) => [
+    (l10n.supplyWarehousesLabel, Icons.store_mall_directory_outlined),
+    (l10n.supplyMyOrders, Icons.receipt_long_outlined),
+    (l10n.supplyStockNeeds, Icons.inventory_2_outlined),
   ];
 
   @override
-  Widget build(BuildContext context) => SizedBox(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SizedBox(
     height: 78,
     child: ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       scrollDirection: Axis.horizontal,
-      itemCount: sections.length,
+      itemCount: sections(l10n).length,
       separatorBuilder: (_, _) => const SizedBox(width: 8),
       itemBuilder: (_, index) {
         final active = selected == index;
-        final item = sections[index];
+        final item = sections(l10n)[index];
         return InkWell(
           borderRadius: BorderRadius.circular(17),
           onTap: () => onSelected(index),
@@ -1428,7 +1466,7 @@ class _PharmacySupplyNavigation extends StatelessWidget {
                 Text(
                   item.$1,
                   style: TextStyle(
-                    color: active ? Colors.white : context.appColors.text,
+                    color: active ? Colors.white : context.appColors.primary,
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                   ),
@@ -1440,6 +1478,7 @@ class _PharmacySupplyNavigation extends StatelessWidget {
       },
     ),
   );
+  }
 }
 
 class _MarketplaceTab extends ConsumerWidget {
@@ -1447,6 +1486,7 @@ class _MarketplaceTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return ref
         .watch(supplyMarketplaceProvider)
         .when(
@@ -1458,9 +1498,9 @@ class _MarketplaceTab extends ConsumerWidget {
           data: (items) => RefreshIndicator(
             onRefresh: () => ref.refresh(supplyMarketplaceProvider.future),
             child: items.isEmpty
-                ? const _Empty(
+                ? _Empty(
                     icon: Icons.store_mall_directory_outlined,
-                    text: 'لا توجد مستودعات متاحة.',
+                    text: l10n.supplyNoWarehouses,
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -1469,8 +1509,8 @@ class _MarketplaceTab extends ConsumerWidget {
                     itemBuilder: (context, index) => index == 0
                         ? _CollectionHeader(
                             icon: Icons.store_mall_directory_outlined,
-                            title: 'المستودعات المتاحة',
-                            subtitle: 'تصفح المستودعات واطلب الأدوية المطلوبة',
+                            title: l10n.supplyAvailableWarehouses,
+                            subtitle: l10n.supplyAvailableWarehousesSubtitle,
                             count: items.length,
                           )
                         : _WarehouseCard(warehouse: items[index - 1]),
@@ -1486,6 +1526,7 @@ class _WarehouseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -1548,12 +1589,16 @@ class _WarehouseCard extends StatelessWidget {
                       children: [
                         _WarehouseStat(
                           icon: Icons.medication_outlined,
-                          label: '${warehouse.availableMedicines} دواء',
+                          label: l10n.supplyAvailableMedicinesCount(
+                            warehouse.availableMedicines,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         _WarehouseStat(
                           icon: Icons.local_shipping_outlined,
-                          label: 'توصيل ${_money(warehouse.deliveryFee)} ل.س',
+                          label: l10n.supplyDeliveryFee(
+                            _money(warehouse.deliveryFee),
+                          ),
                         ),
                       ],
                     ),
@@ -1605,6 +1650,7 @@ class _CatalogOrderSheetState extends ConsumerState<_CatalogOrderSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(supplyCatalogProvider(widget.warehouse.id));
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * .86,
@@ -1619,7 +1665,7 @@ class _CatalogOrderSheetState extends ConsumerState<_CatalogOrderSheet> {
                   widget.warehouse.name,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const Text('حدد الكميات المطلوبة ثم أرسل الطلب.'),
+                Text(l10n.supplySelectQuantities),
               ],
             ),
           ),
@@ -1641,8 +1687,10 @@ class _CatalogOrderSheetState extends ConsumerState<_CatalogOrderSheet> {
                     child: ListTile(
                       title: Text(item.medicineName),
                       subtitle: Text(
-                        '${_money(item.bestPrice)} ل.س · '
-                        'متاح ${item.availableQuantity}',
+                        l10n.supplyCatalogItem(
+                          _money(item.bestPrice),
+                          item.availableQuantity,
+                        ),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -1686,7 +1734,7 @@ class _CatalogOrderSheetState extends ConsumerState<_CatalogOrderSheet> {
                     ? null
                     : _send,
                 icon: const Icon(Icons.send),
-                label: Text(sending ? 'جاري الإرسال...' : 'إرسال الطلب'),
+                label: Text(sending ? l10n.supplySending : l10n.sendRequest),
               ),
             ),
           ),
@@ -1707,10 +1755,16 @@ class _CatalogOrderSheetState extends ConsumerState<_CatalogOrderSheet> {
       ref.invalidate(supplyOrdersProvider);
       if (mounted) {
         Navigator.pop(context);
-        _snack(context, 'تم إرسال طلب التوريد.');
+        _snack(context, AppLocalizations.of(context).supplySupplyOrderSent);
       }
     } catch (e) {
-      if (mounted) _snack(context, _error(e), true);
+      if (mounted) {
+        _snack(
+          context,
+          _error(AppLocalizations.of(context), e),
+          true,
+        );
+      }
     } finally {
       if (mounted) setState(() => sending = false);
     }
@@ -1720,36 +1774,39 @@ class _CatalogOrderSheetState extends ConsumerState<_CatalogOrderSheet> {
 class _SuggestionsTab extends ConsumerWidget {
   const _SuggestionsTab();
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ref
-      .watch(supplySuggestionsProvider)
-      .when(
-        loading: () => const AppLoadingState(),
-        error: (e, _) => AppErrorState(
-          error: e,
-          onRetry: () => ref.invalidate(supplySuggestionsProvider),
-        ),
-        data: (items) => RefreshIndicator(
-          onRefresh: () => ref.refresh(supplySuggestionsProvider.future),
-          child: items.isEmpty
-              ? const _Empty(
-                  icon: Icons.task_alt,
-                  text: 'المخزون ضمن الحدود المناسبة.',
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                  itemCount: items.length + 1,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (_, i) => i == 0
-                      ? _CollectionHeader(
-                          icon: Icons.inventory_2_outlined,
-                          title: 'احتياج المخزون',
-                          subtitle: 'الأدوية التي تحتاج إلى إعادة توريد',
-                          count: items.length,
-                        )
-                      : _SuggestionCard(suggestion: items[i - 1]),
-                ),
-        ),
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return ref
+        .watch(supplySuggestionsProvider)
+        .when(
+          loading: () => const AppLoadingState(),
+          error: (e, _) => AppErrorState(
+            error: e,
+            onRetry: () => ref.invalidate(supplySuggestionsProvider),
+          ),
+          data: (items) => RefreshIndicator(
+            onRefresh: () => ref.refresh(supplySuggestionsProvider.future),
+            child: items.isEmpty
+                ? _Empty(
+                    icon: Icons.task_alt,
+                    text: l10n.supplyStockAdequate,
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                    itemCount: items.length + 1,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (_, i) => i == 0
+                        ? _CollectionHeader(
+                            icon: Icons.inventory_2_outlined,
+                            title: l10n.supplyStockNeeds,
+                            subtitle: l10n.supplyStockNeedsSubtitle,
+                            count: items.length,
+                          )
+                        : _SuggestionCard(suggestion: items[i - 1]),
+                  ),
+          ),
+        );
+  }
 }
 
 class _SuggestionCard extends StatelessWidget {
@@ -1758,6 +1815,7 @@ class _SuggestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -1792,12 +1850,12 @@ class _SuggestionCard extends StatelessWidget {
                     children: [
                       _SuggestionStat(
                         icon: Icons.inventory_2_outlined,
-                        label: 'الحالي ${suggestion.currentQuantity}',
+                        label: l10n.supplyCurrentQty(suggestion.currentQuantity),
                       ),
                       const SizedBox(width: 12),
                       _SuggestionStat(
                         icon: Icons.trending_up_rounded,
-                        label: 'المقترح ${suggestion.suggestedQuantity}',
+                        label: l10n.supplySuggestedQty(suggestion.suggestedQuantity),
                       ),
                     ],
                   ),
@@ -1857,6 +1915,7 @@ class _RepresentativeWorkspace extends ConsumerWidget {
   const _RepresentativeWorkspace();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(supplyOrdersProvider);
     return Scaffold(
       appBar: AppBar(
@@ -1864,9 +1923,9 @@ class _RepresentativeWorkspace extends ConsumerWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('مهام التوصيل'),
+            Text(l10n.supplyDeliveryTasks),
             Text(
-              'جدولك الميداني اليوم',
+              l10n.supplyTodaySchedule,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -1877,7 +1936,7 @@ class _RepresentativeWorkspace extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            tooltip: 'تحديث المهام',
+            tooltip: l10n.supplyRefreshTasks,
             onPressed: () => ref.invalidate(supplyOrdersProvider),
             icon: const Icon(Icons.refresh_rounded),
           ),
@@ -1885,7 +1944,7 @@ class _RepresentativeWorkspace extends ConsumerWidget {
         ],
       ),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري تجهيز مهامك...'),
+        loading: () => AppLoadingState(label: l10n.supplyLoadingTasks),
         error: (e, _) => AppErrorState(
           error: e,
           onRetry: () => ref.invalidate(supplyOrdersProvider),
@@ -1915,10 +1974,10 @@ class _RepresentativeWorkspace extends ConsumerWidget {
                 if (index == 1) {
                   return _CollectionHeader(
                     icon: Icons.route_rounded,
-                    title: 'الشحنات المسندة',
+                    title: l10n.supplyAssignedShipments,
                     subtitle: deliveries.isEmpty
-                        ? 'لا توجد مهمة جديدة في الوقت الحالي'
-                        : 'حدّث حالة المهمة عند كل مرحلة',
+                        ? l10n.supplyNoTasksNow
+                        : l10n.supplyUpdateTaskStatus,
                     count: deliveries.length,
                   );
                 }
@@ -1945,7 +2004,9 @@ class _DeliveryHero extends StatelessWidget {
   final int total, active, completed;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
       color: context.appColors.primary,
@@ -1977,21 +2038,21 @@ class _DeliveryHero extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'رحلة آمنة ومنظمة',
-                    style: TextStyle(
+                    l10n.supplySafeJourney,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   Text(
-                    'راجع العنوان وحدّث حالة الشحنة أثناء التوصيل',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                    l10n.supplySafeJourneySubtitle,
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
                   ),
                 ],
               ),
@@ -2001,16 +2062,17 @@ class _DeliveryHero extends StatelessWidget {
         const SizedBox(height: 18),
         Row(
           children: [
-            _HeroStat(label: 'المهام', value: total),
+            _HeroStat(label: l10n.supplyTasksLabel, value: total),
             const SizedBox(width: 8),
-            _HeroStat(label: 'نشطة', value: active),
+            _HeroStat(label: l10n.supplyActiveShort, value: active),
             const SizedBox(width: 8),
-            _HeroStat(label: 'مكتملة', value: completed),
+            _HeroStat(label: l10n.supplyCompletedShort, value: completed),
           ],
         ),
       ],
     ),
   );
+  }
 }
 
 class _HeroStat extends StatelessWidget {
@@ -2051,6 +2113,7 @@ class _DeliveryCard extends ConsumerWidget {
   final SupplyOrder order;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final shipment = order.shipment;
     if (shipment == null) return const SizedBox.shrink();
     final next = switch (shipment.status) {
@@ -2091,7 +2154,10 @@ class _DeliveryCard extends ConsumerWidget {
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                       Text(
-                        '${shipment.shipmentCode} · ${order.items.length} أصناف',
+                        l10n.supplyDeliveryItems(
+                          shipment.shipmentCode,
+                          order.items.length,
+                        ),
                         style: TextStyle(
                           color: context.appColors.textMuted,
                           fontSize: 11,
@@ -2101,7 +2167,7 @@ class _DeliveryCard extends ConsumerWidget {
                   ),
                 ),
                 _Badge(
-                  _status(shipment.status),
+                  _status(l10n, shipment.status),
                   _statusColor(context.appColors, shipment.status),
                 ),
               ],
@@ -2146,11 +2212,11 @@ class _DeliveryCard extends ConsumerWidget {
                           .updateShipment(shipment.id, next);
                       ref.invalidate(supplyOrdersProvider);
                     } catch (e) {
-                      if (context.mounted) _snack(context, _error(e), true);
+                      if (context.mounted) _snack(context, _error(l10n, e), true);
                     }
                   },
                   icon: Icon(_nextIcon(next)),
-                  label: Text(_nextLabel(next)),
+                  label: Text(_nextLabel(l10n, next)),
                 ),
               ),
             ] else ...[
@@ -2164,7 +2230,7 @@ class _DeliveryCard extends ConsumerWidget {
                   ),
                   SizedBox(width: 7),
                   Text(
-                    'تم تسليم الشحنة بنجاح',
+                    l10n.supplyDeliveredSuccess,
                     style: TextStyle(
                       color: context.appColors.success,
                       fontWeight: FontWeight.w800,
@@ -2201,10 +2267,17 @@ class _DeliveryProgress extends StatelessWidget {
   const _DeliveryProgress({required this.progress});
   final int progress;
 
-  static const labels = ['استلام', 'تحميل', 'بالطريق', 'وصول', 'تسليم'];
-
   @override
-  Widget build(BuildContext context) => Row(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final labels = <String>[
+      l10n.supplyStepPickup,
+      l10n.supplyStepLoading,
+      l10n.supplyStepOnWay,
+      l10n.supplyStepArrival,
+      l10n.supplyStepDelivered,
+    ];
+    return Row(
     children: List.generate(labels.length, (index) {
       final reached = index <= progress;
       return Expanded(
@@ -2266,6 +2339,7 @@ class _DeliveryProgress extends StatelessWidget {
       );
     }),
   );
+  }
 }
 
 class _AsyncList<T> extends StatelessWidget {
@@ -2281,11 +2355,12 @@ class _AsyncList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return state.when(
       loading: () => const AppLoadingState(),
       error: (error, _) => AppErrorState(error: error, onRetry: onRetry),
       data: (items) => items.isEmpty
-          ? const _Empty(icon: Icons.inbox_outlined, text: 'لا توجد بيانات.')
+          ? _Empty(icon: Icons.inbox_outlined, text: l10n.supplyNoData)
           : ListView.separated(
               padding: const EdgeInsets.all(20),
               itemCount: items.length,
@@ -2300,22 +2375,26 @@ class _InvoiceCard extends ConsumerWidget {
   const _InvoiceCard(this.x);
   final SupplyInvoice x;
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Card(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: ListTile(
       leading: Icon(Icons.receipt_long, color: context.appColors.primary),
       title: Text(x.invoiceNumber),
       subtitle: Text(
-        '${x.pharmacyName} · متبقي ${_money(x.remainingAmount)} ل.س',
+        l10n.supplyInvoiceRemaining(x.pharmacyName, _money(x.remainingAmount)),
       ),
       trailing: _Badge(
-        _status(x.paymentStatus),
+        _status(l10n, x.paymentStatus),
         _statusColor(context.appColors, x.paymentStatus),
       ),
       onTap: () => _manageInvoice(context, ref),
     ),
   );
+  }
 
   Future<void> _manageInvoice(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -2332,20 +2411,23 @@ class _InvoiceCard extends ConsumerWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'الإجمالي ${_money(x.totalAmount)} ل.س · المدفوع ${_money(x.paidAmount)} ل.س',
+                l10n.supplyInvoiceSummary(
+                  _money(x.totalAmount),
+                  _money(x.paidAmount),
+                ),
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
                 onPressed: () => Navigator.pop(sheetContext, 'edit'),
                 icon: const Icon(Icons.edit_calendar_outlined),
-                label: const Text('تعديل شروط الفاتورة'),
+                label: Text(l10n.supplyEditInvoiceTerms),
               ),
               FilledButton.icon(
                 onPressed: x.remainingAmount <= 0
                     ? null
                     : () => Navigator.pop(sheetContext, 'payment'),
                 icon: const Icon(Icons.payments_outlined),
-                label: const Text('تسجيل دفعة'),
+                label: Text(l10n.supplyRecordPayment),
               ),
             ],
           ),
@@ -2361,6 +2443,7 @@ class _InvoiceCard extends ConsumerWidget {
   }
 
   Future<void> _recordPayment(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final amount = TextEditingController(text: _money(x.remainingAmount));
     final reference = TextEditingController();
     var method = x.paymentMethod.isEmpty ? 'CashOnDelivery' : x.paymentMethod;
@@ -2368,41 +2451,41 @@ class _InvoiceCard extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('تسجيل دفعة'),
+          title: Text(l10n.supplyRecordPayment),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _Field(amount, 'المبلغ', number: true),
+              _Field(amount, l10n.supplyAmountLabel, number: true),
               DropdownButtonFormField<String>(
                 initialValue: method,
-                decoration: const InputDecoration(labelText: 'طريقة الدفع'),
-                items: const [
+                decoration: InputDecoration(labelText: l10n.supplyPaymentMethod),
+                items: [
                   DropdownMenuItem(
                     value: 'CashOnDelivery',
-                    child: Text('نقدي عند التسليم'),
+                    child: Text(l10n.supplyCashOnDelivery),
                   ),
                   DropdownMenuItem(
                     value: 'BankTransfer',
-                    child: Text('تحويل بنكي'),
+                    child: Text(l10n.supplyBankTransfer),
                   ),
-                  DropdownMenuItem(value: 'Credit', child: Text('آجل')),
+                  DropdownMenuItem(value: 'Credit', child: Text(l10n.supplyCredit)),
                 ],
                 onChanged: (value) {
                   if (value != null) setDialogState(() => method = value);
                 },
               ),
               const SizedBox(height: 8),
-              _Field(reference, 'رقم المرجع (اختياري)'),
+              _Field(reference, l10n.supplyReferenceOptional),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('إلغاء'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('حفظ'),
+              child: Text(l10n.save),
             ),
           ],
         ),
@@ -2423,13 +2506,14 @@ class _InvoiceCard extends ConsumerWidget {
             reference: referenceText,
           );
       ref.invalidate(supplyInvoicesProvider);
-      if (context.mounted) _snack(context, 'تم تسجيل الدفعة.');
+      if (context.mounted) _snack(context, l10n.supplyPaymentRecorded);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(l10n, error), true);
     }
   }
 
   Future<void> _editInvoice(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final discount = TextEditingController(text: _money(x.discountAmount));
     final tax = TextEditingController(text: _money(x.taxAmount));
     final note = TextEditingController(text: x.warehouseNote);
@@ -2439,35 +2523,35 @@ class _InvoiceCard extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('تعديل الفاتورة'),
+          title: Text(l10n.supplyEditInvoice),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<String>(
                   initialValue: method,
-                  decoration: const InputDecoration(labelText: 'طريقة الدفع'),
-                  items: const [
+                  decoration: InputDecoration(labelText: l10n.supplyPaymentMethod),
+                  items: [
                     DropdownMenuItem(
                       value: 'CashOnDelivery',
-                      child: Text('نقدي عند التسليم'),
+                      child: Text(l10n.supplyCashOnDelivery),
                     ),
                     DropdownMenuItem(
                       value: 'BankTransfer',
-                      child: Text('تحويل بنكي'),
+                      child: Text(l10n.supplyBankTransfer),
                     ),
-                    DropdownMenuItem(value: 'Credit', child: Text('آجل')),
+                    DropdownMenuItem(value: 'Credit', child: Text(l10n.supplyCredit)),
                   ],
                   onChanged: (value) {
                     if (value != null) setDialogState(() => method = value);
                   },
                 ),
                 const SizedBox(height: 8),
-                _Field(discount, 'الحسم', number: true),
-                _Field(tax, 'الضريبة', number: true),
-                _Field(note, 'ملاحظة المستودع'),
+                _Field(discount, l10n.supplyDiscountLabel, number: true),
+                _Field(tax, l10n.supplyTaxLabel, number: true),
+                _Field(note, l10n.supplyWarehouseNote),
                 ListTile(
-                  title: const Text('تاريخ الاستحقاق'),
+                  title: Text(l10n.supplyDueDate),
                   subtitle: Text(_date(due)),
                   trailing: const Icon(Icons.calendar_month_outlined),
                   onTap: () async {
@@ -2488,11 +2572,11 @@ class _InvoiceCard extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('إلغاء'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('حفظ'),
+              child: Text(l10n.save),
             ),
           ],
         ),
@@ -2517,9 +2601,9 @@ class _InvoiceCard extends ConsumerWidget {
             note: noteText,
           );
       ref.invalidate(supplyInvoicesProvider);
-      if (context.mounted) _snack(context, 'تم تحديث الفاتورة.');
+      if (context.mounted) _snack(context, l10n.supplyInvoiceUpdated);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(l10n, error), true);
     }
   }
 }
@@ -2528,11 +2612,13 @@ class _ReturnCard extends ConsumerWidget {
   const _ReturnCard(this.x);
   final SupplyReturn x;
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Card(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: ListTile(
       leading: Icon(Icons.keyboard_return, color: context.appColors.warning),
       title: Text(x.medicineName),
-      subtitle: Text('${x.quantity} عبوات · ${x.reason}'),
+      subtitle: Text(l10n.supplyReturnDetails(x.quantity, x.reason)),
       trailing:
           x.status == 'Requested' ||
               x.status == 'Approved' ||
@@ -2540,40 +2626,42 @@ class _ReturnCard extends ConsumerWidget {
           ? PopupMenuButton<String>(
               onSelected: (status) => _review(context, ref, status),
               itemBuilder: (_) => [
-                if (x.status == 'Requested') ...const [
-                  PopupMenuItem(value: 'Approved', child: Text('قبول المرتجع')),
-                  PopupMenuItem(value: 'Rejected', child: Text('رفض المرتجع')),
+                if (x.status == 'Requested') ...[
+                  PopupMenuItem(value: 'Approved', child: Text(l10n.supplyAcceptReturn)),
+                  PopupMenuItem(value: 'Rejected', child: Text(l10n.supplyRejectReturn)),
                 ],
                 if (x.status == 'Approved')
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'Collected',
-                    child: Text('تم الاستلام من الصيدلية'),
+                    child: Text(l10n.supplyCollectedFromPharmacy),
                   ),
                 if (x.status == 'Collected')
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'Completed',
-                    child: Text('إكمال المرتجع'),
+                    child: Text(l10n.supplyCompleteReturn),
                   ),
               ],
             )
           : _Badge(
-              _status(x.status),
+              _status(l10n, x.status),
               _statusColor(context.appColors, x.status),
             ),
     ),
   );
+  }
 
   Future<void> _review(
     BuildContext context,
     WidgetRef ref,
     String status,
   ) async {
+    final l10n = AppLocalizations.of(context);
     try {
       await ref.read(supplyChainRepositoryProvider).reviewReturn(x.id, status);
       ref.invalidate(supplyReturnsProvider);
-      if (context.mounted) _snack(context, 'تم تحديث المرتجع.');
+      if (context.mounted) _snack(context, l10n.supplyReturnUpdated);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(l10n, error), true);
     }
   }
 }
@@ -2581,7 +2669,9 @@ class _ReturnCard extends ConsumerWidget {
 class _RecallsPanel extends ConsumerWidget {
   const _RecallsPanel();
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Column(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
@@ -2590,7 +2680,7 @@ class _RecallsPanel extends ConsumerWidget {
           child: FilledButton.icon(
             onPressed: () => _createRecall(context, ref),
             icon: const Icon(Icons.add_alert_outlined),
-            label: const Text('إنشاء تنبيه سحب'),
+            label: Text(l10n.supplyCreateRecallAlert),
           ),
         ),
       ),
@@ -2603,11 +2693,13 @@ class _RecallsPanel extends ConsumerWidget {
       ),
     ],
   );
+  }
 
   Future<void> _createRecall(BuildContext context, WidgetRef ref) async {
     try {
       final batches = await ref.read(supplyBatchesProvider.future);
       if (!context.mounted || batches.isEmpty) return;
+      final l10n = AppLocalizations.of(context);
       var batchId = batches.first.id;
       var severity = 'Medium';
       final reason = TextEditingController();
@@ -2615,13 +2707,13 @@ class _RecallsPanel extends ConsumerWidget {
         context: context,
         builder: (dialogContext) => StatefulBuilder(
           builder: (context, setDialogState) => AlertDialog(
-            title: const Text('سحب تشغيلة دوائية'),
+            title: Text(l10n.supplyRecallBatch),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<String>(
                   initialValue: batchId,
-                  decoration: const InputDecoration(labelText: 'التشغيلة'),
+                  decoration: InputDecoration(labelText: l10n.supplyBatchLabel),
                   items: batches
                       .map(
                         (item) => DropdownMenuItem(
@@ -2639,29 +2731,29 @@ class _RecallsPanel extends ConsumerWidget {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   initialValue: severity,
-                  decoration: const InputDecoration(labelText: 'درجة الخطورة'),
-                  items: const [
-                    DropdownMenuItem(value: 'Low', child: Text('منخفضة')),
-                    DropdownMenuItem(value: 'Medium', child: Text('متوسطة')),
-                    DropdownMenuItem(value: 'High', child: Text('عالية')),
-                    DropdownMenuItem(value: 'Critical', child: Text('حرجة')),
+                  decoration: InputDecoration(labelText: l10n.supplySeverityLabel),
+                  items: [
+                    DropdownMenuItem(value: 'Low', child: Text(l10n.supplySeverityLow)),
+                    DropdownMenuItem(value: 'Medium', child: Text(l10n.supplySeverityMedium)),
+                    DropdownMenuItem(value: 'High', child: Text(l10n.supplySeverityHigh)),
+                    DropdownMenuItem(value: 'Critical', child: Text(l10n.supplySeverityCritical)),
                   ],
                   onChanged: (value) {
                     if (value != null) setDialogState(() => severity = value);
                   },
                 ),
                 const SizedBox(height: 8),
-                _Field(reason, 'سبب السحب'),
+                _Field(reason, l10n.supplyRecallReason),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: const Text('إلغاء'),
+                child: Text(l10n.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                child: const Text('إنشاء التنبيه'),
+                child: Text(l10n.supplyCreateAlertButton),
               ),
             ],
           ),
@@ -2674,9 +2766,9 @@ class _RecallsPanel extends ConsumerWidget {
           .read(supplyChainRepositoryProvider)
           .createRecall(batchId, reasonText, severity);
       ref.invalidate(supplyRecallsProvider);
-      if (context.mounted) _snack(context, 'تم إنشاء تنبيه السحب.');
+      if (context.mounted) _snack(context, l10n.supplyRecallAlertCreated);
     } catch (error) {
-      if (context.mounted) _snack(context, _error(error), true);
+      if (context.mounted) _snack(context, _error(AppLocalizations.of(context), error), true);
     }
   }
 }
@@ -2699,7 +2791,9 @@ class _BatchCard extends StatelessWidget {
   const _BatchCard({required this.batch});
   final MedicineBatch batch;
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -2727,7 +2821,7 @@ class _BatchCard extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                     Text(
-                      'رقم التشغيلة ${batch.batchNumber}',
+                      l10n.supplyBatchNumberLabel(batch.batchNumber),
                       style: TextStyle(
                         color: context.appColors.textMuted,
                         fontSize: 10,
@@ -2737,7 +2831,7 @@ class _BatchCard extends StatelessWidget {
                 ),
               ),
               _Badge(
-                _health(batch.health),
+                _health(l10n, batch.health),
                 _healthColor(context.appColors, batch.health),
               ),
             ],
@@ -2747,21 +2841,21 @@ class _BatchCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _CompactStat(
-                  label: 'المتاح',
+                  label: l10n.supplyAvailableShort,
                   value: '${batch.sellableQuantity}',
                   icon: Icons.inventory_2_outlined,
                 ),
               ),
               Expanded(
                 child: _CompactStat(
-                  label: 'سعر الجملة',
+                  label: l10n.supplyWholesalePrice,
                   value: _money(batch.wholesalePrice),
                   icon: Icons.payments_outlined,
                 ),
               ),
               Expanded(
                 child: _CompactStat(
-                  label: 'الانتهاء',
+                  label: l10n.supplyExpiryShort,
                   value: _date(batch.expiryDateUtc),
                   icon: Icons.event_outlined,
                 ),
@@ -2772,6 +2866,7 @@ class _BatchCard extends StatelessWidget {
       ),
     ),
   );
+  }
 }
 
 class _Hero extends StatelessWidget {
@@ -3090,8 +3185,8 @@ class _Field extends StatelessWidget {
 
 String _money(double v) => v.toStringAsFixed(v % 1 == 0 ? 0 : 2);
 String _date(DateTime d) => '${d.year}/${d.month}/${d.day}';
-String _error(Object e) =>
-    e is ApiException ? e.message : 'تعذر إكمال العملية.';
+String _error(AppLocalizations l10n, Object e) =>
+    e is ApiException ? e.localize(l10n) : l10n.operationFailed;
 void _snack(BuildContext c, String t, [bool error = false]) =>
     ScaffoldMessenger.of(c).showSnackBar(
       SnackBar(
@@ -3099,11 +3194,12 @@ void _snack(BuildContext c, String t, [bool error = false]) =>
         backgroundColor: error ? c.appColors.danger : null,
       ),
     );
-String _health(String s) => switch (s.toLowerCase()) {
-  'healthy' => 'سليم',
-  'lowstock' => 'منخفض',
-  'expiring' => 'قرب الانتهاء',
-  'expired' => 'منتهي',
+String _health(AppLocalizations l10n, String s) =>
+    switch (s.toLowerCase()) {
+  'healthy' => l10n.supplyHealthHealthy,
+  'lowstock' => l10n.supplyHealthLow,
+  'expiring' => l10n.supplyHealthExpiring,
+  'expired' => l10n.supplyHealthExpired,
   _ => s,
 };
 Color _healthColor(AppColors colors, String s) => switch (s.toLowerCase()) {
@@ -3111,23 +3207,24 @@ Color _healthColor(AppColors colors, String s) => switch (s.toLowerCase()) {
   'expired' => colors.primary,
   _ => colors.primary,
 };
-String _status(String s) => switch (s.toLowerCase()) {
-  'submitted' => 'مرسل',
-  'accepted' => 'مقبول',
-  'preparing' => 'قيد التجهيز',
-  'readyfordispatch' => 'جاهز للشحن',
-  'assigned' => 'مسند',
-  'loading' => 'تحميل',
-  'outfordelivery' => 'في الطريق',
-  'arrived' => 'وصل',
-  'delivered' => 'تم التسليم',
-  'rejected' => 'مرفوض',
-  'paid' => 'مدفوع',
-  'partiallypaid' => 'مدفوع جزئيًا',
-  'unpaid' => 'غير مدفوع',
-  'requested' => 'مطلوب',
-  'approved' => 'مقبول',
-  'active' => 'نشط',
+String _status(AppLocalizations l10n, String s) =>
+    switch (s.toLowerCase()) {
+  'submitted' => l10n.supplyStatusSubmitted,
+  'accepted' => l10n.supplyStatusAccepted,
+  'preparing' => l10n.supplyStatusPreparing,
+  'readyfordispatch' => l10n.supplyStatusReadyForDispatch,
+  'assigned' => l10n.supplyStatusAssigned,
+  'loading' => l10n.supplyStatusLoading,
+  'outfordelivery' => l10n.supplyStatusOutForDelivery,
+  'arrived' => l10n.supplyStatusArrived,
+  'delivered' => l10n.supplyStatusDelivered,
+  'rejected' => l10n.supplyStatusRejected,
+  'paid' => l10n.supplyStatusPaid,
+  'partiallypaid' => l10n.supplyStatusPartiallyPaid,
+  'unpaid' => l10n.supplyStatusUnpaid,
+  'requested' => l10n.supplyStatusRequested,
+  'approved' => l10n.supplyStatusApproved,
+  'active' => l10n.supplyStatusActive,
   _ => s,
 };
 Color _statusColor(AppColors colors, String s) => switch (s.toLowerCase()) {
@@ -3136,10 +3233,10 @@ Color _statusColor(AppColors colors, String s) => switch (s.toLowerCase()) {
   'submitted' || 'requested' || 'unpaid' => colors.primary,
   _ => colors.primary,
 };
-String _nextLabel(String s) => switch (s) {
-  'Loading' => 'بدء التحميل',
-  'OutForDelivery' => 'بدء التوصيل',
-  'Arrived' => 'تأكيد الوصول',
-  'Delivered' => 'تأكيد التسليم',
-  _ => 'تحديث',
+String _nextLabel(AppLocalizations l10n, String s) => switch (s) {
+  'Loading' => l10n.supplyNextLoading,
+  'OutForDelivery' => l10n.supplyNextOutForDelivery,
+  'Arrived' => l10n.supplyNextArrived,
+  'Delivered' => l10n.supplyNextDelivered,
+  _ => l10n.supplyNextUpdate,
 };

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -32,22 +33,23 @@ class _PharmacyRequestDetailsPageState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(pharmacyRequestDetailsProvider(widget.requestId));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تفاصيل الطلب'),
+        title: Text(l10n.requestDetailsTitle),
         actions: [
           IconButton(
             onPressed: () => ref.invalidate(
               pharmacyRequestDetailsProvider(widget.requestId),
             ),
-            tooltip: 'تحديث الطلب',
+            tooltip: l10n.refreshRequest,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري فتح الطلب...'),
+        loading: () => AppLoadingState(label: l10n.openingRequest),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () =>
@@ -88,8 +90,8 @@ class _PharmacyRequestDetailsPageState
                           : const Icon(Icons.inventory_rounded),
                       label: Text(
                         _confirmingPickup
-                            ? 'جاري التأكيد...'
-                            : 'تأكيد استلام المستخدم للدواء',
+                            ? l10n.confirmingProgress
+                            : l10n.confirmUserPickup,
                       ),
                     ),
                   ),
@@ -102,7 +104,9 @@ class _PharmacyRequestDetailsPageState
     );
   }
 
-  Widget _responseForm(PharmacyRequestDetails data) => Card(
+  Widget _responseForm(PharmacyRequestDetails data) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(18),
       child: Column(
@@ -128,11 +132,11 @@ class _PharmacyRequestDetailsPageState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'الرد على الطلب',
+                      l10n.respondToRequest,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     Text(
-                      'سيصل اختيارك وملاحظتك إلى المستخدم',
+                      l10n.replyWillReachUser,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -146,7 +150,7 @@ class _PharmacyRequestDetailsPageState
               Expanded(
                 child: _ResponseChoice(
                   icon: Icons.check_circle_outline_rounded,
-                  label: 'متوفر',
+                  label: l10n.statusAvailable,
                   color: context.appColors.success,
                   selected: _status == 'Available',
                   enabled: data.isRequestedMedicineCurrentlyAvailable,
@@ -157,7 +161,7 @@ class _PharmacyRequestDetailsPageState
               Expanded(
                 child: _ResponseChoice(
                   icon: Icons.cancel_outlined,
-                  label: 'غير متوفر',
+                  label: l10n.statusUnavailable,
                   color: context.appColors.danger,
                   selected: _status == 'Unavailable',
                   onTap: () => setState(() => _status = 'Unavailable'),
@@ -168,15 +172,15 @@ class _PharmacyRequestDetailsPageState
           if (_status == 'Unavailable') ...[
             const SizedBox(height: 13),
             Text(
-              'يمكنك اقتراح بديل متوفر بدلًا منه',
+              l10n.suggestAlternativeHint,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 7),
             DropdownButtonFormField<String>(
               initialValue: _alternative,
               isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'بديل متاح (اختياري)',
+              decoration: InputDecoration(
+                labelText: l10n.availableAlternativeLabel,
               ),
               items: data.alternativeCandidates
                   .map(
@@ -195,8 +199,8 @@ class _PharmacyRequestDetailsPageState
             maxLength: 1000,
             minLines: 3,
             maxLines: 5,
-            decoration: const InputDecoration(
-              labelText: 'ملاحظة للمستخدم (اختياري)',
+            decoration: InputDecoration(
+              labelText: l10n.noteToUserOptional,
               alignLabelWithHint: true,
             ),
           ),
@@ -205,15 +209,19 @@ class _PharmacyRequestDetailsPageState
             child: FilledButton.icon(
               onPressed: _sending ? null : _send,
               icon: const Icon(Icons.send_rounded),
-              label: Text(_sending ? 'جاري الإرسال...' : 'إرسال الرد'),
+              label: Text(
+                _sending ? l10n.sendingProgress : l10n.sendReply,
+              ),
             ),
           ),
         ],
       ),
     ),
-  );
+    );
+  }
 
   Future<void> _send() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _sending = true);
     try {
       await ref
@@ -229,10 +237,10 @@ class _PharmacyRequestDetailsPageState
         ..invalidate(pharmacyRequestDetailsProvider(widget.requestId))
         ..invalidate(pharmacyRequestsProvider)
         ..invalidate(pharmacyDashboardProvider);
-      _message('تم إرسال الرد إلى المستخدم.', false);
+      _message(l10n.replySent, false);
     } catch (error) {
       _message(
-        error is ApiException ? error.message : 'تعذر إرسال الرد.',
+        error is ApiException ? error.localize(l10n) : l10n.sendReplyFailed,
         true,
       );
     } finally {
@@ -241,6 +249,7 @@ class _PharmacyRequestDetailsPageState
   }
 
   Future<void> _confirmPickup() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _confirmingPickup = true);
     try {
       await ref
@@ -250,10 +259,10 @@ class _PharmacyRequestDetailsPageState
         ..invalidate(pharmacyRequestDetailsProvider(widget.requestId))
         ..invalidate(pharmacyRequestsProvider)
         ..invalidate(pharmacyDashboardProvider);
-      _message('تم تأكيد استلام المستخدم للدواء.', false);
+      _message(l10n.pickupConfirmed, false);
     } catch (error) {
       _message(
-        error is ApiException ? error.message : 'تعذر تأكيد استلام الدواء.',
+        error is ApiException ? error.localize(l10n) : l10n.confirmPickupFailed,
         true,
       );
     } finally {
@@ -277,6 +286,7 @@ class _Hero extends StatelessWidget {
   final PharmacyRequestDetails data;
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final statusColor = switch (data.request.status.toLowerCase()) {
       'available' => context.appColors.success,
       'unavailable' => context.appColors.danger,
@@ -285,7 +295,7 @@ class _Hero extends StatelessWidget {
     };
     final statusText = data.request.statusDisplayText.trim().isNotEmpty
         ? data.request.statusDisplayText
-        : 'بانتظار الرد';
+        : l10n.requestStatusWaitingReply;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -348,7 +358,7 @@ class _Hero extends StatelessWidget {
           Row(
             children: [
               Text(
-                'الكمية ${data.request.requestedQuantity}',
+                l10n.quantityRequestedValue(data.request.requestedQuantity),
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(width: 9),
@@ -370,25 +380,27 @@ class _InfoCard extends StatelessWidget {
   const _InfoCard({required this.data});
   final PharmacyRequestDetails data;
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(17),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionTitle(icon: Icons.science_outlined, title: 'بيانات الدواء'),
+          _SectionTitle(icon: Icons.science_outlined, title: l10n.medicineDataTitle),
           const SizedBox(height: 13),
           _DetailsRow(
-            label: 'الاسم العلمي',
-            value: data.requestedMedicineScientificName ?? 'غير مسجل',
+            label: l10n.scientificNameLabel,
+            value: data.requestedMedicineScientificName ?? l10n.notRegistered,
           ),
           if (data.requestedMedicineArabicScientificName != null)
             _DetailsRow(
-              label: 'الاسم العربي',
+              label: l10n.arabicNameLabel,
               value: data.requestedMedicineArabicScientificName!,
             ),
           _DetailsRow(
-            label: 'الشكل والتركيز',
+            label: l10n.formConcentrationLabel,
             value: [
               data.requestedMedicineDosageForm,
               data.requestedMedicineCapacity,
@@ -403,49 +415,53 @@ class _InfoCard extends StatelessWidget {
                 color: context.appColors.surfaceWarm,
                 borderRadius: BorderRadius.circular(13),
               ),
-              child: Text('ملاحظة المستخدم: ${data.request.note}'),
+              child: Text(l10n.userNoteLabel(data.request.note!)),
             ),
           ],
         ],
       ),
     ),
-  );
+    );
+  }
 }
 
 class _PatientCard extends StatelessWidget {
   const _PatientCard({required this.data});
   final PharmacyRequestDetails data;
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(17),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(
+          _SectionTitle(
             icon: Icons.person_outline_rounded,
-            title: 'بيانات المستخدم',
+            title: l10n.userDataTitle,
           ),
           const SizedBox(height: 10),
           _ContactRow(
             icon: Icons.person_outline,
-            label: 'الاسم',
+            label: l10n.nameLabel,
             value: data.request.userFullName,
           ),
           _ContactRow(
             icon: Icons.phone_outlined,
-            label: 'الهاتف',
-            value: data.request.userPhoneNumber ?? 'غير مسجل',
+            label: l10n.phoneLabel,
+            value: data.request.userPhoneNumber ?? l10n.notRegistered,
           ),
           _ContactRow(
             icon: Icons.email_outlined,
-            label: 'البريد',
+            label: l10n.emailLabel,
             value: data.userEmail,
           ),
         ],
       ),
     ),
-  );
+    );
+  }
 }
 
 class _ResponseChoice extends StatelessWidget {
@@ -544,7 +560,9 @@ class _DetailsRow extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            value.isEmpty ? 'غير مسجل' : value,
+            value.isEmpty
+                ? AppLocalizations.of(context).notRegistered
+                : value,
             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
           ),
         ),
@@ -605,9 +623,9 @@ class _Processed extends StatelessWidget {
       children: [
         const Icon(Icons.task_alt_rounded, color: Color(0xFF167D5A), size: 36),
         const SizedBox(height: 9),
-        const Text(
-          'تمت معالجة هذا الطلب',
-          style: TextStyle(fontWeight: FontWeight.w900),
+        Text(
+          AppLocalizations.of(context).requestProcessed,
+          style: const TextStyle(fontWeight: FontWeight.w900),
         ),
         if (data.request.pharmacyResponseNote != null)
           Text(data.request.pharmacyResponseNote!, textAlign: TextAlign.center),

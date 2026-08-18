@@ -83,7 +83,9 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
     final String? error = authState.hasError
         ? authState.error is ApiException
-            ? (authState.error! as ApiException).message
+            ? (authState.error! as ApiException).localize(
+                AppLocalizations.of(context),
+              )
             : AppLocalizations.of(context).loginFailed
         : null;
 

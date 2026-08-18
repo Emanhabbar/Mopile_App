@@ -6,21 +6,40 @@
 
 ## 0) الحالة الحالية (Checkpoint)
 
-آخر تحديث: **اكتملت فيتشرات auth + account + settings بالكامل — 15 ملفاً محوَّلاً.**
+آخر تحديث: **اكتملت فيتشرات auth + account + settings + user + chat + notifications + intelligence + pharmacy_discovery + صفحات المنظمات العامة — ~31 ملفاً محوَّلاً، 0 عربي متبقي فيها (عدا استثناء وظيفي).**
 
 | القطعة | الحالة |
 |---|---|
 | البنية (l10n.yaml + ARB + delegates) | جاهزة وسليمة |
 | سكربت الاستخراج | ✅ `tools/extract_arabic.ps1` — 1560 سلسلة فريدة في `tools/arabic_strings.json` |
 | ملف `docs/TRANSLATION_WORKFLOW.md` | ✅ أُنشئ (هذا الملف) |
-| المفاتيح في ARB | ✅ ~380 مفتاحاً (عربي + إنجليزي) |
+| المفاتيح في ARB | ✅ ~680 مفتاحاً (عربي + إنجليزي) |
 | **فيتشر auth** | ✅ **كاملة** |
 | **فيتشر account** | ✅ **كاملة** |
-| **فيتشر settings** | ✅ **كاملة** (settings_page + settings_details_pages) |
-| التحويل التالي | ⏳ فيتشر `user` (8 ملفات، ~830 موضعاً) — الأصغر أولاً: `search_history_page` (46) ثم `medicine_requests_page` (50) |
+| **فيتشر settings** | ✅ **كاملة** |
+| **فيتشر user** | ✅ **كاملة** (8 صفحات) |
+| **فيتشر chat** | ✅ **كاملة** (chat_sessions + chat_page) |
+| **فيتشر notifications** | ✅ **كاملة** |
+| **فيتشر intelligence** | ✅ **كاملة** |
+| **فيتشر pharmacy_discovery** | ✅ **كاملة** (external_pharmacy_details) |
+| **صفحات المنظمات العامة** | ✅ **كاملة** (public_organizations + public_organization_details) |
+| **فيتشر prescriptions** | ✅ **كاملة** (prescriptions, prescription_details, pharmacy_prescription_orders) |
+| **فيتشر medicines** | ✅ **كاملة** (medicines_page, medicine_details, create_medicine) |
+| **فيتشر donations** | ✅ **كاملة** (donations, pharmacy_donations, donation_form) |
+| **فيتشر pharmacy (جزئي)** | ✅ 7/9 ملفات: barcode_scanner, requests, working_hours, request_details, license_verification, batch_inventory_editor, profile |
 | `flutter analyze` | ✅ نظيف (6 تحذيرات سابقة غير متعلقة بالترجمة) |
 
-**الملفات المحوَّلة:** `app.dart`, `async_states.dart`, `app_brand.dart`, `login_page.dart`, `auth_widgets.dart`, `registration_success_page.dart`, `splash_page.dart`, `forgot_password_page.dart`, `register_page.dart`, `settings_page.dart`, `account_profile_page.dart`, `change_password_page.dart`, `settings_details_pages.dart`.
+**استثناء وظيفي موثّق:** `chat_page.dart` يحتوي 4 كلمات عربية (`'صيدلي'`, `'دواء'`, `'صحي'`, `'تبرع'`) داخل `_openAction` — مطابقة منطقية لتسميات إجراءات قادمة من الخادم (ليست نصوص UI، لا تُترجم عبر l10n).
+
+**المتبقي: ~2630 موضعاً.** الدفعات القادمة بالترتيب:
+1. ⏳ **pharmacy (باقي)** (inventory 326, dashboard 173, profile 118, batch_inventory_editor 96)
+2. **organization** (workspace 310, home 95)
+3. **supply_chain** (workspace 439, warehouse_home 102, representative_home 98)
+4. **admin** (workspace 416, home 91)
+5. **dashboard** (role_modules 171, overview 97, home_shell 60, modules_page 8)
+6. **core/مؤجل** (api_exception 54, device_location_service 26, api_client 15, auth data 34, app_spacing 28, app_router 24, app_config 1, chat_models 2، بقايا data_sources 11)
+
+ملاحظة: `donationStatus` (في donations_page) غيّرت توقيعها لتستقبل `AppLocalizations` — استدعاءاها في organization_workspace تم إصلاحهما مؤقتاً بتمرير l10n (سيُستكمل تحويل organization_workspace لاحقاً).
 
 ---
 

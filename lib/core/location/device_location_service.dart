@@ -13,7 +13,8 @@ class DeviceLocationService {
   Future<DeviceLocation> determineCurrent() async {
     if (!await Geolocator.isLocationServiceEnabled()) {
       throw const ApiException(
-        'خدمة الموقع متوقفة. فعّلها من إعدادات الجهاز ثم حاول مجددًا.',
+        '',
+        kind: ApiErrorKind.locationServiceDisabled,
       );
     }
 
@@ -22,11 +23,15 @@ class DeviceLocationService {
       permission = await Geolocator.requestPermission();
     }
     if (permission == LocationPermission.denied) {
-      throw const ApiException('لم يتم السماح بالوصول إلى الموقع.');
+      throw const ApiException(
+        '',
+        kind: ApiErrorKind.locationPermissionDenied,
+      );
     }
     if (permission == LocationPermission.deniedForever) {
       throw const ApiException(
-        'إذن الموقع موقوف لهذا التطبيق. يمكنك تفعيله من إعدادات الجهاز.',
+        '',
+        kind: ApiErrorKind.locationPermissionDeniedForever,
       );
     }
 

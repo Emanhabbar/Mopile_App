@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 
 class BatchInventoryEditor extends StatefulWidget {
@@ -147,7 +148,9 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
     );
   }
 
-  Widget _header(double progress) => Padding(
+  Widget _header(double progress) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
     padding: const EdgeInsets.fromLTRB(18, 12, 18, 8),
     child: Column(
       children: [
@@ -180,11 +183,11 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'تجهيز الأدوية المختارة',
+                    l10n.prepareMedicinesTitle,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text(
-                    'أدخل سعر كل دواء، ثم راجع باقي بيانات المخزون.',
+                    l10n.prepareMedicinesSubtitle,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -192,7 +195,7 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
             ),
             IconButton(
               onPressed: () => Navigator.pop(context),
-              tooltip: 'إغلاق',
+              tooltip: l10n.close,
               icon: const Icon(Icons.close_rounded),
             ),
           ],
@@ -208,7 +211,7 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
             ),
             const SizedBox(width: 10),
             Text(
-              '$_completedPrices/${_entries.length} أسعار',
+              l10n.pricesProgress(_completedPrices, _entries.length),
               style: const TextStyle(
                 color: Color(0xFF216474),
                 fontWeight: FontWeight.w800,
@@ -223,14 +226,17 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
           child: OutlinedButton.icon(
             onPressed: _applyCommonSettings,
             icon: const Icon(Icons.tune_rounded, size: 19),
-            label: const Text('تطبيق إعدادات مشتركة على الجميع'),
+            label: Text(l10n.applyCommonSettings),
           ),
         ),
       ],
     ),
-  );
+    );
+  }
 
-  Widget _footer() => Container(
+  Widget _footer() {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
@@ -241,10 +247,11 @@ class _BatchInventoryEditorState extends State<BatchInventoryEditor> {
       child: FilledButton.icon(
         onPressed: _submit,
         icon: const Icon(Icons.add_task_rounded),
-        label: Text('إضافة ${_entries.length} أدوية إلى المخزون'),
+        label: Text(l10n.addMedicinesToStock(_entries.length)),
       ),
     ),
-  );
+    );
+  }
 }
 
 class _BatchMedicineCard extends StatelessWidget {
@@ -265,6 +272,7 @@ class _BatchMedicineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final details = [
       entry.medicine.arabicName,
       entry.medicine.scientificName,
@@ -322,7 +330,7 @@ class _BatchMedicineCard extends StatelessWidget {
                 if (canRemove)
                   IconButton(
                     onPressed: onRemove,
-                    tooltip: 'إزالة من القائمة',
+                    tooltip: l10n.removeFromList,
                     icon: const Icon(Icons.close_rounded, size: 20),
                   ),
               ],
@@ -338,19 +346,19 @@ class _BatchMedicineCard extends StatelessWidget {
                   if (entry.medicine.capacity != null)
                     _MedicineIdentityBadge(
                       icon: Icons.straighten_rounded,
-                      label: 'التركيز',
+                      label: l10n.concentrationLabel,
                       value: entry.medicine.capacity!,
                     ),
                   if (entry.medicine.dosageForm != null)
                     _MedicineIdentityBadge(
                       icon: Icons.category_outlined,
-                      label: 'الشكل',
+                      label: l10n.formLabel,
                       value: entry.medicine.dosageForm!,
                     ),
                   if (entry.medicine.packageSize != null)
                     _MedicineIdentityBadge(
                       icon: Icons.inventory_2_outlined,
-                      label: 'العبوة',
+                      label: l10n.packageLabel,
                       value: entry.medicine.packageSize!,
                     ),
                 ],
@@ -365,16 +373,16 @@ class _BatchMedicineCard extends StatelessWidget {
               ),
               textInputAction: TextInputAction.next,
               inputFormatters: [_decimalFormatter],
-              decoration: const InputDecoration(
-                labelText: 'سعر البيع لهذا الدواء *',
-                hintText: 'مثال: 8500',
-                prefixIcon: Icon(Icons.payments_outlined),
-                suffixText: 'ل.س',
+              decoration: InputDecoration(
+                labelText: l10n.sellingPriceFieldLabel,
+                hintText: l10n.priceHint,
+                prefixIcon: const Icon(Icons.payments_outlined),
+                suffixText: l10n.currencySuffix,
               ),
               validator: (value) {
                 final price = double.tryParse(value?.trim() ?? '');
                 return price == null || price <= 0
-                    ? 'أدخل سعرًا أكبر من صفر.'
+                    ? l10n.enterPositivePrice
                     : null;
               },
             ),
@@ -388,17 +396,17 @@ class _BatchMedicineCard extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                      labelText: 'الكمية',
-                      prefixIcon: Icon(Icons.inventory_2_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n.requestQuantity,
+                      prefixIcon: const Icon(Icons.inventory_2_outlined),
                     ),
                     validator: (value) {
                       final quantity = int.tryParse(value?.trim() ?? '');
                       if (quantity == null || quantity < 0) {
-                        return 'قيمة غير صحيحة';
+                        return l10n.invalidValue;
                       }
                       if (entry.available && quantity == 0) {
-                        return 'أدخل كمية';
+                        return l10n.enterQuantity;
                       }
                       return null;
                     },
@@ -411,14 +419,16 @@ class _BatchMedicineCard extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                      labelText: 'حد التنبيه',
-                      prefixIcon: Icon(Icons.notification_important_outlined),
+                    decoration: InputDecoration(
+                      labelText: l10n.thresholdLabel,
+                      prefixIcon: const Icon(
+                        Icons.notification_important_outlined,
+                      ),
                     ),
                     validator: (value) {
                       final threshold = int.tryParse(value?.trim() ?? '');
                       return threshold == null || threshold < 0
-                          ? 'قيمة غير صحيحة'
+                          ? l10n.invalidValue
                           : null;
                     },
                   ),
@@ -435,7 +445,7 @@ class _BatchMedicineCard extends StatelessWidget {
                   avatar: const Icon(Icons.event_outlined, size: 18),
                   label: Text(
                     entry.expiryDate == null
-                        ? 'تاريخ الصلاحية'
+                        ? l10n.expiryDateLabel
                         : _dateLabel(entry.expiryDate!),
                   ),
                   onPressed: () async {
@@ -455,7 +465,7 @@ class _BatchMedicineCard extends StatelessWidget {
                 ),
                 if (entry.expiryDate != null)
                   ActionChip(
-                    label: const Text('إزالة التاريخ'),
+                    label: Text(l10n.removeDate),
                     onPressed: () {
                       entry.expiryDate = null;
                       onChanged();
@@ -471,7 +481,7 @@ class _BatchMedicineCard extends StatelessWidget {
                 entry.available = value;
                 onChanged();
               },
-              title: const Text('متاح للطلب'),
+              title: Text(l10n.availableForOrder),
             ),
             const SizedBox(height: 8),
             SwitchListTile(
@@ -482,10 +492,8 @@ class _BatchMedicineCard extends StatelessWidget {
                 entry.priceVisible = value;
                 onChanged();
               },
-              title: const Text('إظهار السعر للمستخدم'),
-              subtitle: const Text(
-                'يمكن الاحتفاظ بالسعر داخليًا وإخفاؤه عند الحاجة',
-              ),
+              title: Text(l10n.showPriceToUser),
+              subtitle: Text(l10n.priceHiddenHint),
             ),
           ],
         ),
@@ -559,46 +567,46 @@ class _BatchDefaultsDialogState extends State<_BatchDefaultsDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('إعدادات مشتركة'),
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+    title: Text(l10n.commonSettingsTitle),
     content: Form(
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'ستُطبق هذه القيم على جميع الأدوية، بينما يبقى السعر مستقلًا لكل دواء.',
-            ),
+            Text(l10n.commonSettingsDesc),
             const SizedBox(height: 16),
             TextFormField(
               controller: _quantity,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(labelText: 'الكمية'),
-              validator: _nonNegativeInteger,
+              decoration: InputDecoration(labelText: l10n.requestQuantity),
+              validator: (value) => _nonNegativeInteger(value, l10n),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _threshold,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'حد المخزون المنخفض',
+              decoration: InputDecoration(
+                labelText: l10n.lowStockThresholdLabel,
               ),
-              validator: _nonNegativeInteger,
+              validator: (value) => _nonNegativeInteger(value, l10n),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _available,
               onChanged: (value) => setState(() => _available = value),
-              title: const Text('متاح للطلب'),
+              title: Text(l10n.availableForOrder),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _priceVisible,
               onChanged: (value) => setState(() => _priceVisible = value),
-              title: const Text('إظهار السعر للمستخدم'),
+              title: Text(l10n.showPriceToUser),
             ),
           ],
         ),
@@ -607,7 +615,7 @@ class _BatchDefaultsDialogState extends State<_BatchDefaultsDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('إلغاء'),
+        child: Text(l10n.cancel),
       ),
       FilledButton(
         onPressed: () {
@@ -622,10 +630,11 @@ class _BatchDefaultsDialogState extends State<_BatchDefaultsDialog> {
             ),
           );
         },
-        child: const Text('تطبيق على الجميع'),
+        child: Text(l10n.applyToAll),
       ),
     ],
-  );
+    );
+  }
 }
 
 class _BatchEntry {
@@ -667,9 +676,9 @@ final _decimalFormatter = FilteringTextInputFormatter.allow(
   RegExp(r'^\d{0,12}([.]\d{0,2})?'),
 );
 
-String? _nonNegativeInteger(String? value) {
+String? _nonNegativeInteger(String? value, AppLocalizations l10n) {
   final parsed = int.tryParse(value?.trim() ?? '');
-  return parsed == null || parsed < 0 ? 'أدخل رقمًا صحيحًا.' : null;
+  return parsed == null || parsed < 0 ? l10n.enterValidInteger : null;
 }
 
 String _dateLabel(DateTime date) =>

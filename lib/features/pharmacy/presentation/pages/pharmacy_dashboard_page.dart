@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/layout.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -14,11 +16,11 @@ class PharmacyDashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(pharmacyDashboardProvider);
     final openStatus = ref.watch(pharmacyOpenStatusProvider);
     return state.when(
-      loading: () =>
-          const AppLoadingState(label: 'نجهّز مركز تشغيل الصيدلية...'),
+      loading: () => AppLoadingState(label: l10n.dashboardPreparingPharmacy),
       error: (error, _) => AppErrorState(
         error: error,
         onRetry: () => ref.invalidate(pharmacyDashboardProvider),
@@ -37,7 +39,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 112),
+              padding: EdgeInsets.fromLTRB(20, 14, 20, kBottomNavReserved + 12),
               sliver: SliverList.list(
                 children: [
                   AppReveal(
@@ -47,9 +49,9 @@ class PharmacyDashboardPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 22),
-                  const RoleSectionHeader(
-                    title: 'تشغيل الصيدلية',
-                    subtitle: 'اختصارات لأهم مهامك اليومية',
+                  RoleSectionHeader(
+                    title: l10n.pharmacyOperationsSection,
+                    subtitle: l10n.pharmacyOperationsSectionSubtitle,
                   ),
                   const SizedBox(height: 11),
                   AppReveal(
@@ -57,9 +59,9 @@ class PharmacyDashboardPage extends ConsumerWidget {
                     child: _operations(context, data),
                   ),
                   const SizedBox(height: 24),
-                  const RoleSectionHeader(
-                    title: 'نظرة سريعة',
-                    subtitle: 'مؤشرات المخزون والطلبات الحالية',
+                  RoleSectionHeader(
+                    title: l10n.quickOverviewSection,
+                    subtitle: l10n.quickOverviewSectionSubtitle,
                   ),
                   const SizedBox(height: 11),
                   AppReveal(
@@ -78,12 +80,12 @@ class PharmacyDashboardPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
                   RoleSectionHeader(
-                    title: 'تنبيهات المخزون',
-                    subtitle: 'الأصناف التي تحتاج تدخلك قريبًا',
+                    title: l10n.inventoryAlertsSection,
+                    subtitle: l10n.inventoryAlertsSectionSubtitle,
                     action: TextButton.icon(
                       onPressed: () => context.go('/pharmacy/inventory'),
                       icon: const Icon(Icons.arrow_back_rounded, size: 17),
-                      label: const Text('عرض الكل'),
+                      label: Text(l10n.viewAll),
                     ),
                   ),
                   const SizedBox(height: 11),
@@ -117,13 +119,13 @@ class PharmacyDashboardPage extends ConsumerWidget {
                     onPressed: () =>
                         context.push('/pharmacy/license-verification'),
                     icon: const Icon(Icons.badge_outlined),
-                    label: const Text('التحقق من ترخيص الصيدلية'),
+                    label: Text(l10n.verifyPharmacyLicense),
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton.icon(
                     onPressed: () => context.push('/pharmacy/prescriptions'),
                     icon: const Icon(Icons.receipt_long_rounded),
-                    label: const Text('إدارة الوصفات الطبية'),
+                    label: Text(l10n.managePrescriptions),
                   ),
                   const SizedBox(height: 10),
                   Row(
@@ -132,7 +134,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                         child: OutlinedButton.icon(
                           onPressed: () => context.push('/pharmacy/donations'),
                           icon: const Icon(Icons.verified_outlined),
-                          label: const Text('التبرعات'),
+                          label: Text(l10n.donationsLabel),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -140,7 +142,7 @@ class PharmacyDashboardPage extends ConsumerWidget {
                         child: OutlinedButton.icon(
                           onPressed: () => context.push('/intelligence'),
                           icon: const Icon(Icons.auto_graph_rounded),
-                          label: const Text('تحليل المخزون'),
+                          label: Text(l10n.analyzeInventory),
                         ),
                       ),
                     ],
@@ -157,38 +159,39 @@ class PharmacyDashboardPage extends ConsumerWidget {
   /// اختصارات التشغيل السريع (تستخدم الويدجت المشتركة RoleActionsGrid
   /// لتتطابق مع لغة تصميم بقية الأدوار).
   Widget _operations(BuildContext context, PharmacyDashboard data) {
+    final l10n = AppLocalizations.of(context);
     return RoleActionsGrid(
       items: [
         RoleActionData(
-          title: 'المخزون',
-          subtitle: 'إدارة الأصناف',
+          title: l10n.inventoryLabel,
+          subtitle: l10n.manageItems,
           icon: Icons.inventory_2_rounded,
           color: context.appColors.primary,
           onTap: () => context.go('/pharmacy/inventory'),
           badge: data.lowStockCount > 0
-              ? '${data.lowStockCount} منخفض'
+              ? l10n.lowStockCount(data.lowStockCount)
               : null,
         ),
         RoleActionData(
-          title: 'الطلبات',
-          subtitle: 'متابعة الردود',
+          title: l10n.ordersLabel,
+          subtitle: l10n.followReplies,
           icon: Icons.assignment_rounded,
-          color: context.appColors.primaryDeep,
+          color: context.appColors.primary,
           onTap: () => context.go('/pharmacy/requests'),
           badge: data.pendingRequestsCount > 0
-              ? '${data.pendingRequestsCount} بانتظارك'
+              ? l10n.pendingRequestsBadge(data.pendingRequestsCount)
               : null,
         ),
         RoleActionData(
-          title: 'ساعات العمل',
-          subtitle: 'تنظيم الدوام',
+          title: l10n.workingHours,
+          subtitle: l10n.organizeHours,
           icon: Icons.schedule_rounded,
-          color: context.appColors.primaryDark,
+          color: context.appColors.primary,
           onTap: () => context.push('/pharmacy/working-hours'),
         ),
         RoleActionData(
-          title: 'ملف الصيدلية',
-          subtitle: 'الموقع والبيانات',
+          title: l10n.pharmacyProfile,
+          subtitle: l10n.locationAndData,
           icon: Icons.storefront_rounded,
           color: context.appColors.primary,
           onTap: () => context.push('/pharmacy/profile'),
@@ -199,31 +202,32 @@ class PharmacyDashboardPage extends ConsumerWidget {
 
   /// مؤشرات المخزون والطلبات (تستخدم الويدجت المشتركة RoleMetricsGrid).
   Widget _metrics(BuildContext context, PharmacyDashboard data) {
+    final l10n = AppLocalizations.of(context);
     return RoleMetricsGrid(
       items: [
         RoleMetricData(
-          label: 'أصناف المخزون',
+          label: l10n.inventoryItemsLabel,
           value: '${data.inventoryItemsCount}',
           icon: Icons.medication_rounded,
           color: context.appColors.primary,
         ),
         RoleMetricData(
-          label: 'متوفر',
+          label: l10n.availableLabel,
           value: '${data.inStockCount}',
           icon: Icons.check_circle_rounded,
           color: context.appColors.primary,
         ),
         RoleMetricData(
-          label: 'مخزون منخفض',
+          label: l10n.lowStockLabel,
           value: '${data.lowStockCount}',
           icon: Icons.warning_amber_rounded,
-          color: context.appColors.primaryDeep,
+          color: context.appColors.primary,
         ),
         RoleMetricData(
-          label: 'نافد',
+          label: l10n.outOfStockLabel,
           value: '${data.outOfStockCount}',
           icon: Icons.remove_circle_outline_rounded,
-          color: context.appColors.primaryDark,
+          color: context.appColors.primary,
         ),
       ],
     );
@@ -240,14 +244,15 @@ class _PharmacyHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isOpen = openStatus?.isOpenNow ?? data.isOpenNow;
     final status = openStatus?.statusText.isNotEmpty == true
         ? openStatus!.statusText
         : data.statusText.isNotEmpty
         ? data.statusText
         : isOpen
-        ? 'مفتوحة الآن'
-        : 'مغلقة الآن';
+        ? l10n.openNow
+        : l10n.closedNow;
     final location = [
       data.area,
       data.city,
@@ -255,10 +260,10 @@ class _PharmacyHero extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: context.appColors.primaryDeep,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: context.appColors.primary.withValues(alpha: 0.15),
+          color: context.appColors.primaryLight.withValues(alpha: 0.25),
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -278,7 +283,7 @@ class _PharmacyHero extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.local_pharmacy_rounded,
-                    color: context.appColors.secondary,
+                    color: context.appColors.primaryLight,
                     size: 28,
                   ),
                 ),
@@ -311,7 +316,7 @@ class _PharmacyHero extends StatelessWidget {
                   data.isApproved
                       ? Icons.verified_rounded
                       : Icons.hourglass_top_rounded,
-                  color: context.appColors.secondary,
+                  color: context.appColors.primaryLight,
                   size: 26,
                 ),
               ],
@@ -331,7 +336,7 @@ class _PharmacyHero extends StatelessWidget {
                   child: Text(
                     data.hasLocation && location.isNotEmpty
                         ? location
-                        : 'أضف موقع الصيدلية لتظهر للمستخدمين',
+                        : l10n.addPharmacyLocation,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -350,15 +355,15 @@ class _PharmacyHero extends StatelessWidget {
               children: [
                 _HeroMetric(
                   icon: Icons.star_rounded,
-                  label: 'التقييم',
+                  label: l10n.ratingLabel,
                   value: data.ratingsCount == 0
-                      ? 'جديد'
+                      ? l10n.newLabel
                       : data.averageRating.toStringAsFixed(1),
                 ),
                 const SizedBox(width: 10),
                 _HeroMetric(
                   icon: Icons.assignment_rounded,
-                  label: 'طلبات نشطة',
+                  label: l10n.activeRequests,
                   value: '${data.activeRequestsCount}',
                 ),
               ],
@@ -387,31 +392,32 @@ class _ReadinessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final steps = [
       (
         data.isApproved,
-        'اعتماد حساب الصيدلية',
-        data.isApproved ? 'مكتمل' : 'بانتظار المراجعة',
+        l10n.approvePharmacyAccount,
+        data.isApproved ? l10n.completedLabel : l10n.pendingReview,
         null,
       ),
       (
         data.hasLocation,
-        'موقع الصيدلية',
-        data.hasLocation ? 'تم تحديده' : 'مطلوب للظهور للمستخدمين',
+        l10n.pharmacyLocationTitle,
+        data.hasLocation ? l10n.locationSet : l10n.requiredToAppear,
         onLocation,
       ),
       (
         data.hasWorkingHoursConfigured,
-        'ساعات العمل',
-        data.hasWorkingHoursConfigured ? 'تم إعدادها' : 'حدد أوقات الدوام',
+        l10n.workingHours,
+        data.hasWorkingHoursConfigured ? l10n.hoursConfigured : l10n.setWorkingHours,
         onHours,
       ),
       (
         data.inventoryItemsCount > 0,
-        'مخزون الأدوية',
+        l10n.inventoryTitle,
         data.inventoryItemsCount > 0
-            ? '${data.inventoryItemsCount} صنف'
-            : 'أضف أول دواء',
+            ? l10n.inventoryItemsCountValue(data.inventoryItemsCount)
+            : l10n.addFirstMedicine,
         onInventory,
       ),
     ];
@@ -432,12 +438,12 @@ class _ReadinessCard extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: context.appColors.secondary.withValues(alpha: 0.1),
+                  color: context.appColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   Icons.fact_check_rounded,
-                  color: context.appColors.secondary,
+                  color: context.appColors.primary,
                 ),
               ),
               const SizedBox(width: 12),
@@ -446,11 +452,11 @@ class _ReadinessCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'جاهزية الصيدلية',
+                      l10n.pharmacyReadiness,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     Text(
-                      '${data.profileCompletionPercentage}٪ من الملف مكتمل',
+                      l10n.profileCompletionValue(data.profileCompletionPercentage),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -465,7 +471,7 @@ class _ReadinessCard extends StatelessWidget {
               value: data.profileCompletionPercentage.clamp(0, 100) / 100,
               minHeight: 7,
               backgroundColor: context.appColors.surfaceSoft,
-              color: context.appColors.secondary,
+              color: context.appColors.primary,
             ),
           ),
           const SizedBox(height: 14),
@@ -551,6 +557,7 @@ class _InventoryAlertCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final expiring = alert.alertType.toLowerCase().contains('expir');
     final color =
         expiring ? context.appColors.danger : context.appColors.warning;
@@ -597,8 +604,9 @@ class _InventoryAlertCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       alert.daysUntilExpiry == null
-                          ? 'الكمية ${alert.quantity} · الحد الأدنى ${alert.lowStockThreshold}'
-                          : 'متبقي ${alert.daysUntilExpiry} يومًا على الانتهاء',
+                          ? l10n.inventoryAlertLowStock(
+                              alert.quantity, alert.lowStockThreshold)
+                          : l10n.inventoryAlertExpiry(alert.daysUntilExpiry!),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -633,7 +641,7 @@ class _HealthyInventoryCard extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'المخزون مستقر ولا توجد تنبيهات عاجلة',
+              AppLocalizations.of(context).inventoryHealthy,
               style: TextStyle(
                 color: context.appColors.primary,
                 fontWeight: FontWeight.w800,
@@ -700,14 +708,14 @@ class _CompletionProgress extends StatelessWidget {
             child: LinearProgressIndicator(
               value: value.clamp(0, 100) / 100,
               minHeight: 6,
-              color: context.appColors.secondary,
+              color: context.appColors.primaryLight,
               backgroundColor: Colors.white.withValues(alpha: 0.1),
             ),
           ),
         ),
         const SizedBox(width: 10),
         Text(
-          'اكتمال الملف $value٪',
+          AppLocalizations.of(context).profileCompletionLabel(value),
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.72),
             fontSize: 11,
@@ -742,7 +750,7 @@ class _HeroMetric extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: context.appColors.secondary, size: 18),
+            Icon(icon, color: context.appColors.primaryLight, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Column(

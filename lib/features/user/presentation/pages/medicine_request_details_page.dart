@@ -157,7 +157,7 @@ class _MedicineRequestDetailsPageState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              error is ApiException ? error.message : l10n.cancelRequestFailed,
+              error is ApiException ? error.localize(l10n) : l10n.cancelRequestFailed,
             ),
             backgroundColor: context.appColors.danger,
           ),

@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/layout.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../controllers/pharmacy_providers.dart';
 
@@ -33,13 +35,14 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(pharmacyRequestsProvider(_filter));
     final snapshot = state.valueOrNull ?? const <PharmacyRequest>[];
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('طلبات الأدوية'),
+        title: Text(l10n.medicineRequestsTitle),
         actions: [
           IconButton(
             onPressed: () => ref.invalidate(pharmacyRequestsProvider(_filter)),
-            tooltip: 'تحديث الطلبات',
+            tooltip: l10n.refreshOrders,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
@@ -54,7 +57,7 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
                 _RequestsOverview(items: snapshot),
                 const SizedBox(height: 13),
                 AppTextField(
-                  label: 'ابحث بالدواء أو اسم المستخدم أو الهاتف',
+                  label: l10n.searchRequestField,
                   controller: _search,
                   icon: Icons.search_rounded,
                   textInputAction: TextInputAction.search,
@@ -62,7 +65,7 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
                   suffixIcon: IconButton(
                     onPressed: () => setState(() => _query = _search.text.trim()),
                     icon: const Icon(Icons.arrow_forward_rounded),
-                    tooltip: 'بحث',
+                    tooltip: l10n.searchLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -77,8 +80,7 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
           ),
           Expanded(
             child: state.when(
-              loading: () =>
-                  const AppLoadingState(label: 'جاري تحميل الطلبات...'),
+              loading: () => AppLoadingState(label: l10n.ordersLoading),
               error: (error, _) => AppErrorState(
                 error: error,
                 onRetry: () =>
@@ -90,7 +92,12 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
                 child: items.isEmpty
                     ? const _RequestsEmpty()
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
+                        padding: EdgeInsets.fromLTRB(
+                          20,
+                          10,
+                          20,
+                          kBottomNavReserved + 12,
+                        ),
                         itemCount: items.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 11),
                         itemBuilder: (_, index) => _RequestCard(
@@ -116,6 +123,7 @@ class _RequestsOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pending = items.where((item) => item.canRespond).length;
     final available = items
         .where((item) => item.status.toLowerCase() == 'available')
@@ -123,15 +131,11 @@ class _RequestsOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.appColors.primaryDeep, context.appColors.primary],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: context.appColors.primaryDeep.withValues(alpha: .14),
+            color: context.appColors.primary.withValues(alpha: .14),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -148,7 +152,7 @@ class _RequestsOverview extends StatelessWidget {
             ),
             child: Icon(
               Icons.assignment_turned_in_outlined,
-              color: context.appColors.secondary,
+              color: context.appColors.primaryLight,
               size: 28,
             ),
           ),
@@ -157,9 +161,9 @@ class _RequestsOverview extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'متابعة الطلبات',
-                  style: TextStyle(
+                Text(
+                  l10n.requestsOverviewTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 17,
                     fontWeight: FontWeight.w900,
@@ -168,16 +172,16 @@ class _RequestsOverview extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   pending > 0
-                      ? '$pending طلب يحتاج إلى ردك الآن'
-                      : 'لا توجد طلبات معلّقة ضمن هذه القائمة',
+                      ? l10n.pendingNeedReply(pending)
+                      : l10n.noPendingRequests,
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
           ),
-          _OverviewNumber(label: 'متوفر', value: available),
+          _OverviewNumber(label: l10n.overviewAvailable, value: available),
           const SizedBox(width: 8),
-          _OverviewNumber(label: 'الطلبات', value: items.length),
+          _OverviewNumber(label: l10n.overviewOrders, value: items.length),
         ],
       ),
     );
@@ -214,10 +218,11 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = _statusColor(context.appColors, request.status);
     final label = request.statusDisplayText.trim().isNotEmpty
         ? request.statusDisplayText
-        : _statusLabel(request.status);
+        : _statusLabel(l10n, request.status);
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: EdgeInsets.zero,
@@ -283,7 +288,9 @@ class _RequestCard extends StatelessWidget {
                           children: [
                             _RequestFact(
                               icon: Icons.numbers_rounded,
-                              text: 'الكمية ${request.requestedQuantity}',
+                              text: l10n.quantityRequestedValue(
+                                request.requestedQuantity,
+                              ),
                             ),
                             const _FactDivider(),
                             _RequestFact(
@@ -295,7 +302,7 @@ class _RequestCard extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    'الرد الآن',
+                                    l10n.replyNow,
                                     style: TextStyle(
                                       color: context.appColors.primary,
                                       fontSize: 11,
@@ -409,13 +416,13 @@ class _RequestsEmpty extends StatelessWidget {
       ),
       const SizedBox(height: 16),
       Text(
-        'لا توجد طلبات مطابقة',
+        AppLocalizations.of(context).noMatchingRequests,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.titleMedium,
       ),
       const SizedBox(height: 5),
       Text(
-        'ستظهر هنا طلبات الأدوية الجديدة الواردة من المستخدمين.',
+        AppLocalizations.of(context).noMatchingRequestsSubtitle,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.bodyMedium,
       ),
@@ -423,19 +430,20 @@ class _RequestsEmpty extends StatelessWidget {
   );
 }
 
-String _statusLabel(String value) => switch (value.toLowerCase()) {
-  'available' => 'متوفر',
-  'unavailable' => 'غير متوفر',
-  'cancelled' => 'ملغى',
-  _ => 'بانتظار الرد',
-};
+String _statusLabel(AppLocalizations l10n, String value) =>
+    switch (value.toLowerCase()) {
+      'available' => l10n.statusAvailable,
+      'unavailable' => l10n.statusUnavailable,
+      'cancelled' => l10n.statusCancelled,
+      _ => l10n.requestStatusWaitingReply,
+    };
 
 Color _statusColor(AppColors colors, String value) => switch (value
     .toLowerCase()) {
   'available' => colors.primary,
   'unavailable' => colors.danger,
   'cancelled' => colors.textMuted,
-  _ => colors.primaryDark,
+  _ => colors.primary,
 };
 
 class _RequestStatusSelector extends StatelessWidget {
@@ -450,13 +458,14 @@ class _RequestStatusSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: _RequestStatusButton(
-            label: 'الكل',
+            label: l10n.statusAll,
             icon: Icons.apps_rounded,
-            color: colors.text,
+            color: colors.primary,
             isSelected: selectedStatus == null,
             onTap: () => onStatusSelected('All'),
           ),
@@ -464,9 +473,9 @@ class _RequestStatusSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _RequestStatusButton(
-            label: 'بانتظارك',
+            label: l10n.statusWaitingYou,
             icon: Icons.hourglass_top_rounded,
-            color: colors.primaryDark,
+            color: colors.primary,
             isSelected: selectedStatus == 'Pending',
             onTap: () => onStatusSelected('Pending'),
           ),
@@ -474,7 +483,7 @@ class _RequestStatusSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _RequestStatusButton(
-            label: 'متوفر',
+            label: l10n.statusAvailable,
             icon: Icons.check_circle_rounded,
             color: colors.primary,
             isSelected: selectedStatus == 'Available',
@@ -484,9 +493,9 @@ class _RequestStatusSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _RequestStatusButton(
-            label: 'غير متوفر',
+            label: l10n.statusUnavailable,
             icon: Icons.cancel_rounded,
-            color: colors.primaryDark,
+            color: colors.primary,
             isSelected: selectedStatus == 'Unavailable',
             onTap: () => onStatusSelected('Unavailable'),
           ),

@@ -263,7 +263,7 @@ class _PharmacyDetailsPageState extends ConsumerState<PharmacyDetailsPage> {
 
 String _errorMessage(Object error) =>
     error is ApiException
-        ? error.message
+        ? error.localize(AppLocalizations.of(context))
         : AppLocalizations.of(context).operationFailed;
 }
 

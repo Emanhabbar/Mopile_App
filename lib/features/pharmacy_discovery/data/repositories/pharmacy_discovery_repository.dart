@@ -92,6 +92,6 @@ class PharmacyDiscoveryRepository {
       remote.getExternalDetails(placeId);
   Future<List<int>> getPhoto(String reference) => remote.getPhoto(reference);
   Future<PharmacyLocatorHealth> getHealth() => remote.getHealth();
-  Future<String> clearCache({int hours = 24}) =>
+  Future<String?> clearCache({int hours = 24}) =>
       remote.clearCache(hours: hours);
 }

@@ -6,6 +6,8 @@ import 'package:pharmacy_app/core/storage/secure_session_storage.dart';
 import 'package:pharmacy_app/features/auth/data/models/auth_session.dart';
 import 'package:pharmacy_app/features/auth/presentation/pages/registration_success_page.dart';
 
+import 'helpers.dart';
+
 void main() {
   testWidgets('shows the Arabic login page for a signed-out user', (
     tester,
@@ -25,9 +27,9 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('دوائي'), findsOneWidget);
-    expect(find.text('مرحبًا بعودتك'), findsOneWidget);
-    expect(find.text('تسجيل الدخول'), findsOneWidget);
+    expect(find.text('تسجيل الدخول'), findsWidgets);
+    expect(find.text('البريد الإلكتروني'), findsOneWidget);
+    expect(find.text('كلمة المرور'), findsOneWidget);
   });
 
   testWidgets('opens registration and shows the supported account types', (
@@ -45,7 +47,7 @@ void main() {
     await tester.pumpAndSettle();
     final createAccountButton = find.widgetWithText(
       TextButton,
-      'إنشاء حساب جديد',
+      'إنشاء حساب',
     );
     await tester.ensureVisible(createAccountButton);
     await tester.pumpAndSettle();
@@ -56,6 +58,7 @@ void main() {
     expect(find.text('مستخدم'), findsOneWidget);
     expect(find.text('صيدلية'), findsOneWidget);
     expect(find.text('منظمة'), findsOneWidget);
+    expect(find.text('مستودع أدوية'), findsOneWidget);
   });
 
   testWidgets('opens the password recovery flow from login', (tester) async {
@@ -100,7 +103,7 @@ void main() {
             _MemorySessionStorage(session),
           ),
         ],
-        child: const MaterialApp(home: RegistrationSuccessPage()),
+        child: appUnderTest(const RegistrationSuccessPage()),
       ),
     );
 

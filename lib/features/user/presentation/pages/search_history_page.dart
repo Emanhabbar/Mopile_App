@@ -139,7 +139,7 @@ class _SearchHistoryPageState extends ConsumerState<SearchHistoryPage> {
       SnackBar(
         content: Text(
           error is ApiException
-              ? error.message
+              ? error.localize(AppLocalizations.of(context))
               : AppLocalizations.of(context).searchClearFailed,
         ),
         backgroundColor: context.appColors.danger,

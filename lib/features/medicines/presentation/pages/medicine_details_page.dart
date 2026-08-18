@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../data/models/medicine_models.dart';
 import '../../data/repositories/medicines_repository.dart';
@@ -21,11 +22,11 @@ class MedicineDetailsPage extends ConsumerWidget {
     final isAdmin =
         ref.watch(authControllerProvider).valueOrNull?.user.primaryRole ==
         AppRole.admin;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل الدواء')),
+      appBar: AppBar(title: Text(l10n.medicineDetailsTitle)),
       body: medicine.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل بيانات الدواء...'),
+        loading: () => AppLoadingState(label: l10n.medicineDetailsLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(medicineDetailsProvider(medicineId)),
@@ -42,43 +43,43 @@ class MedicineDetailsPage extends ConsumerWidget {
               _QuickInfoStrip(medicine: data),
               const SizedBox(height: 16),
               _Section(
-                title: 'المعلومات الدوائية',
+                title: l10n.pharmaInfoTitle,
                 icon: Icons.science_outlined,
                 children: [
                   _InfoRow(
-                    label: 'الاسم العلمي العربي',
+                    label: l10n.arabicScientificNameLabel,
                     value: data.arabicScientificName,
                   ),
                   _InfoRow(
-                    label: 'الاسم العلمي الإنكليزي',
+                    label: l10n.englishScientificNameLabel,
                     value: data.scientificName,
                   ),
-                  _InfoRow(label: 'الاسم الإنكليزي', value: data.name),
-                  _InfoRow(label: 'الباركود', value: data.barcode),
-                  _InfoRow(label: 'التركيب', value: data.composition),
-                  _InfoRow(label: 'الشكل الدوائي', value: data.dosageForm),
-                  _InfoRow(label: 'السعة أو التركيز', value: data.capacity),
-                  _InfoRow(label: 'حجم العبوة', value: data.packageSize),
+                  _InfoRow(label: l10n.englishNameLabel, value: data.name),
+                  _InfoRow(label: l10n.barcodeLabel, value: data.barcode),
+                  _InfoRow(label: l10n.compositionLabel, value: data.composition),
+                  _InfoRow(label: l10n.dosageFormLabel, value: data.dosageForm),
+                  _InfoRow(label: l10n.capacityLabel, value: data.capacity),
+                  _InfoRow(label: l10n.packageSizeLabel, value: data.packageSize),
                 ],
               ),
               const SizedBox(height: 12),
               _Section(
-                title: 'التصنيع والتوفر',
+                title: l10n.manufacturingTitle,
                 icon: Icons.factory_outlined,
                 children: [
-                  _InfoRow(label: 'الشركة المصنعة', value: data.manufacturer),
+                  _InfoRow(label: l10n.manufacturerLabel, value: data.manufacturer),
                   _InfoRow(
-                    label: 'الكمية المرجعية',
+                    label: l10n.referenceQuantityLabel,
                     value: '${data.quantityInStock}',
                   ),
                   _InfoRow(
-                    label: 'سعر البيع',
-                    value: _currency(data.sellingPrice),
+                    label: l10n.sellingPriceLabel,
+                    value: _currency(l10n, data.sellingPrice),
                   ),
                   if (isAdmin)
                     _InfoRow(
-                      label: 'سعر الشراء',
-                      value: _currency(data.purchasePrice),
+                      label: l10n.purchasePriceLabel,
+                      value: _currency(l10n, data.purchasePrice),
                     ),
                 ],
               ),
@@ -91,7 +92,7 @@ class MedicineDetailsPage extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () => _editLocalization(context, ref, data),
                   icon: const Icon(Icons.translate_rounded),
-                  label: const Text('تعديل الاسم العربي وأسماء البحث'),
+                  label: Text(l10n.editArabicNames),
                 ),
               ],
               const SizedBox(height: 16),
@@ -108,6 +109,7 @@ class MedicineDetailsPage extends ConsumerWidget {
     WidgetRef ref,
     Medicine medicine,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final arabicName = TextEditingController(text: medicine.arabicName);
     final arabicScientific = TextEditingController(
       text: medicine.arabicScientificName,
@@ -121,29 +123,29 @@ class MedicineDetailsPage extends ConsumerWidget {
     final request = await showDialog<UpdateMedicineLocalization>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('البيانات العربية للدواء'),
+        title: Text(l10n.medicineArabicDataTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: arabicName,
-                decoration: const InputDecoration(labelText: 'الاسم العربي'),
+                decoration: InputDecoration(labelText: l10n.arabicNameLabel),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: arabicScientific,
-                decoration: const InputDecoration(
-                  labelText: 'الاسم العلمي العربي',
+                decoration: InputDecoration(
+                  labelText: l10n.arabicScientificNameLabel,
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: aliases,
                 maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'أسماء أخرى للبحث',
-                  hintText: 'افصل بين الأسماء بفاصلة',
+                decoration: InputDecoration(
+                  labelText: l10n.otherSearchNamesLabel,
+                  hintText: l10n.aliasesSeparatorHint,
                   alignLabelWithHint: true,
                 ),
               ),
@@ -153,7 +155,7 @@ class MedicineDetailsPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -172,7 +174,7 @@ class MedicineDetailsPage extends ConsumerWidget {
                 ),
               );
             },
-            child: const Text('حفظ'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -187,15 +189,15 @@ class MedicineDetailsPage extends ConsumerWidget {
           .updateLocalization(medicine.id, request);
       ref.invalidate(medicineDetailsProvider(medicine.id));
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تحديث البيانات العربية للدواء.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.arabicDataUpdated)));
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error is ApiException ? error.message : 'تعذر حفظ البيانات.',
+            error is ApiException ? error.localize(l10n) : l10n.dataSaveFailed,
           ),
           backgroundColor: context.appColors.danger,
         ),
@@ -212,6 +214,7 @@ class _MedicineHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -263,7 +266,9 @@ class _MedicineHero extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      medicine.requiresPrescription ? 'يتطلب وصفة' : 'بدون وصفة',
+                      medicine.requiresPrescription
+                          ? l10n.requiresPrescription
+                          : l10n.withoutPrescription,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -322,23 +327,24 @@ class _QuickInfoStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = AppLocalizations.of(context);
     final items = <_QuickInfo>[
       _QuickInfo(
         icon: Icons.payments_outlined,
-        label: 'سعر البيع',
-        value: _currency(medicine.sellingPrice),
+        label: l10n.sellingPriceLabel,
+        value: _currency(l10n, medicine.sellingPrice),
         color: colors.primary,
       ),
       if (medicine.dosageForm case final form?)
         _QuickInfo(
           icon: Icons.category_outlined,
-          label: 'الشكل',
+          label: l10n.quickFormLabel,
           value: form,
           color: colors.primary,
         ),
       _QuickInfo(
         icon: Icons.inventory_2_outlined,
-        label: 'المخزون',
+        label: l10n.stockLabel,
         value: '${medicine.quantityInStock}',
         color: colors.primary,
       ),
@@ -559,7 +565,7 @@ class _Description extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'الوصف',
+                AppLocalizations.of(context).descriptionTitle,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -614,7 +620,7 @@ class _DisclaimerBanner extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Text(
-              'هذه البيانات تعريفية. التزم بتوجيهات الطبيب أو الصيدلي ولا تغيّر علاجك دون استشارة مختص.',
+              AppLocalizations.of(context).disclaimerText,
               style: TextStyle(
                 color: colors.text,
                 fontSize: 13,
@@ -629,7 +635,7 @@ class _DisclaimerBanner extends StatelessWidget {
   }
 }
 
-String _currency(double value) {
+String _currency(AppLocalizations l10n, double value) {
   final digits = value == value.roundToDouble() ? 0 : 2;
-  return '${value.toStringAsFixed(digits)} ل.س';
+  return l10n.currencySYP(value.toStringAsFixed(digits));
 }

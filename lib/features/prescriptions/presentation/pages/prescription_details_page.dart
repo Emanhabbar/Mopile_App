@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/prescription_models.dart';
 import '../../data/repositories/prescriptions_repository.dart';
 import '../controllers/prescriptions_providers.dart';
@@ -26,10 +27,11 @@ class _PrescriptionDetailsPageState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(prescriptionDetailsProvider(widget.orderId));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل الوصفة')),
+      appBar: AppBar(title: Text(l10n.prescriptionDetailsTitle)),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل الوصفة...'),
+        loading: () => AppLoadingState(label: l10n.prescriptionDetailsLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () =>
@@ -48,7 +50,10 @@ class _PrescriptionDetailsPageState
                 _WarningsCard(warnings: order.warnings),
               ],
               const SizedBox(height: 18),
-              _Title(title: 'الأدوية', subtitle: '${order.items.length} عناصر'),
+              _Title(
+                title: l10n.medicinesTitle,
+                subtitle: l10n.itemsCount(order.items.length),
+              ),
               const SizedBox(height: 10),
               ...order.items.map(
                 (item) => Padding(
@@ -59,12 +64,12 @@ class _PrescriptionDetailsPageState
               if (order.isAnalyzed) ...[
                 const SizedBox(height: 16),
                 _Title(
-                  title: 'الصيدليات المتاحة',
-                  subtitle: 'اختر صيدلية لحجز الأدوية المتوفرة',
+                  title: l10n.availablePharmaciesTitle,
+                  subtitle: l10n.availablePharmaciesSubtitle,
                 ),
                 const SizedBox(height: 10),
                 if (order.pharmacyMatches.isEmpty)
-                  const _MessageCard(text: 'لا توجد صيدلية مطابقة حاليًا.')
+                  _MessageCard(text: l10n.noMatchingPharmacy)
                 else
                   ...order.pharmacyMatches.map(
                     (match) => Padding(
@@ -88,8 +93,8 @@ class _PrescriptionDetailsPageState
                   icon: const Icon(Icons.alarm_add_rounded),
                   label: Text(
                     order.doseRemindersEnabled || order.refillReminderEnabled
-                        ? 'تعديل التذكيرات'
-                        : 'تفعيل تذكيرات الدواء',
+                        ? l10n.editReminders
+                        : l10n.activateMedicineReminders,
                   ),
                 ),
               ],
@@ -98,7 +103,7 @@ class _PrescriptionDetailsPageState
                 TextButton.icon(
                   onPressed: _working ? null : _cancel,
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text('إلغاء الوصفة'),
+                  label: Text(l10n.cancelPrescription),
                   style: TextButton.styleFrom(
                     foregroundColor: context.appColors.danger,
                   ),
@@ -112,37 +117,39 @@ class _PrescriptionDetailsPageState
   }
 
   Future<void> _reserve(PrescriptionPharmacyMatch match) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _working = true);
     try {
       await ref
           .read(prescriptionsRepositoryProvider)
           .reserve(widget.orderId, match.pharmacyId);
       _refresh();
-      _message('تم حجز الوصفة لدى ${match.pharmacyName}.');
+      _message(l10n.reservedAt(match.pharmacyName));
     } catch (error) {
-      _error(error, 'تعذر حجز الوصفة.');
+      _error(error, l10n.reserveFailed);
     } finally {
       if (mounted) setState(() => _working = false);
     }
   }
 
   Future<void> _cancel() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('إلغاء الوصفة؟'),
-        content: const Text(
-          'سيتم إلغاء الحجز وإعادة الكميات إلى مخزون الصيدلية.',
+        title: Text(l10n.cancelPrescriptionTitle),
+        content: Text(
+          l10n.cancelPrescriptionConfirm,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('عودة'),
+            child: Text(l10n.back),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
-            child: const Text('إلغاء الوصفة'),
+            child: Text(l10n.cancelPrescription),
           ),
         ],
       ),
@@ -152,15 +159,16 @@ class _PrescriptionDetailsPageState
     try {
       await ref.read(prescriptionsRepositoryProvider).cancel(widget.orderId);
       _refresh();
-      _message('تم إلغاء الوصفة.');
+      _message(l10n.prescriptionCancelled);
     } catch (error) {
-      _error(error, 'تعذر إلغاء الوصفة.');
+      _error(error, l10n.cancelFailed);
     } finally {
       if (mounted) setState(() => _working = false);
     }
   }
 
   Future<void> _configureReminders(PrescriptionOrder order) async {
+    final l10n = AppLocalizations.of(context);
     final request = await showModalBottomSheet<PrescriptionReminderRequest>(
       context: context,
       isScrollControlled: true,
@@ -174,9 +182,9 @@ class _PrescriptionDetailsPageState
           .read(prescriptionsRepositoryProvider)
           .activateReminders(widget.orderId, request);
       _refresh();
-      _message('تم حفظ إعدادات التذكير.');
+      _message(l10n.remindersSaved);
     } catch (error) {
-      _error(error, 'تعذر حفظ التذكيرات.');
+      _error(error, l10n.remindersSaveFailed);
     } finally {
       if (mounted) setState(() => _working = false);
     }
@@ -189,7 +197,12 @@ class _PrescriptionDetailsPageState
   }
 
   void _error(Object error, String fallback) {
-    _message(error is ApiException ? error.message : fallback, error: true);
+    _message(
+      error is ApiException
+          ? error.localize(AppLocalizations.of(context))
+          : fallback,
+      error: true,
+    );
   }
 
   void _message(String text, {bool error = false}) {
@@ -212,7 +225,8 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final info = prescriptionStatusInfo(context.appColors, order.status);
+    final l10n = AppLocalizations.of(context);
+    final info = prescriptionStatusInfo(context.appColors, order.status, l10n);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -268,9 +282,9 @@ class _WarningsCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'تنبيهات مهمة',
-          style: TextStyle(fontWeight: FontWeight.w900),
+        Text(
+          AppLocalizations.of(context).importantWarnings,
+          style: const TextStyle(fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 8),
         ...warnings.map(
@@ -324,7 +338,9 @@ class _PharmacyMatchCard extends StatelessWidget {
   final VoidCallback onReserve;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -354,8 +370,8 @@ class _PharmacyMatchCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${match.availableItems}/${match.totalItems} أدوية متوفرة'
-            '${match.distanceMeters == null ? '' : ' · ${_distance(match.distanceMeters!)}'}',
+            '${l10n.prescriptionMedicinesAvailable(match.availableItems, match.totalItems)}'
+            '${match.distanceMeters == null ? '' : ' · ${_distance(l10n, match.distanceMeters!)}'}',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 10),
@@ -365,15 +381,16 @@ class _PharmacyMatchCard extends StatelessWidget {
               onPressed: disabled ? null : onReserve,
               child: Text(
                 match.hasCompletePrescription
-                    ? 'حجز الوصفة كاملة'
-                    : 'حجز الأدوية المتوفرة',
+                    ? l10n.reserveFullPrescription
+                    : l10n.reserveAvailableMedicines,
               ),
             ),
           ),
         ],
       ),
     ),
-  );
+    );
+  }
 }
 
 class _PickupCodeCard extends StatelessWidget {
@@ -382,12 +399,14 @@ class _PickupCodeCard extends StatelessWidget {
   final String code;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(18),
       child: Column(
         children: [
-          const Text('رمز استلام الوصفة'),
+          Text(l10n.pickupCodeTitle),
           const SizedBox(height: 7),
           SelectableText(
             code,
@@ -398,13 +417,14 @@ class _PickupCodeCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            'قدّم هذا الرمز للصيدلية عند الاستلام.',
+            l10n.pickupCodeNote,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),
     ),
-  );
+    );
+  }
 }
 
 class _ReminderSheet extends StatefulWidget {
@@ -425,6 +445,7 @@ class _ReminderSheetState extends State<_ReminderSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
         20,
@@ -437,24 +458,24 @@ class _ReminderSheetState extends State<_ReminderSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'إعداد التذكيرات',
+            l10n.reminderSettingsTitle,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('تذكير الجرعات اليومية'),
+            title: Text(l10n.dailyDoseReminder),
             value: _dose,
             onChanged: (value) => setState(() => _dose = value),
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('تذكير إعادة التعبئة'),
+            title: Text(l10n.refillReminder),
             value: _refill,
             onChanged: (value) => setState(() => _refill = value),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('وقت التذكير'),
+            title: Text(l10n.reminderTime),
             trailing: Text(_time.format(context)),
             onTap: () async {
               final value = await showTimePicker(
@@ -470,8 +491,8 @@ class _ReminderSheetState extends State<_ReminderSheet> {
                 child: TextFormField(
                   initialValue: '$_durationDays',
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'مدة العلاج بالأيام',
+                  decoration: InputDecoration(
+                    labelText: l10n.treatmentDurationLabel,
                   ),
                   onChanged: (value) =>
                       _durationDays = int.tryParse(value) ?? 30,
@@ -482,8 +503,8 @@ class _ReminderSheetState extends State<_ReminderSheet> {
                 child: TextFormField(
                   initialValue: '$_refillAfterDays',
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'التعبئة بعد أيام',
+                  decoration: InputDecoration(
+                    labelText: l10n.refillAfterLabel,
                   ),
                   onChanged: (value) =>
                       _refillAfterDays = int.tryParse(value) ?? 25,
@@ -507,7 +528,7 @@ class _ReminderSheetState extends State<_ReminderSheet> {
                   refillAfterDays: _refillAfterDays.clamp(1, 365),
                 ),
               ),
-              child: const Text('حفظ'),
+              child: Text(l10n.save),
             ),
           ),
         ],
@@ -547,6 +568,6 @@ class _MessageCard extends StatelessWidget {
   );
 }
 
-String _distance(double meters) => meters < 1000
-    ? '${meters.round()} م'
-    : '${(meters / 1000).toStringAsFixed(1)} كم';
+String _distance(AppLocalizations l10n, double meters) => meters < 1000
+    ? l10n.distanceMeters('${meters.round()}')
+    : l10n.distanceKm((meters / 1000).toStringAsFixed(1));

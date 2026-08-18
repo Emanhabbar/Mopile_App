@@ -6,6 +6,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/chat_models.dart';
 import '../../data/repositories/chat_repository.dart';
 import '../controllers/chat_providers.dart';
@@ -23,14 +24,15 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
   @override
   Widget build(BuildContext context) {
     final sessions = ref.watch(chatSessionsProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('المساعد الدوائي'),
+            Text(l10n.pharmacyAssistant),
             Text(
-              'إرشاد سريع للوصول إلى خدمات دوائي',
+              l10n.chatAssistantSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -41,7 +43,7 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
         ),
       ),
       body: sessions.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل المحادثات...'),
+        loading: () => AppLoadingState(label: l10n.chatLoadingSessions),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(chatSessionsProvider),
@@ -60,7 +62,7 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'المحادثات السابقة',
+                      l10n.previousChats,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
@@ -116,32 +118,33 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
                 ),
               )
             : const Icon(Icons.add_comment_rounded),
-        label: const Text('محادثة جديدة'),
+        label: Text(l10n.newChat),
       ),
     );
   }
 
   Future<void> _startSession() async {
+    final l10n = AppLocalizations.of(context);
     final title = TextEditingController();
     final accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('محادثة جديدة'),
+        title: Text(l10n.newChat),
         content: TextField(
           controller: title,
           maxLength: 200,
-          decoration: const InputDecoration(
-            labelText: 'عنوان المحادثة (اختياري)',
+          decoration: InputDecoration(
+            labelText: l10n.chatTitleOptional,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('بدء'),
+            child: Text(l10n.start),
           ),
         ],
       ),
@@ -162,9 +165,7 @@ class _ChatSessionsPageState extends ConsumerState<ChatSessionsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              error is ApiException
-                  ? error.message
-                  : 'تعذر بدء المحادثة حاليًا.',
+              error is ApiException ? error.localize(l10n) : l10n.startChatFailed,
             ),
             backgroundColor: context.appColors.danger,
           ),
@@ -181,7 +182,9 @@ class _InfoCard extends StatelessWidget {
   const _InfoCard();
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
       color: context.appColors.primary,
@@ -212,21 +215,21 @@ class _InfoCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'كيف يمكنني مساعدتك؟',
-                    style: TextStyle(
+                    l10n.howCanIHelp,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   Text(
-                    'ابحث عن دواء، صيدلية قريبة، أو خدمة داخل التطبيق.',
-                    style: TextStyle(
+                    l10n.chatHeroSubtitle,
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 11,
                       height: 1.5,
@@ -238,21 +241,28 @@ class _InfoCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        const Wrap(
+        Wrap(
           spacing: 7,
           runSpacing: 7,
           children: [
-            _HeroHint(icon: Icons.medication_outlined, label: 'البحث عن دواء'),
+            _HeroHint(
+              icon: Icons.medication_outlined,
+              label: l10n.medicineSearchTitle,
+            ),
             _HeroHint(
               icon: Icons.local_pharmacy_outlined,
-              label: 'صيدلية قريبة',
+              label: l10n.nearbyPharmacy,
             ),
-            _HeroHint(icon: Icons.favorite_outline, label: 'خدمات صحية'),
+            _HeroHint(
+              icon: Icons.favorite_outline,
+              label: l10n.healthServicesHint,
+            ),
           ],
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _HeroHint extends StatelessWidget {
@@ -283,7 +293,9 @@ class _SessionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
@@ -313,13 +325,15 @@ class _SessionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    session.title.isEmpty ? 'محادثة دوائية' : session.title,
+                    session.title.isEmpty
+                        ? l10n.chatSessionTitle
+                        : session.title,
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     session.lastMessagePreview ??
-                        '${session.messagesCount} رسائل',
+                        l10n.messageCount(session.messagesCount),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -353,7 +367,8 @@ class _SessionCard extends StatelessWidget {
         ),
       ),
     ),
-  );
+    );
+  }
 }
 
 String _chatDate(DateTime value) =>
@@ -366,7 +381,7 @@ class _EmptySessions extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: EdgeInsets.all(28),
+      padding: const EdgeInsets.all(28),
       child: Column(
         children: [
           Icon(
@@ -374,8 +389,8 @@ class _EmptySessions extends StatelessWidget {
             color: context.appColors.textMuted,
             size: 38,
           ),
-          SizedBox(height: 10),
-          Text('لا توجد محادثات سابقة'),
+          const SizedBox(height: 10),
+          Text(AppLocalizations.of(context).noPreviousChats),
         ],
       ),
     ),

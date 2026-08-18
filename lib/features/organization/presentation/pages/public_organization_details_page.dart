@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../donations/data/models/donation_models.dart';
 import '../../../donations/presentation/controllers/donations_providers.dart';
 
@@ -18,10 +19,11 @@ class PublicOrganizationDetailsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(publicOrganizationProvider(organizationId));
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل المنظمة')),
+      appBar: AppBar(title: Text(l10n.organizationDetailsTitle)),
       body: state.when(
-        loading: () => const AppLoadingState(label: 'جاري تحميل المنظمة...'),
+        loading: () => AppLoadingState(label: l10n.organizationLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () =>
@@ -33,15 +35,15 @@ class PublicOrganizationDetailsPage extends ConsumerWidget {
             _OrganizationHeader(organization: organization),
             const SizedBox(height: 20),
             Text(
-              'الحملات النشطة',
+              l10n.activeCampaignsTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             if (organization.activeCampaigns.isEmpty)
-              const Card(
+              Card(
                 child: Padding(
-                  padding: EdgeInsets.all(22),
-                  child: Center(child: Text('لا توجد حملات نشطة حاليًا.')),
+                  padding: const EdgeInsets.all(22),
+                  child: Center(child: Text(l10n.noActiveCampaigns)),
                 ),
               )
             else
@@ -63,7 +65,9 @@ class _OrganizationHeader extends StatelessWidget {
   final PublicOrganizationDetails organization;
 
   @override
-  Widget build(BuildContext context) => Card(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
     child: Padding(
       padding: const EdgeInsets.all(18),
       child: Column(
@@ -93,8 +97,8 @@ class _OrganizationHeader extends StatelessWidget {
                           size: 17,
                           color: context.appColors.primary,
                         ),
-                        SizedBox(width: 4),
-                        Text('منظمة معتمدة'),
+                        const SizedBox(width: 4),
+                        Text(l10n.approvedOrganizationLabel),
                       ],
                     ),
                   ],
@@ -122,12 +126,13 @@ class _OrganizationHeader extends StatelessWidget {
           const SizedBox(height: 9),
           _InfoLine(
             icon: Icons.badge_outlined,
-            text: 'رقم التسجيل: ${organization.registrationNumber}',
+            text: l10n.registrationNumber(organization.registrationNumber),
           ),
         ],
       ),
     ),
-  );
+    );
+  }
 }
 
 class _CampaignDetailsCard extends StatelessWidget {
@@ -146,14 +151,18 @@ class _CampaignDetailsCard extends StatelessWidget {
           Text(campaign.description),
           if (campaign.requestedMedicinesSummary != null) ...[
             const SizedBox(height: 9),
-            Text('الأدوية المطلوبة: ${campaign.requestedMedicinesSummary}'),
+            Text(
+              AppLocalizations.of(context).requestedMedicinesLabel(
+                campaign.requestedMedicinesSummary!,
+              ),
+            ),
           ],
           if (campaign.acceptsPublicDonations) ...[
             const SizedBox(height: 14),
             FilledButton.icon(
               onPressed: () => context.push('/user/donations/create-offer'),
               icon: const Icon(Icons.volunteer_activism_outlined),
-              label: const Text('تقديم عرض تبرع'),
+              label: Text(AppLocalizations.of(context).donateOffer),
             ),
           ],
         ],

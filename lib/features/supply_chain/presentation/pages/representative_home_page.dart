@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../../data/models/supply_chain_models.dart';
 import '../controllers/supply_chain_providers.dart';
@@ -13,9 +14,10 @@ class RepresentativeHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(supplyOrdersProvider);
     return state.when(
-      loading: () => const AppLoadingState(label: 'نجهّز جدول التوصيل...'),
+      loading: () => AppLoadingState(label: l10n.representativeLoadingSchedule),
       error: (error, _) => AppErrorState(
         error: error,
         onRetry: () => ref.invalidate(supplyOrdersProvider),
@@ -39,45 +41,49 @@ class RepresentativeHomePage extends ConsumerWidget {
             children: [
               RoleDashboardHero(
                 title: current == null
-                    ? 'جاهز لمهمتك القادمة'
-                    : 'مهمتك الحالية إلى ${current.pharmacyName}',
+                    ? l10n.representativeReadyForNextTask
+                    : l10n.representativeCurrentTaskTo(current.pharmacyName),
                 subtitle: current == null
-                    ? 'ستظهر هنا أي شحنة جديدة يسندها المستودع إليك.'
-                    : '${current.pharmacyArea}، ${current.pharmacyCity} · ${_shipmentStatus(current.shipment!.status)}',
+                    ? l10n.representativeNoTaskSubtitle
+                    : l10n.representativeTaskLocation(
+                        current.pharmacyArea,
+                        current.pharmacyCity,
+                        _shipmentStatus(l10n, current.shipment!.status),
+                      ),
                 icon: Icons.delivery_dining_rounded,
                 accent: const Color(0xFF176F65),
                 badge: active.isEmpty
-                    ? 'لا توجد مهمة نشطة'
-                    : '${active.length} مهام نشطة',
+                    ? l10n.representativeNoActiveTask
+                    : l10n.representativeActiveTasksCount(active.length),
               ),
               const SizedBox(height: 22),
-              const RoleSectionHeader(
-                title: 'ملخص الرحلات',
-                subtitle: 'حالة الشحنات المسندة إلى حسابك',
+              RoleSectionHeader(
+                title: l10n.representativeTripsSummary,
+                subtitle: l10n.representativeTripsSummarySubtitle,
               ),
               const SizedBox(height: 11),
               RoleMetricsGrid(
                 items: [
                   RoleMetricData(
-                    label: 'إجمالي المهام',
+                    label: l10n.representativeTotalTasks,
                     value: '${deliveries.length}',
                     icon: Icons.route_rounded,
                     color: context.appColors.primary,
                   ),
                   RoleMetricData(
-                    label: 'مهام نشطة',
+                    label: l10n.representativeActiveTasks,
                     value: '${active.length}',
                     icon: Icons.local_shipping_outlined,
                     color: context.appColors.primaryLight,
                   ),
                   RoleMetricData(
-                    label: 'تم تسليمها',
+                    label: l10n.supplyCompletedShort,
                     value: '$completed',
                     icon: Icons.task_alt_rounded,
                     color: context.appColors.success,
                   ),
                   RoleMetricData(
-                    label: 'متعثرة',
+                    label: l10n.representativeFailedTasks,
                     value:
                         '${deliveries.where((x) => {'Failed', 'Returned'}.contains(x.shipment!.status)).length}',
                     icon: Icons.report_problem_outlined,
@@ -86,24 +92,24 @@ class RepresentativeHomePage extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              const RoleSectionHeader(
-                title: 'وصول سريع',
-                subtitle: 'اختصارات لمهام المندوب',
+              RoleSectionHeader(
+                title: l10n.representativeQuickAccess,
+                subtitle: l10n.representativeQuickAccessSubtitle,
               ),
               const SizedBox(height: 11),
               RoleActionsGrid(
                 items: [
                   RoleActionData(
-                    title: 'مهام التوصيل',
-                    subtitle: 'العناوين وتحديث حالة الشحنة',
+                    title: l10n.supplyDeliveryTasks,
+                    subtitle: l10n.representativeDeliveryTasksSubtitle,
                     badge: active.isNotEmpty ? '${active.length}' : null,
                     icon: Icons.delivery_dining_rounded,
                     color: context.appColors.primary,
                     onTap: () => context.go('/supply-chain'),
                   ),
                   RoleActionData(
-                    title: 'الإشعارات',
-                    subtitle: 'التكليفات وآخر تحديثات المستودع',
+                    title: l10n.notifications,
+                    subtitle: l10n.representativeNotificationsSubtitle,
                     icon: Icons.notifications_active_outlined,
                     color: context.appColors.primaryLight,
                     onTap: () => context.push('/notifications'),
@@ -112,23 +118,22 @@ class RepresentativeHomePage extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               RoleSectionHeader(
-                title: 'المهام النشطة',
+                title: l10n.representativeActiveTasksTitle,
                 subtitle: active.isEmpty
-                    ? 'لا توجد رحلة تتطلب إجراء الآن'
-                    : 'ابدأ بالأقدم وحدّث الحالة عند كل مرحلة',
+                    ? l10n.representativeNoActionRequired
+                    : l10n.representativeStartOldest,
                 action: active.isEmpty
                     ? null
                     : TextButton(
                         onPressed: () => context.go('/supply-chain'),
-                        child: const Text('عرض الكل'),
+                        child: Text(l10n.viewAll),
                       ),
               ),
               const SizedBox(height: 10),
               if (active.isEmpty)
                 RoleNoticeCard(
-                  title: 'أنت متاح لمهمة جديدة',
-                  message:
-                      'عند إسناد شحنة ستصلك عبر الإشعارات وتظهر في هذه الصفحة.',
+                  title: l10n.representativeAvailableForNewTask,
+                  message: l10n.representativeAvailableForNewTaskSubtitle,
                   icon: Icons.check_circle_outline_rounded,
                   color: context.appColors.success,
                   onTap: () => context.push('/notifications'),
@@ -161,11 +166,16 @@ class _DeliverySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final shipment = order.shipment!;
     return RoleNoticeCard(
       title: order.pharmacyName,
-      message:
-          '${shipment.shipmentCode} · ${order.pharmacyArea}، ${order.pharmacyCity} · ${_shipmentStatus(shipment.status)}',
+      message: l10n.representativeDeliveryCardSummary(
+        shipment.shipmentCode,
+        order.pharmacyArea,
+        order.pharmacyCity,
+        _shipmentStatus(l10n, shipment.status),
+      ),
       icon: _shipmentIcon(shipment.status),
       color: _shipmentColor(context.appColors, shipment.status),
       onTap: onTap,
@@ -176,14 +186,14 @@ class _DeliverySummaryCard extends StatelessWidget {
 bool _closed(String status) =>
     {'Delivered', 'Failed', 'Returned'}.contains(status);
 
-String _shipmentStatus(String status) => switch (status) {
-  'Assigned' => 'تم إسنادها',
-  'Loading' => 'جاري التحميل',
-  'OutForDelivery' => 'في الطريق',
-  'Arrived' => 'وصلت للصيدلية',
-  'Delivered' => 'تم التسليم',
-  'Failed' => 'تعذر التسليم',
-  'Returned' => 'أُعيدت للمستودع',
+String _shipmentStatus(AppLocalizations l10n, String status) => switch (status) {
+  'Assigned' => l10n.supplyStatusAssigned,
+  'Loading' => l10n.supplyStatusLoading,
+  'OutForDelivery' => l10n.supplyStatusOutForDelivery,
+  'Arrived' => l10n.supplyStatusArrived,
+  'Delivered' => l10n.supplyStatusDelivered,
+  'Failed' => l10n.representativeStatusFailed,
+  'Returned' => l10n.representativeStatusReturned,
   _ => status,
 };
 

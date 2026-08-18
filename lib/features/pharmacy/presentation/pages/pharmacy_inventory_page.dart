@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/layout.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -13,7 +15,7 @@ import 'pharmacy_barcode_scanner_page.dart';
 
 /// المساحة المحجوزة لشريط التنقل السفلي المخصص (76px ارتفاع + ~12px SafeArea).
 /// تُستخدم كـ padding سفلي للـ Bottom Sheets حتى تظهر أزرارها فوق الشريط.
-const double kPharmacyBottomNavReserved = 88;
+const double kPharmacyBottomNavReserved = kBottomNavReserved;
 
 class PharmacyInventoryPage extends ConsumerStatefulWidget {
   const PharmacyInventoryPage({super.key});
@@ -39,15 +41,16 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(pharmacyInventoryProvider(_filter));
     final snapshot = state.valueOrNull ?? const <PharmacyInventoryItem>[];
     return Scaffold(
       appBar: AppBar(
-        title: const Text('مخزون الأدوية'),
+        title: Text(l10n.inventoryTitle),
         actions: [
           IconButton(
             onPressed: _searchByBarcode,
-            tooltip: 'مسح باركود',
+            tooltip: l10n.scanBarcode,
             icon: const Icon(Icons.qr_code_scanner_rounded),
           ),
           Padding(
@@ -56,15 +59,15 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
               selected: _showArabicNames,
               showCheckmark: false,
               avatar: const Icon(Icons.translate_rounded, size: 17),
-              label: const Text('عربي'),
-              tooltip: 'إظهار الأسماء العربية',
+              label: Text(l10n.arabicLabel),
+              tooltip: l10n.showArabicNamesTooltip,
               onSelected: (value) => setState(() => _showArabicNames = value),
             ),
           ),
           const SizedBox(width: 4),
           IconButton(
             onPressed: () => ref.invalidate(pharmacyInventoryProvider(_filter)),
-            tooltip: 'تحديث المخزون',
+            tooltip: l10n.refreshInventoryTooltip,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
@@ -79,7 +82,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
                 _InventoryOverview(items: snapshot, onAdd: _openAddOptions),
                 const SizedBox(height: 13),
                 AppTextField(
-                  label: 'ابحث باسم الدواء أو الاسم العلمي',
+                  label: l10n.searchByMedicineOrScientificName,
                   controller: _search,
                   icon: Icons.search_rounded,
                   textInputAction: TextInputAction.search,
@@ -89,7 +92,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
                     onPressed: () =>
                         setState(() => _query = _search.text.trim()),
                     icon: const Icon(Icons.arrow_forward_rounded),
-                    tooltip: 'بحث',
+                    tooltip: l10n.searchLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -104,8 +107,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           ),
           Expanded(
             child: state.when(
-              loading: () =>
-                  const AppLoadingState(label: 'جاري تحميل المخزون...'),
+              loading: () => AppLoadingState(label: l10n.inventoryLoading),
               error: (error, _) => AppErrorState(
                 error: error,
                 onRetry: () =>
@@ -117,7 +119,12 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
                 child: items.isEmpty
                     ? _InventoryEmpty(onAdd: _openAddOptions)
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
+                        padding: EdgeInsets.fromLTRB(
+                          20,
+                          10,
+                          20,
+                          kPharmacyBottomNavReserved + 12,
+                        ),
                         itemCount: items.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) => _InventoryCard(
@@ -164,6 +171,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
   }
 
   Future<void> _openCatalog({String? initialQuery}) async {
+    final l10n = AppLocalizations.of(context);
     final selected = await showModalBottomSheet<List<PharmacyCatalogMedicine>>(
       context: context,
       isScrollControlled: true,
@@ -191,13 +199,14 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           .remote
           .addInventoryBatch(items: items);
       _refresh();
-      _message('تمت إضافة ${items.length} أدوية إلى المخزون.');
+      _message(l10n.inventoryBatchAdded(items.length));
     } catch (error) {
       _message(_error(error), true);
     }
   }
 
   Future<void> _openManualEditor() async {
+    final l10n = AppLocalizations.of(context);
     final info = await showModalBottomSheet<_ManualMedicineInfo>(
       context: context,
       isScrollControlled: true,
@@ -250,7 +259,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           );
       ref.read(pharmacyRepositoryProvider).clearCatalogCache();
       _refresh();
-      _message('تم إنشاء الدواء وإضافته إلى المخزون.');
+      _message(l10n.manualMedicineCreated);
     } catch (error) {
       _message(_error(error), true);
     }
@@ -260,6 +269,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
     PharmacyInventoryItem? item, {
     PharmacyCatalogMedicine? medicine,
   }) async {
+    final l10n = AppLocalizations.of(context);
     final draft = await showModalBottomSheet<_InventoryDraft>(
       context: context,
       isScrollControlled: true,
@@ -291,27 +301,28 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
         );
       }
       _refresh();
-      _message(item == null ? 'تمت إضافة الدواء.' : 'تم تحديث الصنف.');
+      _message(item == null ? l10n.inventoryItemAdded : l10n.inventoryItemUpdated);
     } catch (error) {
       _message(_error(error), true);
     }
   }
 
   Future<void> _delete(PharmacyInventoryItem item) async {
+    final l10n = AppLocalizations.of(context);
     final yes = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف الصنف؟'),
-        content: Text('سيتم حذف ${item.medicineName} من مخزون الصيدلية.'),
+        title: Text(l10n.deleteItemTitle),
+        content: Text(l10n.deleteItemConfirm(item.medicineName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: context.appColors.danger),
-            child: const Text('حذف'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -323,7 +334,7 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
           .remote
           .deleteInventory(item.inventoryItemId);
       _refresh();
-      _message('تم حذف الصنف.');
+      _message(l10n.inventoryItemDeleted);
     } catch (error) {
       _message(_error(error), true);
     }
@@ -345,8 +356,9 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
     );
   }
 
-  String _error(Object error) =>
-      error is ApiException ? error.message : 'تعذر إكمال العملية.';
+  String _error(Object error) => error is ApiException
+      ? error.localize(AppLocalizations.of(context))
+      : AppLocalizations.of(context).operationFailed;
 }
 
 class _InventoryOverview extends StatelessWidget {
@@ -357,6 +369,7 @@ class _InventoryOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final available = items.where((item) => item.isAvailable).length;
     final low = items
         .where((item) => item.stockStatus.toLowerCase() == 'lowstock')
@@ -367,11 +380,7 @@ class _InventoryOverview extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [context.appColors.primaryDeep, context.appColors.primary],
-        ),
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -387,7 +396,7 @@ class _InventoryOverview extends StatelessWidget {
                 ),
                 child: Icon(
                   Icons.inventory_2_rounded,
-                  color: context.appColors.secondary,
+                  color: context.appColors.primaryLight,
                 ),
               ),
               const SizedBox(width: 11),
@@ -396,13 +405,13 @@ class _InventoryOverview extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'إدارة المخزون',
+                      l10n.inventoryManagement,
                       style: Theme.of(
                         context,
                       ).textTheme.titleLarge?.copyWith(color: Colors.white),
                     ),
                     Text(
-                      '${items.length} صنف · $available متاح للطلب',
+                      l10n.inventoryOverviewSummary(items.length, available),
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.64),
                         fontSize: 11.5,
@@ -413,9 +422,9 @@ class _InventoryOverview extends StatelessWidget {
               ),
               IconButton.filled(
                 onPressed: onAdd,
-                tooltip: 'إضافة دواء',
+                tooltip: l10n.addMedicine,
                 style: IconButton.styleFrom(
-                  backgroundColor: context.appColors.secondary,
+                  backgroundColor: context.appColors.primaryLight,
                   foregroundColor: context.appColors.primaryDeep,
                 ),
                 icon: const Icon(Icons.add_rounded),
@@ -426,19 +435,19 @@ class _InventoryOverview extends StatelessWidget {
           Row(
             children: [
               _OverviewFact(
-                label: 'متوفر',
+                label: l10n.availableLabel,
                 value: available,
                 color: Colors.white.withValues(alpha: 0.95),
               ),
               const SizedBox(width: 8),
               _OverviewFact(
-                label: 'منخفض',
+                label: l10n.lowLabel,
                 value: low,
                 color: Colors.white.withValues(alpha: 0.85),
               ),
               const SizedBox(width: 8),
               _OverviewFact(
-                label: 'نافد',
+                label: l10n.outOfStockLabel,
                 value: out,
                 color: Colors.white.withValues(alpha: 0.75),
               ),
@@ -503,6 +512,7 @@ class _InventoryCard extends StatelessWidget {
   final VoidCallback onDelete;
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final statusColor = _stockColor(context, item.stockStatus);
     final details = [
       if (showArabicName) item.arabicMedicineName,
@@ -517,7 +527,6 @@ class _InventoryCard extends StatelessWidget {
       child: InkWell(
         onTap: onEdit,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
                 child: Padding(
@@ -567,15 +576,15 @@ class _InventoryCard extends StatelessWidget {
                             ),
                           ),
                           PopupMenuButton<String>(
-                            tooltip: 'خيارات الصنف',
+                            tooltip: l10n.itemOptions,
                             onSelected: (value) =>
                                 value == 'edit' ? onEdit() : onDelete(),
-                            itemBuilder: (_) => const [
+                            itemBuilder: (_) => [
                               PopupMenuItem(
                                 value: 'edit',
                                 child: ListTile(
-                                  leading: Icon(Icons.edit_outlined),
-                                  title: Text('تعديل'),
+                                  leading: const Icon(Icons.edit_outlined),
+                                  title: Text(l10n.editLabel),
                                   contentPadding: EdgeInsets.zero,
                                 ),
                               ),
@@ -584,9 +593,9 @@ class _InventoryCard extends StatelessWidget {
                                 child: ListTile(
                                   leading: Icon(
                                     Icons.delete_outline_rounded,
-                                    color: Color(0xFFB33A3A),
+                                    color: const Color(0xFFB33A3A),
                                   ),
-                                  title: Text('حذف'),
+                                  title: Text(l10n.delete),
                                   contentPadding: EdgeInsets.zero,
                                 ),
                               ),
@@ -601,24 +610,24 @@ class _InventoryCard extends StatelessWidget {
                           color: context.appColors.background,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Row(
-                          children: [
-                            _InventoryFact(
-                              label: 'الكمية',
-                              value: '${item.quantity}',
-                            ),
-                            _InventoryFact(
-                              label: 'السعر',
-                              value: item.isPriceVisibleToUsers
-                                  ? '${item.sellingPrice.toStringAsFixed(0)} ل.س'
-                                  : 'مخفي',
-                            ),
-                            _InventoryFact(
-                              label: 'الحالة',
-                              value: _stock(item.stockStatus),
-                            ),
-                          ],
-                        ),
+                          child: Row(
+                            children: [
+                              _InventoryFact(
+                                label: l10n.quantityLabel,
+                                value: '${item.quantity}',
+                              ),
+                              _InventoryFact(
+                                label: l10n.priceLabel,
+                                value: item.isPriceVisibleToUsers
+                                    ? l10n.priceValue(item.sellingPrice.toStringAsFixed(0))
+                                    : l10n.hiddenLabel,
+                              ),
+                              _InventoryFact(
+                                label: l10n.statusLabel,
+                                value: _stock(l10n, item.stockStatus),
+                              ),
+                            ],
+                          ),
                       ),
                       const SizedBox(height: 10),
                       Wrap(
@@ -627,28 +636,30 @@ class _InventoryCard extends StatelessWidget {
                         children: [
                           if (item.capacity != null)
                             _Chip(
-                              text: 'التركيز: ${item.capacity}',
+                              text: l10n.concentrationChip(item.capacity!),
                               color: context.appColors.primary,
                             ),
                           if (item.dosageForm != null)
                             _Chip(
-                              text: 'الشكل: ${item.dosageForm}',
-                              color: context.appColors.primaryDark,
+                              text: l10n.dosageFormChip(item.dosageForm!),
+                              color: context.appColors.primary,
                             ),
                           _Chip(
-                            text: item.isAvailable ? 'متاح للطلب' : 'غير متاح',
+                            text: item.isAvailable
+                                ? l10n.availableForOrder
+                                : l10n.notAvailable,
                             color: item.isAvailable
                                 ? context.appColors.primary
                                 : context.appColors.textMuted,
                           ),
                           if (item.requiresPrescription)
                             _Chip(
-                              text: 'يتطلب وصفة',
-                              color: context.appColors.primaryDark,
+                              text: l10n.requiresPrescription,
+                              color: context.appColors.primary,
                             ),
                           if (expiry != null)
                             _Chip(
-                              text: 'ينتهي $expiry',
+                              text: l10n.expiresOn(expiry),
                               color:
                                   item.daysUntilExpiry != null &&
                                       item.daysUntilExpiry! <= 30
@@ -707,6 +718,7 @@ class _AddMedicineOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     // الـ BottomNav المخصص بارتفاع 76px + SafeArea ~12px.
     // نضيف padding سفلية كافية عشان محتوى الـ Sheet يبان فوقه.
+    final l10n = AppLocalizations.of(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom + kPharmacyBottomNavReserved;
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPadding),
@@ -726,33 +738,33 @@ class _AddMedicineOptions extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            'إضافة إلى المخزون',
+            l10n.addToInventoryTitle,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 4),
           Text(
-            'اختر الطريقة الأنسب لإدخال الدواء.',
+            l10n.addToInventorySubtitle,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           _AddOptionTile(
             icon: Icons.library_add_outlined,
-            title: 'اختيار من دليل الأدوية',
-            subtitle: 'اختر دواءً واحدًا أو عدة أدوية دفعة واحدة',
+            title: l10n.chooseFromCatalog,
+            subtitle: l10n.chooseFromCatalogSubtitle,
             onTap: () => Navigator.pop(context, _AddMedicineAction.catalog),
           ),
           const SizedBox(height: 10),
           _AddOptionTile(
             icon: Icons.qr_code_scanner_rounded,
-            title: 'مسح باركود العبوة',
-            subtitle: 'اعثر على الدواء مباشرة بالكاميرا',
+            title: l10n.scanPackageBarcode,
+            subtitle: l10n.scanPackageBarcodeSubtitle,
             onTap: () => Navigator.pop(context, _AddMedicineAction.barcode),
           ),
           const SizedBox(height: 10),
           _AddOptionTile(
             icon: Icons.edit_note_rounded,
-            title: 'إضافة دواء يدويًا',
-            subtitle: 'استخدمها عندما لا تجد الدواء في الدليل',
+            title: l10n.addMedicineManually,
+            subtitle: l10n.addMedicineManuallySubtitle,
             onTap: () => Navigator.pop(context, _AddMedicineAction.manual),
           ),
         ],
@@ -854,7 +866,9 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
     padding: EdgeInsets.fromLTRB(
       20,
       16,
@@ -880,29 +894,29 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           ),
           const SizedBox(height: 18),
           Text(
-            'بيانات الدواء الجديد',
+            l10n.newMedicineDataTitle,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 4),
           Text(
-            'اكتب البيانات كما تظهر على عبوة الدواء لتسهيل العثور عليه.',
+            l10n.newMedicineDataSubtitle,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'اسم الدواء بالإنكليزية *',
+            label: l10n.medicineNameEnglishLabel,
             controller: _name,
             icon: Icons.medication_outlined,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'اسم الدواء بالعربية',
+            label: l10n.medicineNameArabicLabel,
             controller: _arabicName,
             icon: Icons.translate_rounded,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'الباركود',
+            label: l10n.barcodeLabel,
             controller: _barcode,
             icon: Icons.qr_code_rounded,
             keyboardType: TextInputType.number,
@@ -911,25 +925,25 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
                 final value = await _scanBarcode(context);
                 if (value != null && mounted) _barcode.text = value;
               },
-              tooltip: 'مسح بالكاميرا',
+              tooltip: l10n.scanWithCamera,
               icon: const Icon(Icons.qr_code_scanner_rounded),
             ),
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'الاسم العلمي بالإنكليزية',
+            label: l10n.scientificNameEnglishLabel,
             controller: _scientificName,
             icon: Icons.science_outlined,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'الاسم العلمي بالعربية',
+            label: l10n.scientificNameArabicLabel,
             controller: _arabicScientificName,
             icon: Icons.science_rounded,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'الشركة المصنعة',
+            label: l10n.manufacturerLabel,
             controller: _manufacturer,
             icon: Icons.factory_outlined,
           ),
@@ -938,14 +952,14 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
             children: [
               Expanded(
                 child: AppTextField(
-                  label: 'الشكل الدوائي',
+                  label: l10n.dosageFormLabel,
                   controller: _dosageForm,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: AppTextField(
-                  label: 'التركيز أو السعة',
+                  label: l10n.concentrationOrCapacityLabel,
                   controller: _capacity,
                 ),
               ),
@@ -953,20 +967,20 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'حجم العبوة',
+            label: l10n.packageSizeLabel,
             controller: _packageSize,
             icon: Icons.inventory_2_outlined,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'التركيب الدوائي',
+            label: l10n.compositionLabel,
             controller: _composition,
             icon: Icons.biotech_outlined,
             maxLines: 2,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'وصف إضافي',
+            label: l10n.additionalDescriptionLabel,
             controller: _description,
             icon: Icons.notes_rounded,
             maxLines: 3,
@@ -989,7 +1003,7 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'يتطلب وصفة طبية',
+                    l10n.requiresPrescription,
                     style: TextStyle(
                       color: context.appColors.text,
                       fontSize: 15,
@@ -1045,7 +1059,7 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
             child: FilledButton.icon(
               onPressed: _submit,
               icon: const Icon(Icons.arrow_back_rounded),
-              label: const Text('متابعة إلى بيانات المخزون'),
+              label: Text(l10n.continueToInventoryData),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -1057,10 +1071,11 @@ class _ManualMedicineEditorState extends State<_ManualMedicineEditor> {
       ),
     ),
   );
+  }
 
   void _submit() {
     if (_name.text.trim().isEmpty) {
-      setState(() => _error = 'اسم الدواء مطلوب.');
+      setState(() => _error = AppLocalizations.of(context).medicineNameRequired);
       return;
     }
     Navigator.pop(
@@ -1158,6 +1173,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * .82,
       child: Column(
@@ -1179,12 +1195,12 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'اختيار أدوية من الدليل',
+                  l10n.catalogSelectionTitle,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'يمكنك اختيار دواء واحد أو عدة أدوية وإضافتها دفعة واحدة.',
+                  l10n.catalogSelectionSubtitle,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 9),
@@ -1194,7 +1210,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                     selected: _showArabicNames,
                     showCheckmark: false,
                     avatar: const Icon(Icons.translate_rounded, size: 17),
-                    label: const Text('إظهار الاسم العربي'),
+                    label: Text(l10n.showArabicName),
                     onSelected: (value) =>
                         setState(() => _showArabicNames = value),
                   ),
@@ -1212,7 +1228,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                       borderRadius: BorderRadius.circular(13),
                     ),
                     child: Text(
-                      'تم اختيار ${_selected.length} دواء',
+                      l10n.selectedMedicinesCount(_selected.length),
                       style: const TextStyle(
                         color: Color(0xFFB7791F),
                         fontWeight: FontWeight.w800,
@@ -1222,7 +1238,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                 ],
                 const SizedBox(height: 14),
                 AppTextField(
-                  label: 'اسم الدواء أو الاسم العلمي',
+                  label: l10n.searchByMedicineOrScientificName,
                   controller: _search,
                   icon: Icons.search_rounded,
                   textInputAction: TextInputAction.search,
@@ -1232,7 +1248,7 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                     children: [
                       IconButton(
                         onPressed: _scanCatalogBarcode,
-                        tooltip: 'مسح باركود',
+                        tooltip: l10n.scanBarcode,
                         icon: const Icon(Icons.qr_code_scanner_rounded),
                       ),
                       IconButton(
@@ -1247,17 +1263,17 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
           ),
           Expanded(
             child: _initialLoading
-                ? const AppLoadingState(label: 'جاري فتح دليل الأدوية...')
+                ? AppLoadingState(label: l10n.catalogOpening)
                 : _catalogError != null && _items.isEmpty
                 ? AppErrorState(
                     error: _catalogError!,
                     onRetry: () => _loadPage(reset: true),
                   )
                 : _items.isEmpty
-                ? const Center(
+                ? Center(
                     child: Padding(
                       padding: EdgeInsets.all(24),
-                      child: Text('لا توجد أدوية مطابقة لبحثك.'),
+                      child: Text(l10n.noMatchingMedicines),
                     ),
                   )
                 : RefreshIndicator(
@@ -1386,8 +1402,8 @@ class _CatalogSheetState extends ConsumerState<_CatalogSheet> {
                 icon: const Icon(Icons.playlist_add_check_rounded),
                 label: Text(
                   _selected.isEmpty
-                      ? 'اختر دواءً واحدًا على الأقل'
-                      : 'متابعة مع ${_selected.length} دواء',
+                      ? l10n.selectAtLeastOneMedicine
+                      : l10n.continueWithSelectedCount(_selected.length),
                 ),
               ),
             ),
@@ -1475,7 +1491,9 @@ class _CatalogPaginationFooter extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
     padding: const EdgeInsets.symmetric(vertical: 14),
     child: Center(
       child: loading
@@ -1487,16 +1505,17 @@ class _CatalogPaginationFooter extends StatelessWidget {
           ? TextButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('إعادة تحميل المزيد'),
+              label: Text(l10n.reloadMore),
             )
           : Text(
               hasNextPage
-                  ? 'مرّر للأسفل لعرض المزيد'
-                  : 'تم عرض $loadedCount من $totalCount دواء',
+                  ? l10n.scrollForMore
+                  : l10n.shownCountOfTotal(loadedCount, totalCount),
               style: Theme.of(context).textTheme.bodySmall,
             ),
     ),
   );
+  }
 }
 
 class _CatalogIdentityChip extends StatelessWidget {
@@ -1564,7 +1583,9 @@ class _InventoryEditorState extends State<_InventoryEditor> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
     padding: EdgeInsets.fromLTRB(
       20,
       20,
@@ -1590,27 +1611,27 @@ class _InventoryEditorState extends State<_InventoryEditor> {
           const SizedBox(height: 4),
           Text(
             widget.item == null
-                ? 'أدخل بيانات توفر الدواء داخل صيدليتك.'
-                : 'حدّث الكمية والسعر وحالة العرض للمستخدمين.',
+                ? l10n.enterInventoryAvailability
+                : l10n.updateInventoryData,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'الكمية',
+            label: l10n.quantityLabel,
             controller: _quantity,
             icon: Icons.inventory_2_outlined,
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'السعر بالليرة السورية',
+            label: l10n.priceInSyrianPounds,
             controller: _price,
             icon: Icons.payments_outlined,
             keyboardType: TextInputType.numberWithOptions(decimal: true),
           ),
           const SizedBox(height: 16),
           AppTextField(
-            label: 'حد المخزون المنخفض',
+            label: l10n.lowStockThresholdLabel,
             controller: _threshold,
             icon: Icons.notification_important_outlined,
             keyboardType: TextInputType.number,
@@ -1632,7 +1653,7 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'متاح للطلب',
+                    l10n.availableForOrder,
                     style: TextStyle(
                       color: context.appColors.text,
                       fontSize: 15,
@@ -1664,7 +1685,7 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'إظهار السعر للمستخدم',
+                    l10n.showPriceToUser,
                     style: TextStyle(
                       color: context.appColors.text,
                       fontSize: 15,
@@ -1709,7 +1730,7 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'تاريخ الانتهاء',
+                          l10n.expiryDateLabel,
                           style: TextStyle(
                             color: context.appColors.text,
                             fontSize: 14,
@@ -1719,7 +1740,7 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                         const SizedBox(height: 4),
                         Text(
                           _expiry == null
-                              ? 'غير محدد'
+                              ? l10n.notSpecified
                               : '${_expiry!.year}/${_expiry!.month}/${_expiry!.day}',
                           style: TextStyle(
                             color: context.appColors.textMuted,
@@ -1771,8 +1792,7 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                     t == null ||
                     t < 0) {
                   setState(() {
-                    _validationError =
-                        'أدخل أرقامًا صحيحة؛ لا يمكن أن تكون الكمية أو السعر أو حد المخزون أقل من صفر.';
+                    _validationError = l10n.invalidNumbersError;
                   });
                   return;
                 }
@@ -1789,13 +1809,14 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                   ),
                 );
               },
-              child: const Text('حفظ الصنف'),
+              child: Text(l10n.saveItem),
             ),
           ),
         ],
       ),
     ),
   );
+  }
 }
 
 class _InventoryDraft {
@@ -1841,7 +1862,9 @@ class _InventoryEmpty extends StatelessWidget {
   final VoidCallback onAdd;
 
   @override
-  Widget build(BuildContext context) => ListView(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListView(
     physics: const AlwaysScrollableScrollPhysics(),
     padding: const EdgeInsets.symmetric(horizontal: 28),
     children: [
@@ -1853,13 +1876,13 @@ class _InventoryEmpty extends StatelessWidget {
       ),
       const SizedBox(height: 12),
       Text(
-        'لا توجد أصناف مطابقة',
+        l10n.noMatchingItems,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.titleMedium,
       ),
       const SizedBox(height: 6),
       Text(
-        'غيّر البحث أو أضف دواءً جديدًا من دليل الأدوية.',
+        l10n.noMatchingItemsSubtitle,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.bodyMedium,
       ),
@@ -1867,21 +1890,22 @@ class _InventoryEmpty extends StatelessWidget {
       FilledButton.icon(
         onPressed: onAdd,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('إضافة دواء'),
+        label: Text(l10n.addMedicine),
       ),
     ],
   );
+  }
 }
 
-String _stock(String value) => switch (value.toLowerCase()) {
-  'instock' => 'متوفر',
-  'lowstock' => 'مخزون منخفض',
-  'outofstock' => 'نافد',
+String _stock(AppLocalizations l10n, String value) => switch (value.toLowerCase()) {
+  'instock' => l10n.availableLabel,
+  'lowstock' => l10n.lowStockLabel,
+  'outofstock' => l10n.outOfStockLabel,
   _ => value,
 };
 Color _stockColor(BuildContext context, String value) => switch (value.toLowerCase()) {
   'instock' => context.appColors.primary,
-  'lowstock' => context.appColors.primaryDark,
+  'lowstock' => context.appColors.primary,
   _ => context.appColors.danger,
 };
 
@@ -1896,14 +1920,15 @@ class _StockStatusSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colors = context.appColors;
     return Row(
       children: [
         Expanded(
           child: _StockButton(
-            label: 'الكل',
+            label: l10n.allLabel,
             icon: Icons.apps_rounded,
-            color: colors.text,
+            color: colors.primary,
             isSelected: selectedStatus == null,
             onTap: () => onStatusSelected('All'),
           ),
@@ -1911,7 +1936,7 @@ class _StockStatusSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _StockButton(
-            label: 'متوفر',
+            label: l10n.availableLabel,
             icon: Icons.check_circle_rounded,
             color: colors.primary,
             isSelected: selectedStatus == 'InStock',
@@ -1921,9 +1946,9 @@ class _StockStatusSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _StockButton(
-            label: 'منخفض',
+            label: l10n.lowLabel,
             icon: Icons.warning_amber_rounded,
-            color: colors.primaryDark,
+            color: colors.primary,
             isSelected: selectedStatus == 'LowStock',
             onTap: () => onStatusSelected('LowStock'),
           ),
@@ -1931,9 +1956,9 @@ class _StockStatusSelector extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _StockButton(
-            label: 'نافد',
+            label: l10n.outOfStockLabel,
             icon: Icons.remove_circle_rounded,
-            color: colors.primaryDark,
+            color: colors.primary,
             isSelected: selectedStatus == 'OutOfStock',
             onTap: () => onStatusSelected('OutOfStock'),
           ),

@@ -348,7 +348,10 @@ class PharmacyRemoteDataSource {
         return List<dynamic>.from(data['items'] as List);
       }
 
-      throw const ApiException('استجابة القائمة من الخادم غير صالحة.');
+      throw const ApiException(
+        '',
+        kind: ApiErrorKind.invalidListResponse,
+      );
     } on DioException catch (error) {
       throw ApiException.fromDio(error);
     }

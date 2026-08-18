@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/donation_models.dart';
 import '../controllers/donations_providers.dart';
 
@@ -41,14 +42,15 @@ class _DonationsPageState extends ConsumerState<DonationsPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('التبرعات والمساعدة'),
+            Text(l10n.donationsTitle),
             Text(
-              'دواء يصل إلى من يحتاجه',
+              l10n.donationsSubtitle,
               style: TextStyle(
                 color: context.appColors.textMuted,
                 fontSize: 11,
@@ -93,7 +95,9 @@ class _DonationsPageState extends ConsumerState<DonationsPage>
         backgroundColor: context.appColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
-        label: Text(_tabs.index == 0 ? 'عرض تبرع' : 'طلب مساعدة'),
+        label: Text(
+          _tabs.index == 0 ? l10n.donationOfferAction : l10n.assistanceRequestAction,
+        ),
       ),
     );
   }
@@ -102,31 +106,33 @@ class _DonationsPageState extends ConsumerState<DonationsPage>
 class _DonationHero extends StatelessWidget {
   const _DonationHero();
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
       color: context.appColors.primary,
       borderRadius: BorderRadius.circular(25),
     ),
-    child: const Row(
+    child: Row(
       children: [
-        _DonationHeroIcon(),
-        SizedBox(width: 12),
+        const _DonationHeroIcon(),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'العطاء يبدأ بخطوة',
-                style: TextStyle(
+                l10n.givingStartsWithStep,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               Text(
-                'قدّم دواءً صالحًا أو اطلب المساعدة عبر الجهات المشاركة.',
-                style: TextStyle(
+                l10n.donationHeroSubtitle,
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 10.5,
                   height: 1.5,
@@ -137,7 +143,8 @@ class _DonationHero extends StatelessWidget {
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _DonationHeroIcon extends StatelessWidget {
@@ -164,7 +171,9 @@ class _DonationSegment extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
     child: Container(
       padding: const EdgeInsets.all(5),
@@ -174,12 +183,13 @@ class _DonationSegment extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _item(context, 0, Icons.redeem_outlined, 'عروض التبرع'),
-          _item(context, 1, Icons.health_and_safety_outlined, 'طلبات المساعدة'),
+          _item(context, 0, Icons.redeem_outlined, l10n.donationOffersTab),
+          _item(context, 1, Icons.health_and_safety_outlined, l10n.assistanceRequestsTab),
         ],
       ),
     ),
-  );
+    );
+  }
 
   Widget _item(BuildContext context, int index, IconData icon, String label) {
     final colors = context.appColors;
@@ -237,22 +247,24 @@ class _OffersTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(myDonationOffersProvider(status));
+    final l10n = AppLocalizations.of(context);
+    final values = <String?, String>{
+      null: l10n.statusAll,
+      'PendingReview': l10n.donationStatusUnderReview,
+      'Approved': l10n.donationStatusApproved,
+      'Received': l10n.donationStatusReceived,
+      'Rejected': l10n.donationStatusRejected,
+    };
     return Column(
       children: [
         _StatusFilter(
           selected: status,
-          values: const {
-            null: 'الكل',
-            'PendingReview': 'قيد المراجعة',
-            'Approved': 'مقبول',
-            'Received': 'تم الاستلام',
-            'Rejected': 'مرفوض',
-          },
+          values: values,
           onChanged: onStatusChanged,
         ),
         Expanded(
           child: state.when(
-            loading: () => const AppLoadingState(label: 'جاري تحميل عروضك...'),
+            loading: () => AppLoadingState(label: l10n.offersLoading),
             error: (error, _) => AppErrorState(
               error: error,
               onRetry: () => ref.invalidate(myDonationOffersProvider(status)),
@@ -261,9 +273,9 @@ class _OffersTab extends ConsumerWidget {
               onRefresh: () =>
                   ref.refresh(myDonationOffersProvider(status).future),
               child: items.isEmpty
-                  ? const _EmptyList(
+                  ? _EmptyList(
                       icon: Icons.volunteer_activism_outlined,
-                      text: 'لا توجد عروض تبرع ضمن هذا التصنيف.',
+                      text: l10n.noDonationOffers,
                     )
                   : ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -292,22 +304,24 @@ class _RequestsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(myAssistanceRequestsProvider(status));
+    final l10n = AppLocalizations.of(context);
+    final values = <String?, String>{
+      null: l10n.statusAll,
+      'Open': l10n.statusOpen,
+      'UnderReview': l10n.donationStatusUnderReview,
+      'Fulfilled': l10n.donationStatusFulfilled,
+      'Rejected': l10n.donationStatusRejected,
+    };
     return Column(
       children: [
         _StatusFilter(
           selected: status,
-          values: const {
-            null: 'الكل',
-            'Open': 'مفتوح',
-            'UnderReview': 'قيد المراجعة',
-            'Fulfilled': 'تمت المساعدة',
-            'Rejected': 'مرفوض',
-          },
+          values: values,
           onChanged: onStatusChanged,
         ),
         Expanded(
           child: state.when(
-            loading: () => const AppLoadingState(label: 'جاري تحميل طلباتك...'),
+            loading: () => AppLoadingState(label: l10n.requestsLoading),
             error: (error, _) => AppErrorState(
               error: error,
               onRetry: () =>
@@ -317,9 +331,9 @@ class _RequestsTab extends ConsumerWidget {
               onRefresh: () =>
                   ref.refresh(myAssistanceRequestsProvider(status).future),
               child: items.isEmpty
-                  ? const _EmptyList(
+                  ? _EmptyList(
                       icon: Icons.support_agent_rounded,
-                      text: 'لا توجد طلبات مساعدة ضمن هذا التصنيف.',
+                      text: l10n.noAssistanceRequests,
                     )
                   : ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -389,7 +403,8 @@ class _OfferCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = donationStatus(context.appColors, offer.status);
+    final l10n = AppLocalizations.of(context);
+    final status = donationStatus(context.appColors, offer.status, l10n);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -403,17 +418,17 @@ class _OfferCard extends StatelessWidget {
             ),
             const SizedBox(height: 9),
             Text(
-              '${offer.packageCount} عبوات · ${offer.targetOrganizationName ?? 'منظمة'}',
+              '${l10n.packagesCount(offer.packageCount)} · ${offer.targetOrganizationName ?? l10n.targetOrganization}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (offer.campaignTitle != null)
               Text(
-                'الحملة: ${offer.campaignTitle}',
+                l10n.campaignLabel(offer.campaignTitle!),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             if (offer.reviewNote != null) ...[
               const Divider(height: 22),
-              Text('ملاحظة المنظمة: ${offer.reviewNote}'),
+              Text(l10n.organizationNoteLabel(offer.reviewNote!)),
             ],
           ],
         ),
@@ -429,7 +444,8 @@ class _RequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = donationStatus(context.appColors, request.status);
+    final l10n = AppLocalizations.of(context);
+    final status = donationStatus(context.appColors, request.status, l10n);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -443,17 +459,17 @@ class _RequestCard extends StatelessWidget {
             ),
             const SizedBox(height: 9),
             Text(
-              '${request.requestedPackageCount} عبوات · ${request.targetOrganizationName ?? 'منظمة'}',
+              '${l10n.packagesCount(request.requestedPackageCount)} · ${request.targetOrganizationName ?? l10n.targetOrganization}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (request.neededBeforeUtc != null)
               Text(
-                'مطلوب قبل ${_date(request.neededBeforeUtc!)}',
+                l10n.neededBeforeLabel(_date(request.neededBeforeUtc!)),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             if (request.responseNote != null) ...[
               const Divider(height: 22),
-              Text('رد المنظمة: ${request.responseNote}'),
+              Text(l10n.organizationResponseLabel(request.responseNote!)),
             ],
           ],
         ),
@@ -519,22 +535,25 @@ class _EmptyList extends StatelessWidget {
   );
 }
 
-({String label, Color color}) donationStatus(AppColors colors, String value) =>
-    switch (value.toLowerCase()) {
-      'approved' => (label: 'مقبول', color: colors.success),
-      'received' || 'fulfilled' => (
-        label: value.toLowerCase() == 'received'
-            ? 'تم الاستلام'
-            : 'تمت المساعدة',
-        color: colors.success,
-      ),
-      'rejected' => (label: 'مرفوض', color: colors.danger),
-      'cancelled' => (label: 'ملغى', color: colors.textMuted),
-      'underreview' || 'pendingreview' => (
-        label: 'قيد المراجعة',
-        color: const Color(0xFFB47618),
-      ),
-      _ => (label: 'مفتوح', color: colors.primary),
-    };
+({String label, Color color}) donationStatus(
+  AppColors colors,
+  String value,
+  AppLocalizations l10n,
+) => switch (value.toLowerCase()) {
+  'approved' => (label: l10n.donationStatusApproved, color: colors.success),
+  'received' || 'fulfilled' => (
+    label: value.toLowerCase() == 'received'
+        ? l10n.donationStatusReceived
+        : l10n.donationStatusFulfilled,
+    color: colors.success,
+  ),
+  'rejected' => (label: l10n.donationStatusRejected, color: colors.danger),
+  'cancelled' => (label: l10n.donationStatusCancelled, color: colors.textMuted),
+  'underreview' || 'pendingreview' => (
+    label: l10n.donationStatusUnderReview,
+    color: const Color(0xFFB47618),
+  ),
+  _ => (label: l10n.donationStatusOpen, color: colors.primary),
+};
 
 String _date(DateTime value) => '${value.year}/${value.month}/${value.day}';

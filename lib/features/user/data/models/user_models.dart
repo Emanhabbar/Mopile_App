@@ -69,7 +69,8 @@ class UserDashboard {
     this.locationContext,
   });
 
-  /// إنشاء نسخة فارغة当السيرفر يرجع خطأ (مثل عدم تكوين Google Places).
+  /// Creates an empty fallback instance when the server returns an error
+  /// (for example, when Google Places is not configured).
   factory UserDashboard.fallback() => UserDashboard(
     profile: const UserProfile(
       userId: '',

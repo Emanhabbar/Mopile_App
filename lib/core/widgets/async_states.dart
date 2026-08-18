@@ -45,7 +45,7 @@ class AppErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final message = error is ApiException
-        ? (error as ApiException).message
+        ? (error as ApiException).localize(l10n)
         : l10n.loadFailedMessage;
 
     return Center(

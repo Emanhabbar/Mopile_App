@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/location/device_location_service.dart';
 import '../../../../core/widgets/async_states.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
@@ -47,24 +48,24 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(pharmacyProfileProvider);
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('بيانات الصيدلية'),
+        title: Text(l10n.pharmacyDataTitle),
         actions: [
           IconButton(
             onPressed: () {
               _initialized = false;
               ref.invalidate(pharmacyProfileProvider);
             },
-            tooltip: 'تحديث البيانات',
+            tooltip: l10n.refreshData,
             icon: const Icon(Icons.refresh_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: state.when(
-        loading: () =>
-            const AppLoadingState(label: 'جاري تحميل ملف الصيدلية...'),
+        loading: () => AppLoadingState(label: l10n.pharmacyProfileLoading),
         error: (error, _) => AppErrorState(
           error: error,
           onRetry: () => ref.invalidate(pharmacyProfileProvider),
@@ -77,33 +78,33 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
               _ProfileHeader(data: data),
               const SizedBox(height: 18),
               _Section(
-                title: 'البيانات العامة',
-                subtitle: 'المعلومات التي تظهر للمستخدم عند فتح الصيدلية',
+                title: l10n.generalDataTitle,
+                subtitle: l10n.generalDataSubtitle,
                 icon: Icons.storefront_outlined,
                 child: Column(
                   children: [
                     _Field(
-                      label: 'اسم الصيدلية',
+                      label: l10n.pharmacyNameLabel,
                       controller: _name,
                       icon: Icons.local_pharmacy_outlined,
                     ),
                     _Field(
-                      label: 'المدينة',
+                      label: l10n.cityLabel,
                       controller: _city,
                       icon: Icons.location_city_outlined,
                     ),
                     _Field(
-                      label: 'المنطقة',
+                      label: l10n.areaLabel,
                       controller: _area,
                       icon: Icons.map_outlined,
                     ),
                     _Field(
-                      label: 'العنوان التفصيلي',
+                      label: l10n.detailedAddressLabel,
                       controller: _address,
                       icon: Icons.signpost_outlined,
                     ),
                     _Field(
-                      label: 'وصف الصيدلية',
+                      label: l10n.pharmacyDescriptionLabel,
                       controller: _description,
                       maxLines: 4,
                       icon: Icons.notes_rounded,
@@ -121,8 +122,8 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                           Icons.delivery_dining_outlined,
                           color: context.appColors.primary,
                         ),
-                        title: const Text('خدمة توصيل الأدوية'),
-                        subtitle: const Text('أخبر المستخدمين بتوفر التوصيل'),
+                        title: Text(l10n.deliveryServiceTitle),
+                        subtitle: Text(l10n.deliveryServiceSubtitle),
                       ),
                     ),
                     SizedBox(
@@ -130,7 +131,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                       child: FilledButton.icon(
                         onPressed: _saving ? null : _saveProfile,
                         icon: const Icon(Icons.save_rounded),
-                        label: const Text('حفظ الملف'),
+                        label: Text(l10n.saveProfile),
                       ),
                     ),
                   ],
@@ -138,15 +139,15 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
               ),
               const SizedBox(height: 16),
               _Section(
-                title: 'موقع الصيدلية',
-                subtitle: 'موقع دقيق يساعد المستخدم في العثور عليك بسهولة',
+                title: l10n.pharmacyLocationTitle,
+                subtitle: l10n.pharmacyLocationSubtitle,
                 icon: Icons.location_on_outlined,
                 child: Column(
                   children: [
                     _LocationMethod(
                       icon: Icons.my_location_rounded,
-                      title: 'تحديد تلقائي',
-                      subtitle: 'استخدم موقع هذا الجهاز',
+                      title: l10n.automaticLocation,
+                      subtitle: l10n.useDeviceLocation,
                       onTap: _saving ? null : _useGps,
                     ),
                     const SizedBox(height: 12),
@@ -156,7 +157,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            'أو أدخل الإحداثيات يدويًا',
+                            l10n.orEnterCoordinates,
                             style: TextStyle(
                               color: context.appColors.textMuted,
                               fontSize: 11,
@@ -171,7 +172,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                       children: [
                         Expanded(
                           child: _Field(
-                            label: 'خط العرض',
+                            label: l10n.latitudeLabel,
                             controller: _latitude,
                             number: true,
                             icon: Icons.north_rounded,
@@ -180,7 +181,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _Field(
-                            label: 'خط الطول',
+                            label: l10n.longitudeLabel,
                             controller: _longitude,
                             number: true,
                             icon: Icons.east_rounded,
@@ -193,7 +194,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                       child: FilledButton.icon(
                         onPressed: _saving ? null : _saveLocation,
                         icon: const Icon(Icons.location_on_rounded),
-                        label: const Text('حفظ الإحداثيات'),
+                        label: Text(l10n.saveCoordinates),
                       ),
                     ),
                     const SizedBox(height: 9),
@@ -202,7 +203,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
                       child: OutlinedButton.icon(
                         onPressed: _saving ? null : _findRegisteredPlace,
                         icon: const Icon(Icons.add_location_alt_outlined),
-                        label: const Text('مطابقة الموقع مع المكان المسجل'),
+                        label: Text(l10n.matchRegisteredPlace),
                       ),
                     ),
                   ],
@@ -229,11 +230,12 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
   }
 
   Future<void> _saveProfile() async {
+    final l10n = AppLocalizations.of(context);
     if (_name.text.trim().isEmpty ||
         _city.text.trim().isEmpty ||
         _area.text.trim().isEmpty ||
         _address.text.trim().isEmpty) {
-      _message('أكمل اسم الصيدلية والمدينة والمنطقة والعنوان.', true);
+      _message(l10n.completeProfileFields, true);
       return;
     }
     await _perform(
@@ -248,11 +250,12 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
             description: _description.text.trim(),
             hasDeliveryService: _delivery,
           ),
-      'تم حفظ بيانات الصيدلية.',
+      l10n.pharmacyProfileSaved,
     );
   }
 
   Future<void> _useGps() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _saving = true);
     try {
       final location = await ref
@@ -266,27 +269,29 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
         location.accuracyMeters,
       );
     } catch (error) {
-      _message(_error(error), true);
+      _message(_error(error, l10n), true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
 
   Future<void> _saveLocation() async {
+    final l10n = AppLocalizations.of(context);
     final lat = double.tryParse(_latitude.text.trim());
     final lng = double.tryParse(_longitude.text.trim());
     if (lat == null || lat < -90 || lat > 90) {
-      _message('أدخل خط عرض صحيحًا بين -90 و90.', true);
+      _message(l10n.invalidLatitude, true);
       return;
     }
     if (lng == null || lng < -180 || lng > 180) {
-      _message('أدخل خط طول صحيحًا بين -180 و180.', true);
+      _message(l10n.invalidLongitude, true);
       return;
     }
-    await _perform(() => _updateLocation(lat, lng, null), 'تم حفظ الموقع.');
+    await _perform(() => _updateLocation(lat, lng, null), l10n.locationSaved);
   }
 
   Future<void> _findRegisteredPlace() async {
+    final l10n = AppLocalizations.of(context);
     final lat = double.tryParse(_latitude.text.trim());
     final lng = double.tryParse(_longitude.text.trim());
     setState(() => _saving = true);
@@ -303,15 +308,15 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
           padding: const EdgeInsets.all(18),
           children: [
             Text(
-              'اختر المكان الصحيح',
+              l10n.chooseCorrectPlace,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             if (candidates.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(25),
+              Padding(
+                padding: const EdgeInsets.all(25),
                 child: Text(
-                  'لم يتم العثور على مكان مطابق بالقرب من الإحداثيات.',
+                  l10n.noMatchingPlace,
                   textAlign: TextAlign.center,
                 ),
               )
@@ -348,9 +353,9 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
         ..invalidate(pharmacyProfileProvider)
         ..invalidate(pharmacyDashboardProvider);
       _initialized = false;
-      _message('تم ربط موقع الصيدلية بالمكان المسجل.', false);
+      _message(l10n.matchRegisteredPlaceSuccess, false);
     } catch (error) {
-      _message(_error(error), true);
+      _message(_error(error, l10n), true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -376,6 +381,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
     Future<PharmacyDashboard> Function() action,
     String success,
   ) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _saving = true);
     try {
       await action();
@@ -384,7 +390,7 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
         ..invalidate(pharmacyDashboardProvider);
       _message(success, false);
     } catch (error) {
-      _message(_error(error), true);
+      _message(_error(error, l10n), true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -400,15 +406,17 @@ class _PharmacyProfilePageState extends ConsumerState<PharmacyProfilePage> {
     );
   }
 
-  String _error(Object error) =>
-      error is ApiException ? error.message : 'تعذر حفظ البيانات.';
+  String _error(Object error, AppLocalizations l10n) =>
+      error is ApiException ? error.localize(l10n) : l10n.dataSaveFailed;
 }
 
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({required this.data});
   final PharmacyDashboard data;
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -468,18 +476,23 @@ class _ProfileHeader extends StatelessWidget {
           children: [
             _HeaderBadge(
               icon: Icons.shield_outlined,
-              text: data.isApproved ? 'حساب معتمد' : 'بانتظار الاعتماد',
+              text: data.isApproved
+                  ? l10n.approvedAccount
+                  : l10n.pendingApproval,
             ),
             const SizedBox(width: 8),
             _HeaderBadge(
               icon: Icons.location_on_outlined,
-              text: data.hasLocation ? 'الموقع محفوظ' : 'الموقع غير مكتمل',
+              text: data.hasLocation
+                  ? l10n.locationSavedBadge
+                  : l10n.locationIncomplete,
             ),
           ],
         ),
       ],
     ),
-  );
+    );
+  }
 }
 
 class _HeaderBadge extends StatelessWidget {

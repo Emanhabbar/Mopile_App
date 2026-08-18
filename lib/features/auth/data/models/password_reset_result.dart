@@ -3,9 +3,7 @@ class PasswordResetResult {
 
   factory PasswordResetResult.fromJson(Map<String, dynamic> json) {
     return PasswordResetResult(
-      message:
-          json['message'] as String? ??
-          'إذا كان البريد مسجلًا فستصلك تعليمات استعادة الحساب.',
+      message: json['message'] as String? ?? '',
       developmentToken: json['developmentToken'] as String?,
     );
   }

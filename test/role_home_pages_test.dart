@@ -12,6 +12,8 @@ import 'package:pharmacy_app/features/supply_chain/presentation/controllers/supp
 import 'package:pharmacy_app/features/supply_chain/presentation/pages/representative_home_page.dart';
 import 'package:pharmacy_app/features/supply_chain/presentation/pages/warehouse_home_page.dart';
 
+import 'helpers.dart';
+
 void main() {
   testWidgets('admin home renders live platform indicators', (tester) async {
     await tester.pumpWidget(
@@ -54,7 +56,7 @@ void main() {
             ),
           ),
         ],
-        child: const MaterialApp(home: Scaffold(body: AdminHomePage())),
+        child: appUnderTest(Scaffold(body: AdminHomePage())),
       ),
     );
     await tester.pumpAndSettle();
@@ -87,7 +89,7 @@ void main() {
             ),
           ),
         ],
-        child: const MaterialApp(home: Scaffold(body: OrganizationHomePage())),
+        child: appUnderTest(Scaffold(body: OrganizationHomePage())),
       ),
     );
     await tester.pumpAndSettle();
@@ -114,7 +116,7 @@ void main() {
             ),
           ),
         ],
-        child: const MaterialApp(home: Scaffold(body: WarehouseHomePage())),
+        child: appUnderTest(Scaffold(body: WarehouseHomePage())),
       ),
     );
     await tester.pumpAndSettle();
@@ -151,9 +153,7 @@ void main() {
         overrides: [
           supplyOrdersProvider.overrideWith((ref) async => [order]),
         ],
-        child: const MaterialApp(
-          home: Scaffold(body: RepresentativeHomePage()),
-        ),
+        child: appUnderTest(Scaffold(body: RepresentativeHomePage())),
       ),
     );
     await tester.pumpAndSettle();

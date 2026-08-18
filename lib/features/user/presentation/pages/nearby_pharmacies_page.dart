@@ -211,6 +211,7 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
   }
 
   Future<void> _saveLocation(UserLocationUpdate request) async {
+    final l10n = AppLocalizations.of(context);
     await ref.read(userRepositoryProvider).updateLocation(request);
     ref
       ..invalidate(userLocationDiscoveryProvider)
@@ -218,7 +219,7 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
       ..invalidate(userNearestPharmaciesProvider)
       ..invalidate(userDashboardProvider)
       ..invalidate(userProfileProvider);
-    _showMessage(AppLocalizations.of(context).locationUpdated);
+    _showMessage(l10n.locationUpdated);
   }
 
   void _showMessage(String message, {bool error = false}) {
@@ -233,10 +234,8 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
       );
   }
 
-String _messageFor(Object error) =>
-    error is ApiException
-        ? error.message
-        : AppLocalizations.of(context).locationUpdateFailed;
+String _messageFor(Object error, AppLocalizations l10n) =>
+    error is ApiException ? error.localize(l10n) : l10n.locationUpdateFailed;
 }
 
 class _LocationHeader extends StatelessWidget {
@@ -254,6 +253,7 @@ class _LocationHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -281,14 +281,14 @@ class _LocationHeader extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            hasLocation ? 'اكتشف الأقرب إليك' : 'حدد موقعك أولًا',
+            hasLocation ? l10n.discoverNearest : l10n.setLocationFirst,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.white, fontSize: 22),
           ),
           const SizedBox(height: 6),
           Text(
-            'اعرض أقرب ثلاث صيدليات والطريق إلى الخيار الأقرب.',
+            l10n.nearbyHeaderSubtitle,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(
@@ -314,7 +314,7 @@ class _LocationHeader extends StatelessWidget {
                           )
                         : const Icon(Icons.my_location_rounded),
                     label: Text(
-                      isUpdating ? 'جاري التحديد...' : 'موقعي الحالي',
+                      isUpdating ? l10n.locatingNow : l10n.myCurrentLocation,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -329,9 +329,9 @@ class _LocationHeader extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: isUpdating ? null : onManual,
                   icon: const Icon(Icons.edit_location_alt_outlined, size: 20),
-                  label: const Text(
-                    'يدوي',
-                    style: TextStyle(
+                  label: Text(
+                    l10n.manualLabel,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
@@ -360,16 +360,22 @@ class _RadiusSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const options = {1000: '1 كم', 3000: '3 كم', 5000: '5 كم', 10000: '10 كم'};
+    final l10n = AppLocalizations.of(context);
+    final options = <int, String>{
+      1000: l10n.distanceKm('1'),
+      3000: l10n.distanceKm('3'),
+      5000: l10n.distanceKm('5'),
+      10000: l10n.distanceKm('10'),
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text('نطاق البحث', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.searchRangeLabel, style: Theme.of(context).textTheme.titleMedium),
             const Spacer(),
             Text(
-              'اسحب الخريطة للاستكشاف',
+              l10n.dragMapHint,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -455,6 +461,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final center = LatLng(data.latitude, data.longitude);
     final routePoints =
         route?.path
@@ -577,12 +584,12 @@ class _MapCardState extends ConsumerState<_MapCard> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'تعذر تحميل الخريطة',
+                              l10n.mapLoadFailed,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'تأكد من اتصالك بالإنترنت ثم حاول مجددًا.',
+                              l10n.mapLoadFailedSubtitle,
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
@@ -610,13 +617,13 @@ class _MapCardState extends ConsumerState<_MapCard> {
               children: [
                 _MapControl(
                   icon: Icons.my_location_rounded,
-                  tooltip: 'العودة إلى موقعي',
+                  tooltip: l10n.backToMyLocation,
                   onTap: _centerOnUser,
                 ),
                 const SizedBox(height: 9),
                 _MapControl(
                   icon: Icons.fit_screen_rounded,
-                  tooltip: 'عرض جميع المواقع',
+                  tooltip: l10n.showAllLocations,
                   onTap: _fitAll,
                 ),
                 const SizedBox(height: 9),
@@ -624,7 +631,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
                   icon: _expanded
                       ? Icons.fullscreen_exit_rounded
                       : Icons.fullscreen_rounded,
-                  tooltip: _expanded ? 'تصغير الخريطة' : 'تكبير الخريطة',
+                  tooltip: _expanded ? l10n.shrinkMap : l10n.expandMap,
                   onTap: () {
                     setState(() => _expanded = !_expanded);
                     WidgetsBinding.instance.addPostFrameCallback(
@@ -733,6 +740,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
     UserNearestRoute? route,
     UserMapPharmacy pharmacy,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final raw = route?.directionsUrl.isNotEmpty == true
         ? route!.directionsUrl
         : pharmacy.googleMapsUrl;
@@ -743,7 +751,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
       } catch (_) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تعذر فتح تطبيق الخرائط.')),
+            SnackBar(content: Text(l10n.mapOpenFailed)),
           );
         }
       }
@@ -790,6 +798,7 @@ class _RouteOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final minutes = route?.durationSeconds == null
         ? null
         : (route!.durationSeconds! / 60).ceil();
@@ -824,8 +833,13 @@ class _RouteOverview extends StatelessWidget {
             Flexible(
               child: Text(
                 routeReady
-                    ? '${_distance(route!.distanceMeters)}${minutes == null ? '' : ' · $minutes د'} إلى الأقرب'
-                    : 'استكشف الصيدليات على الخريطة',
+                    ? l10n.routeToNearest(
+                        _distance(l10n, route!.distanceMeters),
+                        minutes == null
+                            ? ''
+                            : ' · $minutes ${l10n.minuteUnit}',
+                      )
+                    : l10n.exploreMapHint,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -894,6 +908,7 @@ class _MapPharmacyPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final minutes = route?.durationSeconds == null
         ? null
         : (route!.durationSeconds! / 60).ceil();
@@ -956,7 +971,7 @@ class _MapPharmacyPreview extends StatelessWidget {
                         const SizedBox(width: 4),
                         Flexible(
                           child: Text(
-                            '${_distance(pharmacy.distanceMeters)}${minutes == null ? '' : ' · نحو $minutes دقيقة'}',
+                            '${_distance(l10n, pharmacy.distanceMeters)}${minutes == null ? '' : ' · ${l10n.routeMinutes(minutes)}'}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodySmall
@@ -971,7 +986,7 @@ class _MapPharmacyPreview extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton.filled(
                 onPressed: canNavigate ? onDirections : null,
-                tooltip: 'بدء الاتجاهات',
+                tooltip: l10n.startDirections,
                 style: IconButton.styleFrom(
                   backgroundColor: context.appColors.primary,
                   foregroundColor: Colors.white,
@@ -994,7 +1009,7 @@ class _UserMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'موقعك الحالي',
+      label: AppLocalizations.of(context).yourCurrentLocation,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -1044,7 +1059,9 @@ class _PharmacyMarker extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
-      label: 'الصيدلية رقم $number، $pharmacyName',
+      label: AppLocalizations.of(
+        context,
+      ).pharmacyMarkerSemantics(number, pharmacyName),
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -1136,6 +1153,7 @@ class _ResultsSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
@@ -1143,11 +1161,14 @@ class _ResultsSummary extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'أقرب 3 صيدليات',
+                l10n.nearestThreePharmacies,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Text(
-                '${data.registeredCount} مسجلة · ${data.externalCount} خيارات إضافية',
+                l10n.resultsSummaryCounts(
+                  data.registeredCount,
+                  data.externalCount,
+                ),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -1174,6 +1195,7 @@ class _NearbyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final minutes = route?.durationSeconds == null
         ? null
         : (route!.durationSeconds! / 60).ceil();
@@ -1229,7 +1251,7 @@ class _NearbyItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _distance(pharmacy.distanceMeters),
+                      _distance(l10n, pharmacy.distanceMeters),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(
@@ -1248,12 +1270,12 @@ class _NearbyItem extends StatelessWidget {
                         if (minutes != null)
                           _InfoPill(
                             icon: Icons.route_rounded,
-                            text: 'نحو $minutes دقيقة',
+                            text: l10n.routeMinutes(minutes),
                           ),
                         if (isNearest)
-                          const _InfoPill(
+                          _InfoPill(
                             icon: Icons.bolt_rounded,
-                            text: 'الأقرب',
+                            text: l10n.nearestLabel,
                             highlighted: true,
                           ),
                       ],
@@ -1263,7 +1285,7 @@ class _NearbyItem extends StatelessWidget {
               ),
               IconButton.filledTonal(
                 onPressed: () => _openDirections(route, pharmacy),
-                tooltip: 'الاتجاهات',
+                tooltip: l10n.directions,
                 icon: const Icon(Icons.navigation_rounded),
               ),
             ],
@@ -1339,9 +1361,10 @@ class _ManualLocationSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final key = GlobalKey<FormState>();
-    // الـ BottomNav المخصص بارتفاع 76px + SafeArea ~12px.
-    // نضيف padding سفلية كافية عشان محتوى النموذج يظهر فوق الشريط.
+    // The custom BottomNav is 76px tall + SafeArea ~12px.
+    // Add enough bottom padding so the form content stays above the bar.
     final bottomPadding =
         MediaQuery.viewInsetsOf(context).bottom + 88 + 24;
     return Padding(
@@ -1353,12 +1376,12 @@ class _ManualLocationSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'إدخال الموقع يدويًا',
+              l10n.manualLocationTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 7),
             Text(
-              'أدخل الإحداثيات الدقيقة لموقعك الحالي.',
+              l10n.manualLocationSubtitle,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 18),
@@ -1368,14 +1391,14 @@ class _ManualLocationSheet extends StatelessWidget {
                 decimal: true,
                 signed: true,
               ),
-              decoration: const InputDecoration(
-                labelText: 'خط العرض',
-                prefixIcon: Icon(Icons.north_rounded),
+              decoration: InputDecoration(
+                labelText: l10n.latitudeLabel,
+                prefixIcon: const Icon(Icons.north_rounded),
               ),
               validator: (value) {
                 final number = double.tryParse(value?.trim() ?? '');
                 return number == null || number < -90 || number > 90
-                    ? 'أدخل خط عرض بين -90 و90.'
+                    ? l10n.latitudeInvalid
                     : null;
               },
             ),
@@ -1386,14 +1409,14 @@ class _ManualLocationSheet extends StatelessWidget {
                 decimal: true,
                 signed: true,
               ),
-              decoration: const InputDecoration(
-                labelText: 'خط الطول',
-                prefixIcon: Icon(Icons.east_rounded),
+              decoration: InputDecoration(
+                labelText: l10n.longitudeLabel,
+                prefixIcon: const Icon(Icons.east_rounded),
               ),
               validator: (value) {
                 final number = double.tryParse(value?.trim() ?? '');
                 return number == null || number < -180 || number > 180
-                    ? 'أدخل خط طول بين -180 و180.'
+                    ? l10n.longitudeInvalid
                     : null;
               },
             ),
@@ -1412,7 +1435,7 @@ class _ManualLocationSheet extends StatelessWidget {
                   );
                 },
                 icon: const Icon(Icons.check_rounded),
-                label: const Text('حفظ الموقع'),
+                label: Text(l10n.saveLocation),
               ),
             ),
           ],
@@ -1427,10 +1450,11 @@ class _NoLocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _CenteredMessage(
+    final l10n = AppLocalizations.of(context);
+    return _CenteredMessage(
       icon: Icons.location_off_rounded,
-      title: 'لم يتم تحديد الموقع',
-      message: 'استخدم موقع الجهاز أو أدخل الإحداثيات لعرض الصيدليات.',
+      title: l10n.noLocationTitle,
+      message: l10n.noLocationMessage,
     );
   }
 }
@@ -1440,10 +1464,11 @@ class _EmptyNearby extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _CenteredMessage(
+    final l10n = AppLocalizations.of(context);
+    return _CenteredMessage(
       icon: Icons.local_pharmacy_outlined,
-      title: 'لا توجد صيدليات ضمن النطاق',
-      message: 'وسّع مسافة البحث أو حدّث موقعك ثم حاول مجددًا.',
+      title: l10n.noNearbyTitle,
+      message: l10n.noNearbyMessage,
     );
   }
 }
@@ -1482,9 +1507,9 @@ class _CenteredMessage extends StatelessWidget {
   }
 }
 
-String _distance(double meters) => meters < 1000
-    ? '${meters.round()} م'
-    : '${(meters / 1000).toStringAsFixed(1)} كم';
+String _distance(AppLocalizations l10n, double meters) => meters < 1000
+    ? l10n.distanceMeters('${meters.round()}')
+    : l10n.distanceKm((meters / 1000).toStringAsFixed(1));
 
 bool _isMissingLocation(Object error) {
   return error is ApiException && error.isLocationRequired;

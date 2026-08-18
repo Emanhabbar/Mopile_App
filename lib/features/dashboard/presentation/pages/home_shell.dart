@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_roles.dart';
 import '../../../../core/widgets/app_brand.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/profile_avatar.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../notifications/presentation/controllers/notifications_providers.dart';
@@ -24,7 +25,8 @@ class HomeShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final destinations = _destinationsForRole(role);
+    final l10n = AppLocalizations.of(context);
+    final destinations = _destinationsForRole(l10n, role);
 
     return PopScope(
       canPop: false,
@@ -90,6 +92,7 @@ class HomeShellAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final unreadNotifications =
         ref.watch(notificationUnreadCountProvider).valueOrNull?.unreadCount ??
         0;
@@ -99,7 +102,7 @@ class HomeShellAppBar extends ConsumerWidget implements PreferredSizeWidget {
       title: const AppBrand(compact: true),
       actions: [
         _HeaderAction(
-          tooltip: 'الإشعارات',
+          tooltip: l10n.notifications,
           onPressed: () => context.push('/notifications'),
           child: Badge(
             isLabelVisible: unreadNotifications > 0,
@@ -121,131 +124,134 @@ class HomeShellAppBar extends ConsumerWidget implements PreferredSizeWidget {
   }
 }
 
-List<_BottomDestination> _destinationsForRole(AppRole role) {
+List<_BottomDestination> _destinationsForRole(
+  AppLocalizations l10n,
+  AppRole role,
+) {
   return switch (role) {
     AppRole.user => [
-      const _BottomDestination(
-        label: 'الرئيسية',
+      _BottomDestination(
+        label: l10n.home,
         icon: Icons.home_outlined,
         selectedIcon: Icons.home_rounded,
       ),
-      const _BottomDestination(
-        label: 'البحث',
+      _BottomDestination(
+        label: l10n.searchLabel,
         icon: Icons.search_rounded,
         selectedIcon: Icons.manage_search_rounded,
       ),
-      const _BottomDestination(
-        label: 'الصيدليات',
+      _BottomDestination(
+        label: l10n.nearbyPharmacies,
         icon: Icons.location_on_outlined,
         selectedIcon: Icons.location_on_rounded,
       ),
-      const _BottomDestination(
-        label: 'طلباتي',
+      _BottomDestination(
+        label: l10n.requestsTitle,
         icon: Icons.receipt_long_outlined,
         selectedIcon: Icons.receipt_long_rounded,
       ),
-      const _BottomDestination(
-        label: 'حسابي',
+      _BottomDestination(
+        label: l10n.account,
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
       ),
     ],
     AppRole.pharmacy => [
-      const _BottomDestination(
-        label: 'الرئيسية',
+      _BottomDestination(
+        label: l10n.home,
         icon: Icons.home_outlined,
         selectedIcon: Icons.home_rounded,
       ),
-      const _BottomDestination(
-        label: 'المخزون',
+      _BottomDestination(
+        label: l10n.inventoryTitle,
         icon: Icons.inventory_2_outlined,
         selectedIcon: Icons.inventory_2_rounded,
       ),
-      const _BottomDestination(
-        label: 'الطلبات',
+      _BottomDestination(
+        label: l10n.ordersLabel,
         icon: Icons.assignment_outlined,
         selectedIcon: Icons.assignment_rounded,
       ),
-      const _BottomDestination(
-        label: 'التوريد',
+      _BottomDestination(
+        label: l10n.homeShellSupply,
         icon: Icons.local_shipping_outlined,
         selectedIcon: Icons.local_shipping_rounded,
       ),
-      const _BottomDestination(
-        label: 'حسابي',
+      _BottomDestination(
+        label: l10n.account,
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
       ),
     ],
     AppRole.admin => [
-      const _BottomDestination(
-        label: 'الرئيسية',
+      _BottomDestination(
+        label: l10n.home,
         icon: Icons.dashboard_outlined,
         selectedIcon: Icons.dashboard_rounded,
       ),
-      const _BottomDestination(
-        label: 'الإدارة',
+      _BottomDestination(
+        label: l10n.homeShellAdmin,
         icon: Icons.admin_panel_settings_outlined,
         selectedIcon: Icons.admin_panel_settings_rounded,
       ),
-      const _BottomDestination(
-        label: 'الأدوية',
+      _BottomDestination(
+        label: l10n.homeShellMedicines,
         icon: Icons.medication_outlined,
         selectedIcon: Icons.medication_rounded,
       ),
-      const _BottomDestination(
-        label: 'حسابي',
+      _BottomDestination(
+        label: l10n.account,
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
       ),
     ],
     AppRole.organization => [
-      const _BottomDestination(
-        label: 'الرئيسية',
+      _BottomDestination(
+        label: l10n.home,
         icon: Icons.dashboard_outlined,
         selectedIcon: Icons.dashboard_rounded,
       ),
-      const _BottomDestination(
-        label: 'إدارة المنظمة',
+      _BottomDestination(
+        label: l10n.homeShellOrgManagement,
         icon: Icons.apartment_outlined,
         selectedIcon: Icons.apartment_rounded,
       ),
-      const _BottomDestination(
-        label: 'حسابي',
+      _BottomDestination(
+        label: l10n.account,
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
       ),
     ],
     AppRole.warehouse => [
-      const _BottomDestination(
-        label: 'الرئيسية',
+      _BottomDestination(
+        label: l10n.home,
         icon: Icons.dashboard_outlined,
         selectedIcon: Icons.dashboard_rounded,
       ),
-      const _BottomDestination(
-        label: 'المستودع',
+      _BottomDestination(
+        label: l10n.homeShellWarehouse,
         icon: Icons.warehouse_outlined,
         selectedIcon: Icons.warehouse_rounded,
       ),
-      const _BottomDestination(
-        label: 'حسابي',
+      _BottomDestination(
+        label: l10n.account,
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
       ),
     ],
     AppRole.representative => [
-      const _BottomDestination(
-        label: 'الرئيسية',
+      _BottomDestination(
+        label: l10n.home,
         icon: Icons.home_outlined,
         selectedIcon: Icons.home_rounded,
       ),
-      const _BottomDestination(
-        label: 'مهامي',
+      _BottomDestination(
+        label: l10n.homeShellMyTasks,
         icon: Icons.delivery_dining_outlined,
         selectedIcon: Icons.delivery_dining_rounded,
       ),
-      const _BottomDestination(
-        label: 'حسابي',
+      _BottomDestination(
+        label: l10n.account,
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
       ),

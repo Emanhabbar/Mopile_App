@@ -2,11 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pharmacy_app/core/constants/app_roles.dart';
 import 'package:pharmacy_app/features/dashboard/data/role_modules.dart';
 import 'package:pharmacy_app/features/dashboard/presentation/navigation/module_navigation.dart';
+import 'package:pharmacy_app/l10n/generated/app_localizations_ar.dart';
 
 void main() {
   test('every role module has an application destination', () {
+    final l10n = AppLocalizationsAr();
     for (final role in AppRole.values) {
-      for (final module in modulesForRole(role)) {
+      for (final module in modulesForRole(l10n, role)) {
         expect(
           moduleLocationFor(role, module.routeName),
           isNotNull,

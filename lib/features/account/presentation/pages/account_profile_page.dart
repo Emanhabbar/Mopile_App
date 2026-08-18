@@ -318,7 +318,7 @@ class _AccountProfilePageState extends ConsumerState<AccountProfilePage> {
   }
 
   String _message(Object error) => error is ApiException
-      ? error.message
+      ? error.localize(AppLocalizations.of(context))
       : AppLocalizations.of(context).accountOperationFailed;
 
   void _showMessage(String message, {bool isError = false}) {

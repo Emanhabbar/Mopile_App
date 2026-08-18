@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pharmacy_app/app/theme/app_theme.dart';
 import 'package:pharmacy_app/features/user/data/models/user_discovery_models.dart';
 import 'package:pharmacy_app/features/user/presentation/controllers/user_providers.dart';
 import 'package:pharmacy_app/features/user/presentation/pages/nearby_pharmacies_page.dart';
+
+import 'helpers.dart';
 
 void main() {
   testWidgets('nearby map stays renderable while semantics are enabled', (
@@ -68,10 +69,7 @@ void main() {
           ).overrideWith((ref) async => discovery),
           userNearestRouteProvider(5000).overrideWith((ref) async => route),
         ],
-        child: MaterialApp(
-          theme: AppTheme.light,
-          home: const NearbyPharmaciesPage(),
-        ),
+        child: appUnderTest(const NearbyPharmaciesPage()),
       ),
     );
     await tester.pumpAndSettle(const Duration(milliseconds: 700));
