@@ -142,14 +142,14 @@ class _LoginPageState extends ConsumerState<LoginPage>
         Center(
           child: Image.asset(
             _logoPath,
-            width: 64,
-            height: 64,
+            width: 256,
+            height: 256,
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
             errorBuilder: (_, _, _) => Icon(
               Icons.local_pharmacy_rounded,
               color: colors.primary,
-              size: 56,
+              size: 224,
             ),
           ),
         ),

@@ -130,6 +130,50 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingGetStarted => 'Get Started';
+
+  @override
+  String get onboardingIntroTitle => 'Welcome to Dawaai';
+
+  @override
+  String get onboardingIntroDesc =>
+      'An integrated pharmaceutical platform connecting users, pharmacies, warehouses and organizations for faster, easier access to medicine.';
+
+  @override
+  String get onboardingSearchTitle => 'Find your medicine';
+
+  @override
+  String get onboardingSearchDesc =>
+      'Search any medicine, check availability and prices, and place your order in one tap.';
+
+  @override
+  String get onboardingPharmaciesTitle => 'Nearby pharmacies';
+
+  @override
+  String get onboardingPharmaciesDesc =>
+      'Discover the nearest pharmacies, their working hours and details before you visit.';
+
+  @override
+  String get onboardingInventoryTitle => 'Inventory & barcode';
+
+  @override
+  String get onboardingInventoryDesc =>
+      'Manage your inventory, scan barcodes, and track quantities and expiry dates with ease.';
+
+  @override
+  String get onboardingDonationsTitle => 'Donate and help others';
+
+  @override
+  String get onboardingDonationsDesc =>
+      'Join donation campaigns, offer assistance, and get smart support from the assistant.';
+
+  @override
   String get forgotOperationFailed =>
       'Unable to complete the operation right now. Try again.';
 

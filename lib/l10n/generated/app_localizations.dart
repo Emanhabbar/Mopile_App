@@ -326,6 +326,84 @@ abstract class AppLocalizations {
   /// **'{percent} بالمئة'**
   String splashPercent(Object percent);
 
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخطي'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingGetStarted.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الآن'**
+  String get onboardingGetStarted;
+
+  /// No description provided for @onboardingIntroTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرحباً بك في دوائي'**
+  String get onboardingIntroTitle;
+
+  /// No description provided for @onboardingIntroDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'منصة دوائية متكاملة تربط المستخدمين بالصيدليات والمستودعات والمنظمات لوصول أسرع وأسهل إلى الدواء.'**
+  String get onboardingIntroDesc;
+
+  /// No description provided for @onboardingSearchTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن دوائك'**
+  String get onboardingSearchTitle;
+
+  /// No description provided for @onboardingSearchDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن أي دواء، واعرف توفره وأسعاره، وقدّم طلبك بضغطة واحدة.'**
+  String get onboardingSearchDesc;
+
+  /// No description provided for @onboardingPharmaciesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصيدليات القريبة منك'**
+  String get onboardingPharmaciesTitle;
+
+  /// No description provided for @onboardingPharmaciesDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتشف أقرب الصيدليات وساعات عملها وتفاصيلها قبل الزيارة.'**
+  String get onboardingPharmaciesDesc;
+
+  /// No description provided for @onboardingInventoryTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدارة المخزون والباركود'**
+  String get onboardingInventoryTitle;
+
+  /// No description provided for @onboardingInventoryDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدر مخزونك وامسح الباركود وتابع الكميات وتواريخ الصلاحية بسهولة.'**
+  String get onboardingInventoryDesc;
+
+  /// No description provided for @onboardingDonationsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تبرّع وساعد غيرك'**
+  String get onboardingDonationsTitle;
+
+  /// No description provided for @onboardingDonationsDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'شارك في حملات التبرع وقدّم المساعدة واحصل على دعم ذكي من المساعد.'**
+  String get onboardingDonationsDesc;
+
   /// No description provided for @forgotOperationFailed.
   ///
   /// In ar, this message translates to:

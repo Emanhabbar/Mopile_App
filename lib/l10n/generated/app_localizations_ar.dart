@@ -127,6 +127,50 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get onboardingSkip => 'تخطي';
+
+  @override
+  String get onboardingNext => 'التالي';
+
+  @override
+  String get onboardingGetStarted => 'ابدأ الآن';
+
+  @override
+  String get onboardingIntroTitle => 'مرحباً بك في دوائي';
+
+  @override
+  String get onboardingIntroDesc =>
+      'منصة دوائية متكاملة تربط المستخدمين بالصيدليات والمستودعات والمنظمات لوصول أسرع وأسهل إلى الدواء.';
+
+  @override
+  String get onboardingSearchTitle => 'ابحث عن دوائك';
+
+  @override
+  String get onboardingSearchDesc =>
+      'ابحث عن أي دواء، واعرف توفره وأسعاره، وقدّم طلبك بضغطة واحدة.';
+
+  @override
+  String get onboardingPharmaciesTitle => 'الصيدليات القريبة منك';
+
+  @override
+  String get onboardingPharmaciesDesc =>
+      'اكتشف أقرب الصيدليات وساعات عملها وتفاصيلها قبل الزيارة.';
+
+  @override
+  String get onboardingInventoryTitle => 'إدارة المخزون والباركود';
+
+  @override
+  String get onboardingInventoryDesc =>
+      'أدر مخزونك وامسح الباركود وتابع الكميات وتواريخ الصلاحية بسهولة.';
+
+  @override
+  String get onboardingDonationsTitle => 'تبرّع وساعد غيرك';
+
+  @override
+  String get onboardingDonationsDesc =>
+      'شارك في حملات التبرع وقدّم المساعدة واحصل على دعم ذكي من المساعد.';
+
+  @override
   String get forgotOperationFailed => 'تعذر إكمال العملية الآن. حاول مجددًا.';
 
   @override

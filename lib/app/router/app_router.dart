@@ -14,6 +14,8 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/registration_success_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
+import '../../features/onboarding/presentation/controllers/onboarding_controller.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/chat/presentation/pages/chat_page.dart';
 import '../../features/chat/presentation/pages/chat_sessions_page.dart';
 import '../../features/dashboard/presentation/pages/home_shell.dart';
@@ -58,6 +60,7 @@ final _routerRefreshProvider = Provider<_RouterRefreshNotifier>((ref) {
   final notifier = _RouterRefreshNotifier();
   ref.listen(authControllerProvider, (_, _) => notifier.refresh());
   ref.listen(splashCompletedProvider, (_, _) => notifier.refresh());
+  ref.listen(onboardingCompletedProvider, (_, _) => notifier.refresh());
   ref.onDispose(notifier.dispose);
   return notifier;
 });
@@ -73,8 +76,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   final auth = ref.read(authControllerProvider);
   final isAuthenticated = auth.valueOrNull != null;
+  final onboardingDone =
+      ref.read(onboardingCompletedProvider).valueOrNull ?? false;
   final initialLocation = !splashCompleted
       ? '/splash'
+      : !onboardingDone
+      ? '/onboarding'
       : !isAuthenticated
       ? '/login'
       : ref.read(registrationCompletedProvider)
@@ -93,13 +100,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return location == '/splash' ? null : '/splash';
       }
 
+      final onboardingDone =
+          ref.read(onboardingCompletedProvider).valueOrNull ?? false;
+      if (!onboardingDone) {
+        return location == '/onboarding' ? null : '/onboarding';
+      }
+
       // أثناء تسجيل الدخول/إنشاء الحساب، الـ authControllerProvider بيصير
       // AsyncLoading، ومنّا نريد أن الـ router يهدم الصفحة (وبالتالي يضيّع
       // بيانات الفورم). فنبقى على صفحات الـ auth العامة وقت التحميل.
       if (auth.isLoading) {
         final isPublicAuthPage = location == '/login' ||
             location == '/register' ||
-            location == '/forgot-password';
+            location == '/forgot-password' ||
+            location == '/onboarding';
         if (isPublicAuthPage) {
           return null;
         }
@@ -111,7 +125,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         final isPublicAuthPage =
             location == '/login' ||
             location == '/register' ||
-            location == '/forgot-password';
+            location == '/forgot-password' ||
+            location == '/onboarding';
         return isPublicAuthPage ? null : '/login';
       }
 
@@ -126,7 +141,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (location == '/login' ||
           location == '/register' ||
           location == '/forgot-password' ||
-          location == '/splash') {
+          location == '/splash' ||
+          location == '/onboarding') {
         return '/home';
       }
 
@@ -163,6 +179,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/splash',
         name: 'splash',
         builder: (context, state) => const SplashPage(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        builder: (context, state) => const OnboardingPage(),
       ),
       GoRoute(
         path: '/login',

@@ -76,6 +76,7 @@ flutter:
     - assets/brand/newlogo.png
     - assets/brand/newlogodark.png
     - assets/brand/logo_splash.png
+    - assets/onboarding/
 
   fonts:
     - family: IBM Plex Sans Arabic
