@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -117,7 +119,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                         ),
                       ),
                       const Spacer(),
-                      _LoadingTrack(progress: progress),
+                      const _FlowingLines(),
                       const SizedBox(height: 14),
                       Opacity(
                         opacity: progress,
@@ -273,53 +275,110 @@ class _LogoReveal extends StatelessWidget {
   }
 }
 
-class _LoadingTrack extends StatelessWidget {
-  const _LoadingTrack({required this.progress});
+class _FlowingLines extends StatefulWidget {
+  const _FlowingLines();
 
-  final double progress;
+  @override
+  State<_FlowingLines> createState() => _FlowingLinesState();
+}
+
+class _FlowingLinesState extends State<_FlowingLines>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: AppLocalizations.of(context).splashLoadingLabel,
-      value: AppLocalizations.of(context).splashPercent((progress * 100).round()),
-      child: SizedBox(
-        width: 148,
-        height: 4,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return Semantics(
+          label: AppLocalizations.of(context).splashLoadingLabel,
+          value: '',
+          child: SizedBox(
+            width: 220,
+            height: 36,
+            child: CustomPaint(
+              painter: _FlowingLinesPainter(t: _controller.value),
             ),
-            ClipRect(
-              child: Align(
-                alignment: AlignmentDirectional.centerStart,
-                widthFactor: progress,
-                child: Container(
-                  width: 148,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [context.appColors.secondary, context.appColors.secondary.withValues(alpha: 0.7)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: context.appColors.secondary.withValues(alpha: 0.28),
-                        blurRadius: 9,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
+}
+
+class _FlowingLinesPainter extends CustomPainter {
+  const _FlowingLinesPainter({required this.t});
+
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final width = size.width;
+    final height = size.height;
+    final midY = height / 2;
+
+    // Line 1: teal/cyan flowing wave
+    final paint1 = Paint()
+      ..color = const Color(0xFF8BD0CB)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    final path1 = Path();
+    final shift1 = t * width;
+    for (double x = 0; x <= width; x += 1) {
+      final amplitude = math.sin(x / width * math.pi);
+      final y = midY +
+          12 * amplitude *
+              math.sin(((x + shift1) * 2 * math.pi / width) + 0.5);
+      if (x == 0) {
+        path1.moveTo(x, y);
+      } else {
+        path1.lineTo(x, y);
+      }
+    }
+    canvas.drawPath(path1, paint1);
+
+    // Line 2: golden flowing wave (slightly offset phase)
+    final paint2 = Paint()
+      ..color = const Color(0xFFF5CB72)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+
+    final path2 = Path();
+    final shift2 = t * width;
+    for (double x = 0; x <= width; x += 1) {
+      final amplitude = math.sin(x / width * math.pi);
+      final y = midY +
+          9 * amplitude *
+              math.sin(((x + shift2) * 2 * math.pi / width) - 0.3);
+      if (x == 0) {
+        path2.moveTo(x, y);
+      } else {
+        path2.lineTo(x, y);
+      }
+    }
+    canvas.drawPath(path2, paint2);
+  }
+
+  @override
+  bool shouldRepaint(_FlowingLinesPainter oldDelegate) =>
+      t != oldDelegate.t;
 }
