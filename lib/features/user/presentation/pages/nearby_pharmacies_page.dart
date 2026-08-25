@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/demo_flags.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/location/device_location_service.dart';
 import '../../../../core/widgets/app_reveal.dart';
@@ -14,6 +15,7 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_discovery_models.dart';
 import '../../data/repositories/user_repository.dart';
 import '../controllers/user_providers.dart';
+import '../widgets/nearby_pharmacies_demo.dart';
 
 class NearbyPharmaciesPage extends ConsumerStatefulWidget {
   const NearbyPharmaciesPage({super.key});
@@ -32,6 +34,9 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (kScreenshotDemo) {
+      return const NearbyPharmaciesDemo();
+    }
     final discovery = ref.watch(userLocationDiscoveryProvider(_parameters));
     final l10n = AppLocalizations.of(context);
 

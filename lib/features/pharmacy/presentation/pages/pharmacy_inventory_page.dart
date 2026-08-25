@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/layout.dart';
+import '../../../../core/constants/demo_flags.dart';
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
@@ -11,6 +12,7 @@ import '../../data/models/pharmacy_models.dart';
 import '../../data/repositories/pharmacy_repository.dart';
 import '../controllers/pharmacy_providers.dart';
 import '../widgets/batch_inventory_editor.dart';
+import '../widgets/pharmacy_inventory_demo.dart';
 import 'pharmacy_barcode_scanner_page.dart';
 
 /// المساحة المحجوزة لشريط التنقل السفلي المخصص (76px ارتفاع + ~12px SafeArea).
@@ -41,6 +43,9 @@ class _PharmacyInventoryPageState extends ConsumerState<PharmacyInventoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (kScreenshotDemo) {
+      return const PharmacyInventoryDemo();
+    }
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(pharmacyInventoryProvider(_filter));
     final snapshot = state.valueOrNull ?? const <PharmacyInventoryItem>[];

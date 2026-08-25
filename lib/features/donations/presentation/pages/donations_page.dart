@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/demo_flags.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/donation_models.dart';
 import '../controllers/donations_providers.dart';
+import '../widgets/donations_demo.dart';
 
 class DonationsPage extends ConsumerStatefulWidget {
   const DonationsPage({super.key});
@@ -42,6 +44,9 @@ class _DonationsPageState extends ConsumerState<DonationsPage>
 
   @override
   Widget build(BuildContext context) {
+    if (kScreenshotDemo) {
+      return const DonationsDemo();
+    }
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(

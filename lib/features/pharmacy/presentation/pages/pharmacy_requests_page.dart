@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/layout.dart';
+import '../../../../core/constants/demo_flags.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/pharmacy_models.dart';
 import '../controllers/pharmacy_providers.dart';
+import '../widgets/pharmacy_requests_demo.dart';
 
 class PharmacyRequestsPage extends ConsumerStatefulWidget {
   const PharmacyRequestsPage({super.key});
@@ -33,6 +35,9 @@ class _PharmacyRequestsPageState extends ConsumerState<PharmacyRequestsPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (kScreenshotDemo) {
+      return const PharmacyRequestsDemo();
+    }
     final state = ref.watch(pharmacyRequestsProvider(_filter));
     final snapshot = state.valueOrNull ?? const <PharmacyRequest>[];
     final l10n = AppLocalizations.of(context);
