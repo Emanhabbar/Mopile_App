@@ -71,6 +71,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
           final title = _phase(value, 0.43, 0.72);
           final subtitle = _phase(value, 0.58, 0.82);
           final progress = _phase(value, 0.68, 0.96, Curves.easeInOut);
+          final reveal = _phase(value, 0.0, 0.7, Curves.easeOut);
           final l10n = AppLocalizations.of(context);
 
           return Stack(
@@ -81,59 +82,19 @@ class _SplashPageState extends ConsumerState<SplashPage>
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high,
               ),
+              Positioned.fill(child: _FlowingLines(progress: reveal)),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 34, 24, 26),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Opacity(
-                        opacity: subtitle,
-                        child: Transform.translate(
-                          offset: Offset(0, -10 * (1 - subtitle)),
-                          child: const _TopCaption(),
-                        ),
-                      ),
-                      const Spacer(),
                       Semantics(
                         label: AppLocalizations.of(context).splashAppLogoLabel,
                         image: true,
                         child: _LogoReveal(progress: logo),
                       ),
                       const SizedBox(height: 8),
-                      Opacity(
-                        opacity: subtitle,
-                        child: Transform.translate(
-                          offset: Offset(0, 15 * (1 - subtitle)),
-                          child: Text(
-                            l10n.splashTagline,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.1,
-                                ),
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      const _FlowingLines(),
-                      const SizedBox(height: 14),
-                      Opacity(
-                        opacity: progress,
-                        child: Text(
-                          l10n.splashPreparing,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.52),
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -276,7 +237,8 @@ class _LogoReveal extends StatelessWidget {
 }
 
 class _FlowingLines extends StatefulWidget {
-  const _FlowingLines();
+  const _FlowingLines({required this.progress});
+  final double progress;
 
   @override
   State<_FlowingLines> createState() => _FlowingLinesState();
@@ -284,37 +246,44 @@ class _FlowingLines extends StatefulWidget {
 
 class _FlowingLinesState extends State<_FlowingLines>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+  late final AnimationController _flow;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _flow = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 8),
     )..repeat();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _flow.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: _flow,
       builder: (context, _) {
         return Semantics(
           label: AppLocalizations.of(context).splashLoadingLabel,
           value: '',
-          child: SizedBox(
-            width: 220,
-            height: 36,
-            child: CustomPaint(
-              painter: _FlowingLinesPainter(t: _controller.value),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                child: CustomPaint(
+                  painter: _FlowingLinesPainter(
+                    t: _flow.value,
+                    progress: widget.progress,
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
@@ -323,62 +292,53 @@ class _FlowingLinesState extends State<_FlowingLines>
 }
 
 class _FlowingLinesPainter extends CustomPainter {
-  const _FlowingLinesPainter({required this.t});
+  const _FlowingLinesPainter({required this.t, required this.progress});
 
   final double t;
+  final double progress;
+  static const _margin = 120.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final width = size.width;
-    final height = size.height;
-    final midY = height / 2;
+    if (progress <= 0) return;
+    final w = size.width;
+    final shift = t * w * 0.4;
 
-    // Line 1: teal/cyan flowing wave
-    final paint1 = Paint()
-      ..color = const Color(0xFF8BD0CB)
+    _drawComet(canvas, w, size.height * 0.90, shift, 28, 3,
+        const Color(0xFF8BD0CB), 1.2, math.pi / 2);
+    _drawComet(canvas, w, size.height * 0.90, shift * 0.75, 22, 2.5,
+        const Color(0xFFF5CB72), 1.2, 3 * math.pi / 2);
+  }
+
+  void _drawComet(Canvas canvas, double w, double baseY, double shift,
+      double amp, double sw, Color color, double wavelength, double phase) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.65)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
+      ..strokeWidth = sw
       ..strokeCap = StrokeCap.round;
 
-    final path1 = Path();
-    final shift1 = t * width;
-    for (double x = 0; x <= width; x += 1) {
-      final amplitude = math.sin(x / width * math.pi);
-      final y = midY +
-          12 * amplitude *
-              math.sin(((x + shift1) * 2 * math.pi / width) + 0.5);
-      if (x == 0) {
-        path1.moveTo(x, y);
+    final fullPath = Path();
+    for (double x = -_margin; x <= w + _margin; x += 1) {
+      final main = (x + shift) * 2 * math.pi / (w * wavelength) + phase;
+      final y = baseY +
+          amp * math.sin(main) +
+          0.25 * amp * math.sin(main * 2.3 + 1.1);
+      if (x == -_margin) {
+        fullPath.moveTo(x, y);
       } else {
-        path1.lineTo(x, y);
+        fullPath.lineTo(x, y);
       }
     }
-    canvas.drawPath(path1, paint1);
 
-    // Line 2: golden flowing wave (slightly offset phase)
-    final paint2 = Paint()
-      ..color = const Color(0xFFF5CB72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-
-    final path2 = Path();
-    final shift2 = t * width;
-    for (double x = 0; x <= width; x += 1) {
-      final amplitude = math.sin(x / width * math.pi);
-      final y = midY +
-          9 * amplitude *
-              math.sin(((x + shift2) * 2 * math.pi / width) - 0.3);
-      if (x == 0) {
-        path2.moveTo(x, y);
-      } else {
-        path2.lineTo(x, y);
-      }
-    }
-    canvas.drawPath(path2, paint2);
+    final metrics = fullPath.computeMetrics().first;
+    final total = metrics.length;
+    final visible = progress * total;
+    final visiblePath = metrics.extractPath(total - visible, total);
+    canvas.drawPath(visiblePath, paint);
   }
 
   @override
-  bool shouldRepaint(_FlowingLinesPainter oldDelegate) =>
-      t != oldDelegate.t;
+  bool shouldRepaint(_FlowingLinesPainter old) =>
+      t != old.t || progress != old.progress;
 }
