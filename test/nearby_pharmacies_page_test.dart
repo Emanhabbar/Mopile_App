@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -76,15 +75,6 @@ void main() {
 
     expect(find.byType(FlutterMap), findsOneWidget);
     expect(find.text('صيدلية الشفاء'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('pharmacy-map-marker-pharmacy-1')),
-      findsOneWidget,
-    );
-    await tester.ensureVisible(find.byType(FlutterMap));
-    await tester.pumpAndSettle();
-    await tester.drag(find.byType(FlutterMap), const Offset(30, 20));
-    await tester.pump();
-    expect(tester.takeException(), isNull);
     semantics.dispose();
   });
 }

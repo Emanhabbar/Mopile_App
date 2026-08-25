@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/constants/demo_flags.dart';
 import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../l10n/generated/app_localizations.dart';
@@ -13,6 +14,7 @@ import '../../../dashboard/presentation/widgets/home_ticker_panel.dart';
 import '../../../dashboard/presentation/widgets/role_dashboard_widgets.dart';
 import '../../data/models/user_models.dart';
 import '../controllers/user_providers.dart';
+import '../widgets/user_dashboard_demo.dart';
 
 class UserDashboardPage extends ConsumerWidget {
   const UserDashboardPage({required this.user, super.key});
@@ -21,6 +23,9 @@ class UserDashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (kScreenshotDemo) {
+      return const UserDashboardDemo();
+    }
     final dashboard = ref.watch(userDashboardProvider);
 
     return dashboard.when(

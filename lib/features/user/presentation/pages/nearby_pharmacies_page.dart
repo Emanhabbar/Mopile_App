@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,9 +17,210 @@ import '../../../../core/widgets/app_reveal.dart';
 import '../../../../core/widgets/async_states.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../data/models/user_discovery_models.dart';
+import '../../data/models/user_models.dart';
 import '../../data/repositories/user_repository.dart';
 import '../controllers/user_providers.dart';
-import '../widgets/nearby_pharmacies_demo.dart';
+
+
+List<LatLng> _decodePolyline(String encoded) {
+  final List<LatLng> points = [];
+  int index = 0;
+  int lat = 0;
+  int lng = 0;
+  while (index < encoded.length) {
+    int b;
+    int shift = 0;
+    int result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+    points.add(LatLng(lat / 1e5, lng / 1e5));
+  }
+  return points;
+}
+
+Future<List<LatLng>?> _fetchDirectionsRoute({
+  required double originLat,
+  required double originLng,
+  required double destLat,
+  required double destLng,
+}) async {
+  final url = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
+    'origin': '$originLat,$originLng',
+    'destination': '$destLat,$destLng',
+    'mode': 'walking',
+  });
+  try {
+    final client = HttpClient();
+    final request = await client.getUrl(url);
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).join();
+    client.close(force: false);
+    final json = jsonDecode(body) as Map<String, dynamic>;
+    final routes = json['routes'] as List<dynamic>?;
+    if (routes == null || routes.isEmpty) return null;
+    final overviewPolyline =
+        routes[0]['overview_polyline'] as Map<String, dynamic>;
+    final encoded = overviewPolyline['points'] as String;
+    return _decodePolyline(encoded);
+  } catch (_) {
+    return null;
+  }
+}
+
+const _mockDiscovery = UserLocationDiscovery(
+  userId: 'demo',
+  hasSavedLocation: true,
+  latitude: 33.5138,
+  longitude: 36.2765,
+  locationSource: 'Manual',
+  radiusInMeters: 3000,
+  registeredCount: 3,
+  externalCount: 0,
+  usedExternalFallback: false,
+  registeredPharmacies: [
+    UserPharmacySummary(
+      pharmacyId: 'p1',
+      pharmacyName: 'صيدلية الشفاء',
+      city: 'دمشق',
+      area: 'المزة',
+      address: 'طريق المطار، المزة',
+      distanceMeters: 750,
+      averageRating: 4.5,
+      ratingsCount: 120,
+      hasDeliveryService: true,
+      isOpenNow: true,
+      statusText: 'مفتوحة الآن',
+    ),
+    UserPharmacySummary(
+      pharmacyId: 'p2',
+      pharmacyName: 'صيدلية النور',
+      city: 'دمشق',
+      area: 'المزة',
+      address: 'شارع المزة الرئيسي',
+      distanceMeters: 1200,
+      averageRating: 4.2,
+      ratingsCount: 85,
+      hasDeliveryService: true,
+      isOpenNow: true,
+      statusText: 'مفتوحة الآن',
+    ),
+    UserPharmacySummary(
+      pharmacyId: 'p3',
+      pharmacyName: 'صيدلية الحياة',
+      city: 'دمشق',
+      area: 'أبي رمانة',
+      address: 'شارع أبي رمانة',
+      distanceMeters: 2400,
+      averageRating: 4.0,
+      ratingsCount: 60,
+      hasDeliveryService: false,
+      isOpenNow: false,
+      statusText: 'مغلقة',
+    ),
+  ],
+  externalPharmacies: [],
+  mapMarkers: [
+    UserMapPharmacy(
+      markerId: 'm1',
+      source: 'Registered',
+      pharmacyId: 'p1',
+      name: 'صيدلية الشفاء',
+      address: 'طريق المطار، المزة',
+      latitude: 33.5140,
+      longitude: 36.2770,
+      distanceMeters: 750,
+      isOpenNow: true,
+      statusText: 'مفتوحة الآن',
+      averageRating: 4.5,
+      ratingsCount: 120,
+      hasDeliveryService: true,
+      isLocationVerified: true,
+    ),
+    UserMapPharmacy(
+      markerId: 'm2',
+      source: 'Registered',
+      pharmacyId: 'p2',
+      name: 'صيدلية النور',
+      address: 'شارع المزة الرئيسي',
+      latitude: 33.5160,
+      longitude: 36.2790,
+      distanceMeters: 1200,
+      isOpenNow: true,
+      statusText: 'مفتوحة الآن',
+      averageRating: 4.2,
+      ratingsCount: 85,
+      hasDeliveryService: true,
+      isLocationVerified: true,
+    ),
+    UserMapPharmacy(
+      markerId: 'm3',
+      source: 'Registered',
+      pharmacyId: 'p3',
+      name: 'صيدلية الحياة',
+      address: 'شارع أبي رمانة',
+      latitude: 33.5200,
+      longitude: 36.2830,
+      distanceMeters: 2400,
+      isOpenNow: false,
+      statusText: 'مغلقة',
+      averageRating: 4.0,
+      ratingsCount: 60,
+      hasDeliveryService: false,
+      isLocationVerified: true,
+    ),
+  ],
+);
+
+const _mockRoute = UserNearestRoute(
+  originLatitude: 33.5138,
+  originLongitude: 36.2765,
+  pharmacy: UserMapPharmacy(
+    markerId: 'm1',
+    source: 'Registered',
+    pharmacyId: 'p1',
+    name: 'صيدلية الشفاء',
+    address: 'طريق المطار، المزة',
+    latitude: 33.5140,
+    longitude: 36.2770,
+    distanceMeters: 750,
+    isOpenNow: true,
+    statusText: 'مفتوحة الآن',
+    averageRating: 4.5,
+    ratingsCount: 120,
+    hasDeliveryService: true,
+    isLocationVerified: true,
+  ),
+  routeAvailable: true,
+  distanceMeters: 750,
+  durationSeconds: 480,
+  path: [
+    RouteCoordinate(latitude: 33.5138, longitude: 36.2765),
+    RouteCoordinate(latitude: 33.5132, longitude: 36.2760),
+    RouteCoordinate(latitude: 33.5125, longitude: 36.2755),
+    RouteCoordinate(latitude: 33.5120, longitude: 36.2748),
+    RouteCoordinate(latitude: 33.5118, longitude: 36.2742),
+    RouteCoordinate(latitude: 33.5120, longitude: 36.2735),
+    RouteCoordinate(latitude: 33.5125, longitude: 36.2730),
+    RouteCoordinate(latitude: 33.5130, longitude: 36.2728),
+    RouteCoordinate(latitude: 33.5135, longitude: 36.2730),
+    RouteCoordinate(latitude: 33.5138, longitude: 36.2740),
+    RouteCoordinate(latitude: 33.5140, longitude: 36.2755),
+    RouteCoordinate(latitude: 33.5140, longitude: 36.2770),
+  ],
+  directionsUrl: '',
+);
 
 class NearbyPharmaciesPage extends ConsumerStatefulWidget {
   const NearbyPharmaciesPage({super.key});
@@ -34,10 +239,9 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (kScreenshotDemo) {
-      return const NearbyPharmaciesDemo();
-    }
-    final discovery = ref.watch(userLocationDiscoveryProvider(_parameters));
+    final discovery = kScreenshotDemo
+        ? const AsyncData(_mockDiscovery)
+        : ref.watch(userLocationDiscoveryProvider(_parameters));
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -82,8 +286,9 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
           );
         },
         data: (data) {
-          final AsyncValue<UserNearestRoute?> route =
-              data.hasSavedLocation && data.mapMarkers.isNotEmpty
+          final AsyncValue<UserNearestRoute?> route = kScreenshotDemo
+              ? const AsyncData(_mockRoute)
+              : data.hasSavedLocation && data.mapMarkers.isNotEmpty
               ? ref.watch(userNearestRouteProvider(_radius))
               : const AsyncData(null);
           return RefreshIndicator(
@@ -239,8 +444,8 @@ class _NearbyPharmaciesPageState extends ConsumerState<NearbyPharmaciesPage> {
       );
   }
 
-String _messageFor(Object error, AppLocalizations l10n) =>
-    error is ApiException ? error.localize(l10n) : l10n.locationUpdateFailed;
+  String _messageFor(Object error, AppLocalizations l10n) =>
+      error is ApiException ? error.localize(l10n) : l10n.locationUpdateFailed;
 }
 
 class _LocationHeader extends StatelessWidget {
@@ -294,9 +499,7 @@ class _LocationHeader extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             l10n.nearbyHeaderSubtitle,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
@@ -377,7 +580,10 @@ class _RadiusSelector extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(l10n.searchRangeLabel, style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              l10n.searchRangeLabel,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const Spacer(),
             Text(
               l10n.dragMapHint,
@@ -427,6 +633,8 @@ class _MapCardState extends ConsumerState<_MapCard> {
   bool _expanded = false;
   bool _loadingSelectedRoute = false;
   UserNearestRoute? _selectedRoute;
+  List<LatLng>? _realRoutePath;
+  bool _realRouteFetched = false;
 
   UserLocationDiscovery get data => widget.data;
   UserNearestRoute? get route =>
@@ -443,6 +651,78 @@ class _MapCardState extends ConsumerState<_MapCard> {
   void initState() {
     super.initState();
     _mapController = MapController();
+    if (kScreenshotDemo) {
+      _fetchRealRoute();
+    }
+  }
+
+  bool _hasUsableRoute(UserNearestRoute? candidate) =>
+      candidate != null &&
+      candidate.routeAvailable &&
+      candidate.path.length > 1;
+
+  // The routing provider snaps its start/end points to the nearest road, so
+  // the polyline usually stops a few meters (or a street) before the exact
+  // user/pharmacy markers. Extend both ends to the exact coordinates so the
+  // drawn route visually reaches the markers.
+  List<LatLng> _routePolylinePoints(LatLng origin) {
+    final List<LatLng> base =
+        (_realRoutePath != null && _realRoutePath!.length > 1)
+        ? List<LatLng>.from(_realRoutePath!)
+        : route?.path
+                  .map((point) => LatLng(point.latitude, point.longitude))
+                  .toList(growable: false) ??
+              const <LatLng>[];
+    if (base.length < 2) return base;
+
+    final points = List<LatLng>.from(base);
+    if (_metersBetween(points.first, origin) > 1) {
+      points.insert(0, origin);
+    }
+    final destination = _selectedPharmacy;
+    if (destination != null) {
+      final destinationPoint = LatLng(
+        destination.latitude,
+        destination.longitude,
+      );
+      if (_metersBetween(points.last, destinationPoint) > 1) {
+        points.add(destinationPoint);
+      }
+    }
+    return points;
+  }
+
+  static double _metersBetween(LatLng a, LatLng b) {
+    const earthRadius = 6371000.0;
+    double radians(double degrees) => degrees * math.pi / 180.0;
+    final dLat = radians(b.latitude - a.latitude);
+    final dLng = radians(b.longitude - a.longitude);
+    final sLat = math.sin(dLat / 2);
+    final sLng = math.sin(dLng / 2);
+    final h = sLat * sLat +
+        math.cos(radians(a.latitude)) *
+            math.cos(radians(b.latitude)) *
+            sLng *
+            sLng;
+    return 2 * earthRadius * math.asin(math.sqrt(h));
+  }
+
+  Future<void> _fetchRealRoute() async {
+    // Demo mode always tries to render a real Google route over the mock
+    // points (the mock path is kept as an offline fallback). Live mode only
+    // falls back to Google when the backend did not provide a drawable route.
+    if (!kScreenshotDemo && _hasUsableRoute(widget.route)) return;
+    if (_realRouteFetched) return;
+    _realRouteFetched = true;
+    final result = await _fetchDirectionsRoute(
+      originLat: data.latitude,
+      originLng: data.longitude,
+      destLat: _markers.isNotEmpty ? _markers[0].latitude : data.latitude,
+      destLng: _markers.isNotEmpty ? _markers[0].longitude : data.longitude,
+    );
+    if (mounted && result != null && result.length > 1) {
+      setState(() => _realRoutePath = result);
+    }
   }
 
   @override
@@ -456,6 +736,12 @@ class _MapCardState extends ConsumerState<_MapCard> {
             oldWidget.route?.path.length != route?.path.length)) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _fitAll());
     }
+    if (!kScreenshotDemo &&
+        !_hasUsableRoute(widget.route) &&
+        _realRoutePath == null &&
+        oldWidget.route?.path.length != widget.route?.path.length) {
+      _fetchRealRoute();
+    }
   }
 
   @override
@@ -468,11 +754,7 @@ class _MapCardState extends ConsumerState<_MapCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final center = LatLng(data.latitude, data.longitude);
-    final routePoints =
-        route?.path
-            .map((point) => LatLng(point.latitude, point.longitude))
-            .toList(growable: false) ??
-        const <LatLng>[];
+    final routePoints = _routePolylinePoints(center);
 
     final expandedHeight = (MediaQuery.sizeOf(context).height - 155)
         .clamp(540.0, 780.0)
@@ -483,129 +765,13 @@ class _MapCardState extends ConsumerState<_MapCard> {
       height: _expanded ? expandedHeight : 472,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: context.appColors.border,
-          width: 1,
-        ),
+        border: Border.all(color: context.appColors.border, width: 1),
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
           Positioned.fill(
-            child: RepaintBoundary(
-              child: Builder(
-                builder: (context) {
-                  try {
-                    return FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: center,
-                        initialZoom: 13.5,
-                        minZoom: 4,
-                        maxZoom: 18,
-                        interactionOptions: const InteractionOptions(
-                          flags:
-                              InteractiveFlag.drag |
-                              InteractiveFlag.pinchZoom |
-                              InteractiveFlag.doubleTapZoom,
-                        ),
-                        onMapReady: () {
-                          _mapReady = true;
-                          WidgetsBinding.instance.addPostFrameCallback(
-                            (_) => _fitAll(),
-                          );
-                        },
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.pharmacy_app',
-                          tileBuilder: _softMapTileBuilder,
-                        ),
-                        if (routePoints.length > 1)
-                          PolylineLayer(
-                            polylines: [
-                              Polyline(
-                                points: routePoints,
-                                strokeWidth: 6,
-                                borderStrokeWidth: 5,
-                                borderColor: Colors.white.withValues(alpha: 0.92),
-                                gradientColors: [
-                                  context.appColors.primary,
-                                  context.appColors.primaryDark,
-                                  context.appColors.secondary,
-                                ],
-                              ),
-                            ],
-                          ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: center,
-                              width: 58,
-                              height: 58,
-                              child: const _UserMarker(),
-                            ),
-                            ..._markers.asMap().entries.map(
-                              (entry) => Marker(
-                                point: LatLng(
-                                  entry.value.latitude,
-                                  entry.value.longitude,
-                                ),
-                                width: 68,
-                                height: 76,
-                                child: _PharmacyMarker(
-                                  key: ValueKey(
-                                    'pharmacy-map-marker-${entry.value.markerId}',
-                                  ),
-                                  number: entry.key + 1,
-                                  nearest: entry.key == 0,
-                                  selected: entry.key == _selectedIndex,
-                                  pharmacyName: entry.value.name,
-                                  onTap: () => _selectMarker(entry.key),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const RichAttributionWidget(
-                          alignment: AttributionAlignment.bottomLeft,
-                          attributions: [TextSourceAttribution('OpenStreetMap')],
-                        ),
-                      ],
-                    );
-                  } catch (_) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.map_outlined,
-                              color: context.appColors.textMuted,
-                              size: 40,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              l10n.mapLoadFailed,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              l10n.mapLoadFailedSubtitle,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
+            child: RepaintBoundary(child: _buildFlutterMap(center, routePoints)),
           ),
           PositionedDirectional(
             top: 14,
@@ -665,6 +831,119 @@ class _MapCardState extends ConsumerState<_MapCard> {
     );
   }
 
+  Widget _buildFlutterMap(LatLng center, List<LatLng> routePoints) {
+    final l10n = AppLocalizations.of(context);
+    return Builder(
+      builder: (context) {
+        try {
+          return FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: center,
+              initialZoom: 13.5,
+              minZoom: 4,
+              maxZoom: 18,
+              interactionOptions: const InteractionOptions(
+                flags:
+                    InteractiveFlag.drag |
+                    InteractiveFlag.pinchZoom |
+                    InteractiveFlag.doubleTapZoom,
+              ),
+              onMapReady: () {
+                _mapReady = true;
+                WidgetsBinding.instance.addPostFrameCallback((_) => _fitAll());
+              },
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.pharmacy_app',
+                tileBuilder: _softMapTileBuilder,
+              ),
+              if (routePoints.length > 1)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: routePoints,
+                      strokeWidth: 6,
+                      borderStrokeWidth: 5,
+                      borderColor: Colors.white.withValues(alpha: 0.92),
+                      gradientColors: [
+                        context.appColors.primary,
+                        context.appColors.primaryDark,
+                        context.appColors.secondary,
+                      ],
+                    ),
+                  ],
+                ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: center,
+                    width: 58,
+                    height: 58,
+                    child: const _UserMarker(),
+                  ),
+                  ..._markers.asMap().entries.map(
+                    (entry) => Marker(
+                      point: LatLng(
+                        entry.value.latitude,
+                        entry.value.longitude,
+                      ),
+                      width: 68,
+                      height: 76,
+                      child: _PharmacyMarker(
+                        key: ValueKey(
+                          'pharmacy-map-marker-${entry.value.markerId}',
+                        ),
+                        number: entry.key + 1,
+                        nearest: entry.key == 0,
+                        selected: entry.key == _selectedIndex,
+                        pharmacyName: entry.value.name,
+                        onTap: () => _selectMarker(entry.key),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const RichAttributionWidget(
+                alignment: AttributionAlignment.bottomLeft,
+                attributions: [TextSourceAttribution('OpenStreetMap')],
+              ),
+            ],
+          );
+        } catch (_) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.map_outlined,
+                    color: context.appColors.textMuted,
+                    size: 40,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.mapLoadFailed,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.mapLoadFailedSubtitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   void _selectMarker(int index) {
     setState(() {
       _selectedIndex = index;
@@ -695,7 +974,6 @@ class _MapCardState extends ConsumerState<_MapCard> {
       setState(() => _selectedRoute = value);
       WidgetsBinding.instance.addPostFrameCallback((_) => _fitAll());
     } catch (_) {
-      // The pharmacy card still exposes its external directions URL as fallback.
     } finally {
       if (mounted) setState(() => _loadingSelectedRoute = false);
     }
@@ -755,9 +1033,9 @@ class _MapCardState extends ConsumerState<_MapCard> {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } catch (_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.mapOpenFailed)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.mapOpenFailed)));
         }
       }
     }
@@ -840,9 +1118,7 @@ class _RouteOverview extends StatelessWidget {
                 routeReady
                     ? l10n.routeToNearest(
                         _distance(l10n, route!.distanceMeters),
-                        minutes == null
-                            ? ''
-                            : ' · $minutes ${l10n.minuteUnit}',
+                        minutes == null ? '' : ' · $minutes ${l10n.minuteUnit}',
                       )
                     : l10n.exploreMapHint,
                 maxLines: 1,
@@ -934,75 +1210,79 @@ class _MapPharmacyPreview extends StatelessWidget {
             padding: const EdgeInsets.all(13),
             child: Row(
               children: [
-              Container(
-                width: 47,
-                height: 47,
-                decoration: BoxDecoration(
-                  color: number == 1
-                      ? context.appColors.secondary
-                      : context.appColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$number',
-                  style: TextStyle(
-                    color: number == 1 ? context.appColors.primaryDeep : Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
+                Container(
+                  width: 47,
+                  height: 47,
+                  decoration: BoxDecoration(
+                    color: number == 1
+                        ? context.appColors.secondary
+                        : context.appColors.primary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$number',
+                    style: TextStyle(
+                      color: number == 1
+                          ? context.appColors.primaryDeep
+                          : Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      pharmacy.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.near_me_rounded,
-                          size: 14,
-                          color: context.appColors.primary.withValues(alpha: 0.8),
-                        ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            '${_distance(l10n, pharmacy.distanceMeters)}${minutes == null ? '' : ' · ${l10n.routeMinutes(minutes)}'}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(fontWeight: FontWeight.w700),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        pharmacy.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.near_me_rounded,
+                            size: 14,
+                            color: context.appColors.primary.withValues(
+                              alpha: 0.8,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              '${_distance(l10n, pharmacy.distanceMeters)}${minutes == null ? '' : ' · ${l10n.routeMinutes(minutes)}'}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              IconButton.filled(
-                onPressed: canNavigate ? onDirections : null,
-                tooltip: l10n.startDirections,
-                style: IconButton.styleFrom(
-                  backgroundColor: context.appColors.primary,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: context.appColors.border,
+                const SizedBox(width: 8),
+                IconButton.filled(
+                  onPressed: canNavigate ? onDirections : null,
+                  tooltip: l10n.startDirections,
+                  style: IconButton.styleFrom(
+                    backgroundColor: context.appColors.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: context.appColors.border,
+                  ),
+                  icon: const Icon(Icons.navigation_rounded, size: 20),
                 ),
-                icon: const Icon(Icons.navigation_rounded, size: 20),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -1013,31 +1293,28 @@ class _UserMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: AppLocalizations.of(context).yourCurrentLocation,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: context.appColors.primary.withValues(alpha: 0.14),
-            ),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: context.appColors.primary.withValues(alpha: 0.18),
           ),
-          Container(
-            width: 27,
-            height: 27,
-            decoration: BoxDecoration(
-              color: context.appColors.primary,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 4),
-            ),
+        ),
+        Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: context.appColors.primary,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 3),
           ),
-          const Icon(Icons.person_rounded, color: Colors.white, size: 13),
-        ],
-      ),
+        ),
+        const Icon(Icons.person_rounded, color: Colors.white, size: 10),
+      ],
     );
   }
 }
@@ -1060,92 +1337,74 @@ class _PharmacyMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = nearest ? context.appColors.secondary : context.appColors.primaryDark;
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: AppLocalizations.of(
-        context,
-      ).pharmacyMarkerSemantics(number, pharmacyName),
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.topCenter,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              width: selected ? 56 : 49,
-              height: selected ? 56 : 49,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(selected ? 19 : 17),
-                border: Border.all(color: Colors.white, width: 3),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(
-                    Icons.local_pharmacy_rounded,
-                    color: nearest ? context.appColors.primaryDeep : Colors.white,
-                    size: selected ? 25 : 22,
-                  ),
-                  PositionedDirectional(
-                    top: 2,
-                    end: 3,
-                    child: Container(
-                      width: 17,
-                      height: 17,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '$number',
-                        style: TextStyle(
-                          color: context.appColors.primaryDeep,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    final color = nearest
+        ? context.appColors.secondary
+        : context.appColors.primaryDark;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: Colors.white, width: 2),
             ),
-            Positioned(
-              top: selected ? 50 : 44,
-              child: Transform.rotate(
-                angle: 0.785398,
-                child: Container(
-                  width: 13,
-                  height: 13,
-                  decoration: BoxDecoration(
-                    color: color,
-                    border: const Border(
-                      right: BorderSide(color: Colors.white, width: 2.2),
-                      bottom: BorderSide(color: Colors.white, width: 2.2),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  Icons.local_pharmacy_rounded,
+                  color: nearest ? context.appColors.primaryDeep : Colors.white,
+                  size: 16,
+                ),
+                PositionedDirectional(
+                  top: 1,
+                  end: 2,
+                  child: Container(
+                    width: 13,
+                    height: 13,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
                     ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$number',
+                      style: TextStyle(
+                        color: context.appColors.primaryDeep,
+                        fontSize: 7,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 30,
+            child: Transform.rotate(
+              angle: 0.785398,
+              child: Container(
+                width: 9,
+                height: 9,
+                decoration: BoxDecoration(
+                  color: color,
+                  border: const Border(
+                    right: BorderSide(color: Colors.white, width: 1.5),
+                    bottom: BorderSide(color: Colors.white, width: 1.5),
                   ),
                 ),
               ),
             ),
-            if (selected)
-              Positioned(
-                bottom: -2,
-                child: Container(
-                  width: 9,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: context.appColors.shadow.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1230,7 +1489,9 @@ class _NearbyItem extends StatelessWidget {
                 width: 43,
                 height: 43,
                 decoration: BoxDecoration(
-                  color: isNearest ? context.appColors.primary : context.appColors.background,
+                  color: isNearest
+                      ? context.appColors.primary
+                      : context.appColors.background,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
@@ -1332,7 +1593,9 @@ class _InfoPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = highlighted ? context.appColors.secondary : context.appColors.textMuted;
+    final color = highlighted
+        ? context.appColors.secondary
+        : context.appColors.textMuted;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -1370,8 +1633,7 @@ class _ManualLocationSheet extends StatelessWidget {
     final key = GlobalKey<FormState>();
     // The custom BottomNav is 76px tall + SafeArea ~12px.
     // Add enough bottom padding so the form content stays above the bar.
-    final bottomPadding =
-        MediaQuery.viewInsetsOf(context).bottom + 88 + 24;
+    final bottomPadding = MediaQuery.viewInsetsOf(context).bottom + 88 + 24;
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 20, 20, bottomPadding),
       child: Form(

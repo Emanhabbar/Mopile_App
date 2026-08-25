@@ -46,9 +46,7 @@ class _TickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = item.isDutyPharmacy
-        ? context.appColors.primaryLight
-        : context.appColors.primary;
+    final color = context.appColors.primary;
     return Material(
       color: color.withValues(alpha: 0.07),
       borderRadius: BorderRadius.circular(20),
@@ -123,7 +121,7 @@ class _TickerCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    Icons.chevron_left_rounded,
+                    Icons.chevron_right_rounded,
                     color: color,
                     size: 18,
                   ),
