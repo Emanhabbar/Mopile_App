@@ -6,13 +6,17 @@ import '../../data/models/home_ticker_item.dart';
 import '../controllers/home_ticker_provider.dart';
 
 class HomeTickerPanel extends ConsumerWidget {
-  const HomeTickerPanel({super.key, this.onPharmacyTap});
+  const HomeTickerPanel({
+    super.key,
+    this.onPharmacyTap,
+  });
 
   final void Function(String pharmacyId)? onPharmacyTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeTickerProvider);
+
     return state.maybeWhen(
       data: (items) => items.isEmpty
           ? const SizedBox.shrink()
@@ -26,7 +30,9 @@ class HomeTickerPanel extends ConsumerWidget {
                         onTap:
                             item.pharmacyProfileId != null &&
                                 onPharmacyTap != null
-                            ? () => onPharmacyTap!(item.pharmacyProfileId!)
+                            ? () => onPharmacyTap!(
+                                item.pharmacyProfileId!,
+                              )
                             : null,
                       ),
                     ),
@@ -39,7 +45,10 @@ class HomeTickerPanel extends ConsumerWidget {
 }
 
 class _TickerCard extends StatelessWidget {
-  const _TickerCard({required this.item, this.onTap});
+  const _TickerCard({
+    required this.item,
+    this.onTap,
+  });
 
   final HomeTickerItem item;
   final VoidCallback? onTap;
@@ -47,59 +56,81 @@ class _TickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = context.appColors.primary;
+
+    final isRtl =
+        Directionality.of(context) == TextDirection.rtl;
+
     return Material(
+      // ============================================================
+      // CARD BACKGROUND
+      // ============================================================
       color: color.withValues(alpha: 0.07),
       borderRadius: BorderRadius.circular(20),
+
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
+
         child: Padding(
           padding: const EdgeInsets.all(14),
+
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
+
             children: [
-              Container(
+              // ======================================================
+              // ICON
+              // ======================================================
+              //
+              // تم حذف الـ gradient والخلفية بالكامل.
+              // الأيقونة الآن تظهر مباشرة بدون مربع أو تموج خلفها.
+              //
+              SizedBox(
                 width: 42,
                 height: 42,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      color.withValues(alpha: 0.2),
-                      color.withValues(alpha: 0.08),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(13),
-                ),
                 child: Icon(
                   item.isDutyPharmacy
                       ? Icons.local_pharmacy_outlined
                       : Icons.campaign_outlined,
                   color: color,
-                  size: 20,
+                  size: 24,
                 ),
               ),
+
               const SizedBox(width: 12),
+
+              // ======================================================
+              // TEXT
+              // ======================================================
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       item.title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall
+                          ?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
                     ),
+
                     const SizedBox(height: 4),
+
                     Text(
                       item.message,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        height: 1.4,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(
+                            height: 1.4,
+                          ),
                     ),
+
                     if (item.pharmacyName != null) ...[
                       const SizedBox(height: 5),
+
                       Text(
                         item.pharmacyName!,
                         style: TextStyle(
@@ -112,7 +143,19 @@ class _TickerCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (onTap != null)
+
+              // ======================================================
+              // ARROW
+              // ======================================================
+              //
+              // LTR  : >
+              // RTL  : <
+              //
+              // يتم قلب السهم 180 درجة في اللغة العربية.
+              //
+              if (onTap != null) ...[
+                const SizedBox(width: 10),
+
                 Container(
                   width: 28,
                   height: 28,
@@ -120,12 +163,16 @@ class _TickerCard extends StatelessWidget {
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: color,
-                    size: 18,
+                  child: Transform.rotate(
+                    angle: isRtl ? 3.14159265359 : 0,
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      color: color,
+                      size: 18,
+                    ),
                   ),
                 ),
+              ],
             ],
           ),
         ),

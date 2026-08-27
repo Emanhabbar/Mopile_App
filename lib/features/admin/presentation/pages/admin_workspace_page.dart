@@ -94,7 +94,6 @@ class _AdminWorkspacePageState extends ConsumerState<AdminWorkspacePage> {
               ),
             ),
           ),
-          const Divider(),
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 280),
@@ -666,8 +665,9 @@ class _TickerSheetBodyState extends State<_TickerSheetBody> {
               margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: colors.surfaceSoft,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.border),
               ),
               child: Row(
                 children: [
@@ -1063,9 +1063,7 @@ class _DashboardTab extends ConsumerWidget {
                         label: v.label,
                         value: '${v.count}',
                         icon: v.icon,
-                        color: v.pending
-                            ? context.appColors.secondary
-                            : context.appColors.primary,
+                        color: context.appColors.primary,
                       ),
                     )
                     .toList(),
@@ -1086,120 +1084,138 @@ class _AdminHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final pending =
-        data.pendingPharmacies +
-        data.pendingOrganizationVerifications +
-        data.pendingWarehouses;
+    final colors = context.appColors;
+
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: context.appColors.primary,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: context.appColors.primaryDark.withValues(alpha: 0.35),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(
-                    Icons.admin_panel_settings_rounded,
-                    color: context.appColors.secondary,
-                    size: 34,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.adminHeroPulse,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        l10n.adminHeroSubtitle,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: pending > 0
-                        ? context.appColors.secondary.withValues(alpha: .2)
-                        : Colors.white.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: .15),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        '$pending',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      Text(
-                        l10n.adminNeedsDecision,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                _AdminHeroMetric(
-                  label: l10n.adminActiveAccount,
-                  value: data.activeUsers,
-                ),
-                _AdminHeroMetric(
-                  label: l10n.adminPharmacyPoints,
-                  value: data.totalPharmacies + data.totalWarehouses,
-                ),
-                _AdminHeroMetric(
-                  label: l10n.adminOrganizations,
-                  value: data.totalOrganizations,
-                ),
-              ],
-            ),
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            colors.primary,
+            colors.primaryDark,
           ],
         ),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: .16),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -55,
+            left: -35,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: .055),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -70,
+            right: -35,
+            child: Container(
+              width: 190,
+              height: 190,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: .045),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 58,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: .13),
+                        borderRadius: BorderRadius.circular(19),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: .10),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.admin_panel_settings_rounded,
+                        color: Colors.white,
+                        size: 31,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.adminHeroPulse,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 21,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: .2,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            l10n.adminHeroSubtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: .72),
+                              fontSize: 12.5,
+                              height: 1.35,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: .08),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: .08),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      _AdminHeroMetric(
+                        label: l10n.adminActiveAccount,
+                        value: data.activeUsers,
+                      ),
+                      _AdminHeroMetric(
+                        label: l10n.adminPharmacyPoints,
+                        value: data.totalPharmacies + data.totalWarehouses,
+                      ),
+                      _AdminHeroMetric(
+                        label: l10n.adminOrganizations,
+                        value: data.totalOrganizations,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2448,8 +2464,9 @@ class _ApprovalCardState extends State<_ApprovalCard>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: colors.surfaceSoft,
+                      color: colors.surface,
                       borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: colors.border),
                     ),
                     child: Row(
                       children: [
@@ -2500,13 +2517,6 @@ class _ApprovalCardState extends State<_ApprovalCard>
               child: _expanded && widget.expandedChild != null
                   ? Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          child: Divider(
-                            height: 1,
-                            color: colors.border,
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
                           child: widget.expandedChild,
@@ -2752,8 +2762,8 @@ class _AccountCard extends StatelessWidget {
         color: colors.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: account.isActive ? color.withValues(alpha: .3) : colors.border,
-          width: account.isActive ? 1.5 : 1,
+          color: colors.border,
+          width: 1,
         ),
       ),
       child: InkWell(
@@ -3141,8 +3151,8 @@ class _TickerCard extends StatelessWidget {
         color: colors.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: item.isActive ? color.withValues(alpha: .3) : colors.border,
-          width: item.isActive ? 1.5 : 1,
+          color: colors.border,
+          width: 1,
         ),
       ),
       child: Column(
@@ -3152,7 +3162,7 @@ class _TickerCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: .05),
+              color: colors.surface,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Row(
